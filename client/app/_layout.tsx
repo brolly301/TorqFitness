@@ -1,14 +1,17 @@
-import { Stack } from "expo-router";
+import { Redirect, Stack, usePathname } from "expo-router";
 import "react-native-reanimated";
 
-export const unstable_settings = {
-  anchor: "(tabs)",
-};
-
 export default function RootLayout() {
+  const pathname = usePathname();
+
+  if (pathname === "/") {
+    return <Redirect href="/profile" />;
+  }
+
   return (
     <Stack>
       <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+      <Stack.Screen name="+not-found" />
     </Stack>
   );
 }
