@@ -1,18 +1,32 @@
 import { StyleSheet, Text, View } from "react-native";
-import React from "react";
+import React, { useRef } from "react";
 import { Exercise } from "@/types/Global";
+import { Image } from "expo-image";
 
 type Props = {
   exercise: Exercise;
 };
 
 export default function ExerciseItem({ exercise }: Props) {
+  const expoImageRef = useRef<Image>(null);
+
   return (
     <View style={styles.container}>
-      <Text style={styles.name}>{exercise.name}</Text>
-      <Text style={styles.primaryMuscle}>
-        {exercise.primaryMuscle} & {exercise.secondaryMuscle}
-      </Text>
+      <Image
+        style={styles.gif}
+        ref={expoImageRef}
+        source={exercise.gifUrl}
+        onLoad={() => {
+          expoImageRef.current?.stopAnimating();
+        }}
+      />
+      <View style={styles.textContainer}>
+        <Text style={styles.name}>{exercise.name}</Text>
+        <Text style={styles.primaryMuscle}>{exercise.bodyParts[0]}</Text>
+        <Text style={styles.primaryMuscle}>
+          {exercise.primaryMuscles[0]} & {exercise.secondaryMuscles[1]}
+        </Text>
+      </View>
     </View>
   );
 }
@@ -23,6 +37,7 @@ const styles = StyleSheet.create({
     backgroundColor: "white",
     borderRadius: 10,
     marginVertical: 5,
+    flexDirection: "row",
   },
   name: {
     fontSize: 20,
@@ -32,4 +47,9 @@ const styles = StyleSheet.create({
   primaryMuscle: {
     fontSize: 14,
   },
+  gif: {
+    width: 65,
+    height: 65,
+  },
+  textContainer: {},
 });
