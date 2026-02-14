@@ -1,3 +1,5 @@
+import { ReactNode } from "react";
+
 export type Exercise = {
   id: string;
   name: string;
@@ -29,4 +31,10 @@ export type WorkoutExercise = {
 export type PerformedSet = {
   reps: number;
   weight?: number;
+};
+
+export type Setting = {
+  id: string;
+  name: string;
+  icon: ReactNode;
 };
