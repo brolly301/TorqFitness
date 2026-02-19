@@ -2,6 +2,7 @@ import { StyleSheet, Text, View } from "react-native";
 import React, { useRef } from "react";
 import { Exercise } from "@/types/Global";
 import { Image } from "expo-image";
+import { capitalizeWords } from "@/utils/helpers";
 
 type Props = {
   exercise: Exercise;
@@ -21,7 +22,7 @@ export default function ExerciseItem({ exercise }: Props) {
         }}
       />
       <View style={styles.textContainer}>
-        <Text style={styles.name}>{exercise.name}</Text>
+        <Text style={styles.name}>{capitalizeWords(exercise.name)}</Text>
         <Text style={styles.primaryMuscle}>{exercise.bodyParts[0]}</Text>
         <Text style={styles.primaryMuscle}>
           {exercise.primaryMuscles[0]} & {exercise.secondaryMuscles[1]}

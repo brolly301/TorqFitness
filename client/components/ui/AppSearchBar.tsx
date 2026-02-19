@@ -6,7 +6,7 @@ type Props = {
   setSearch: React.Dispatch<React.SetStateAction<string>>;
 };
 
-export default function AppSeaechBar({ setSearch }: Props) {
+export default function AppSearchBar({ setSearch }: Props) {
   return (
     <View style={styles.container}>
       <FontAwesome6 name="magnifying-glass" size={14} color="black" />

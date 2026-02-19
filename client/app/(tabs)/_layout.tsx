@@ -21,11 +21,11 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
-        name="history"
+        name="exercises"
         options={{
           tabBarLabel: () => null,
           tabBarIcon: () => {
-            return <FontAwesome6 name="clock" size={20} />;
+            return <FontAwesome6 name="dumbbell" size={20} />;
           },
         }}
       />
@@ -38,12 +38,13 @@ export default function TabLayout() {
           },
         }}
       />
+
       <Tabs.Screen
-        name="exercises"
+        name="history"
         options={{
           tabBarLabel: () => null,
           tabBarIcon: () => {
-            return <FontAwesome6 name="dumbbell" size={20} />;
+            return <FontAwesome6 name="clock" size={20} />;
           },
         }}
       />
