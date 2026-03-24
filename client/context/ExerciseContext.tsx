@@ -1,12 +1,31 @@
-import { createContext, ReactNode, useContext } from "react";
+import { Exercise } from "@/types/Global";
+import {
+  createContext,
+  ReactNode,
+  useContext,
+  useEffect,
+  useState,
+} from "react";
+import exercisesJSON from "../constants/exercises.json";
 
-type ExerciseContextType = {};
+type ExerciseContextType = {
+  exercises: Exercise[];
+  setExercises: React.Dispatch<React.SetStateAction<Exercise[]>>;
+};
 
 const ExerciseContext = createContext<ExerciseContextType | null>(null);
 
 export const ExerciseProvider = ({ children }: { children: ReactNode }) => {
+  const [exercises, setExercises] = useState<Exercise[]>([]);
+
+  useEffect(() => {
+    setExercises(exercisesJSON);
+  }, []);
+
   return (
-    <ExerciseContext.Provider value={{}}>{children}</ExerciseContext.Provider>
+    <ExerciseContext.Provider value={{ exercises, setExercises }}>
+      {children}
+    </ExerciseContext.Provider>
   );
 };
 

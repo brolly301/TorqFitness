@@ -3,6 +3,7 @@ import React, { useState } from "react";
 import AppSearchBar from "@/components/ui/AppSearchBar";
 import ExerciseList from "@/components/exercises/ExerciseList";
 import exercises from "@/constants/exercises.json";
+import { useWorkoutContext } from "@/context/WorkoutContext";
 
 export default function ExerciseModal() {
   const [search, setSearch] = useState<string>("");

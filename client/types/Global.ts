@@ -15,22 +15,48 @@ export type Workout = {
   id: string;
   name: string;
   description?: string;
-  date: string;
-  startTime: string;
-  endTime?: string;
+  startedAt: string | null;
+  completedAt: string | null;
   exercises: WorkoutExercise[];
   notes?: string;
 };
 
 export type WorkoutExercise = {
+  id: string;
   exerciseId: string;
+  order: number;
   sets: PerformedSet[];
   notes?: string;
 };
 
 export type PerformedSet = {
+  id: string;
+  order: number;
   reps: number;
-  weight?: number;
+  weight?: number | null;
+};
+
+export type Routine = {
+  id: string;
+  name: string;
+  description?: string;
+  exercises: RoutineExercise[];
+  notes?: string;
+};
+
+export type RoutineExercise = {
+  id: string;
+  exerciseId: string;
+  order: number;
+  sets: RoutineSet[];
+  notes?: string;
+};
+
+export type RoutineSet = {
+  id: string;
+  order: number;
+  reps: number;
+  weight?: number | null;
 };
 
 export type Setting = {

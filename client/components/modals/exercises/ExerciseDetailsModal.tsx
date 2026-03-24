@@ -2,18 +2,21 @@ import { Modal, Pressable, StyleSheet, Text, View } from "react-native";
 import React, { useState } from "react";
 import { Button } from "@react-navigation/elements";
 import EvilIcons from "@expo/vector-icons/EvilIcons";
-import { Exercise } from "@/types/Global";
+import { Exercise, WorkoutExercise } from "@/types/Global";
 import DetailsTab from "./DetailsTab";
 import ChartsTab from "./ChartsTab";
 import RecordsTab from "./RecordsTab";
 import HistoryTab from "./HistoryTab";
 import { capitalizeWords } from "@/utils/helpers";
-import { usePathname } from "expo-router";
+import { router, usePathname } from "expo-router";
+import * as crypto from "expo-crypto";
 
 type Props = {
   setModalVisible: React.Dispatch<React.SetStateAction<boolean>>;
   modalVisible: boolean;
   exercise: Exercise | null;
+  workoutExercises: WorkoutExercise[];
+  setWorkoutExercises: React.Dispatch<React.SetStateAction<WorkoutExercise[]>>;
 };
 
 type TabName = "Details" | "Records" | "History" | "Charts";
@@ -22,6 +25,8 @@ export default function ExerciseDetailsModal({
   modalVisible,
   setModalVisible,
   exercise,
+  workoutExercises,
+  setWorkoutExercises,
 }: Props) {
   const [tab, setTab] = useState<TabName>("Details");
   const tabName: TabName[] = ["Details", "Records", "Records", "Charts"];
@@ -41,7 +46,22 @@ export default function ExerciseDetailsModal({
     }
   };
 
-  const pathname = usePathname();
+  const handleSubmit = () => {
+    if (!exercise) return;
+
+    setWorkoutExercises((prev) => [
+      ...prev,
+      {
+        id: crypto.randomUUID(),
+        exerciseId: exercise?.id,
+        order: prev.length + 1,
+        sets: [{ id: crypto.randomUUID(), order: 1, reps: 0, weight: null }],
+        notes: "",
+      },
+    ]);
+
+    router.back();
+  };
 
   return (
     <Modal visible={modalVisible} transparent animationType="fade">
@@ -58,7 +78,7 @@ export default function ExerciseDetailsModal({
               color={"black"}
               onPress={() => setModalVisible(!modalVisible)}
             />
-            <Pressable style={styles.addButton}>
+            <Pressable style={styles.addButton} onPress={handleSubmit}>
               <Text style={styles.addButtonText}>Add</Text>
             </Pressable>
           </View>

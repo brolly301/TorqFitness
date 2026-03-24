@@ -3,11 +3,16 @@ import React from "react";
 import { Button } from "@react-navigation/elements";
 import WorkoutTile from "@/components/workout/WorkoutTile";
 import RoutineTile from "@/components/workout/RoutineTile";
+import { router } from "expo-router";
 
 export default function WorkoutScreen() {
   return (
     <View>
-      <Button>Start Workout</Button>
+      <Button
+        onPressIn={() => router.navigate("/(tabs)/workout/createWorkout")}
+      >
+        Start Workout
+      </Button>
       <Text style={styles.subTitle}>Previous Workouts</Text>
       <WorkoutTile />
       <WorkoutTile />
