@@ -10,13 +10,12 @@ import HistoryTab from "./HistoryTab";
 import { capitalizeWords } from "@/utils/helpers";
 import { router, usePathname } from "expo-router";
 import * as crypto from "expo-crypto";
+import { useWorkoutContext } from "@/context/WorkoutContext";
 
 type Props = {
   setModalVisible: React.Dispatch<React.SetStateAction<boolean>>;
   modalVisible: boolean;
   exercise: Exercise | null;
-  workoutExercises: WorkoutExercise[];
-  setWorkoutExercises: React.Dispatch<React.SetStateAction<WorkoutExercise[]>>;
 };
 
 type TabName = "Details" | "Records" | "History" | "Charts";
@@ -25,11 +24,9 @@ export default function ExerciseDetailsModal({
   modalVisible,
   setModalVisible,
   exercise,
-  workoutExercises,
-  setWorkoutExercises,
 }: Props) {
   const [tab, setTab] = useState<TabName>("Details");
-  const tabName: TabName[] = ["Details", "Records", "Records", "Charts"];
+  const tabName: TabName[] = ["Details", "History", "Records", "Charts"];
 
   const renderTab = () => {
     switch (tab) {
@@ -46,19 +43,24 @@ export default function ExerciseDetailsModal({
     }
   };
 
+  const { setWorkout } = useWorkoutContext();
+
   const handleSubmit = () => {
     if (!exercise) return;
 
-    setWorkoutExercises((prev) => [
+    setWorkout((prev) => ({
       ...prev,
-      {
-        id: crypto.randomUUID(),
-        exerciseId: exercise?.id,
-        order: prev.length + 1,
-        sets: [{ id: crypto.randomUUID(), order: 1, reps: 0, weight: null }],
-        notes: "",
-      },
-    ]);
+      exercises: [
+        ...prev.exercises,
+        {
+          id: crypto.randomUUID(),
+          exerciseId: exercise?.id,
+          order: prev.exercises.length + 1,
+          sets: [{ id: crypto.randomUUID(), order: 1, reps: 0, weight: null }],
+          notes: "",
+        },
+      ],
+    }));
 
     router.back();
   };
@@ -88,7 +90,11 @@ export default function ExerciseDetailsModal({
           <View style={styles.tabRowContainer}>
             {tabName.map((tab) => {
               return (
-                <Pressable style={styles.tab} onPress={() => setTab(tab)}>
+                <Pressable
+                  key={tab}
+                  style={styles.tab}
+                  onPress={() => setTab(tab)}
+                >
                   <Text style={styles.tabLabel}>{tab}</Text>
                 </Pressable>
               );

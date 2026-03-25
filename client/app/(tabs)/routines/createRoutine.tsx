@@ -1,75 +1,44 @@
-import { StyleSheet, TextInput, View } from "react-native";
-import React from "react";
-import { useForm, Controller } from "react-hook-form";
-import AppError from "@/components/ui/AppError";
-import { Button } from "@react-navigation/elements";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { WorkoutSchema, workoutSchema } from "@/utils/validation/workoutSchema";
-import { router } from "expo-router";
+import { StyleSheet, View } from "react-native";
+import React, { useCallback, useLayoutEffect } from "react";
+import { router, useNavigation } from "expo-router";
+import { useRoutineContext } from "@/context/RoutineContext";
+import WorkoutForm from "@/components/workout/WorkoutForm";
+import EvilIcons from "@expo/vector-icons/EvilIcons";
 
 export default function CreateRoutineScreen() {
-  const {
-    control,
-    handleSubmit,
-    formState: { errors },
-  } = useForm<WorkoutSchema>({
-    resolver: zodResolver(workoutSchema),
-    defaultValues: {
-      name: "",
-      description: "",
-    },
-    mode: "onChange",
-  });
+  const { resetRoutine, routine, setRoutine, setRoutines } =
+    useRoutineContext();
 
-  const onSubmit = (data: WorkoutSchema) => {
-    console.log("Submitted data:", data);
-  };
+  const navigation = useNavigation();
 
-  const fields: { key: keyof WorkoutSchema; placeholder: string }[] = [
-    { key: "name", placeholder: "Name" },
-    { key: "description", placeholder: "Description" },
-  ];
+  const handleSubmit = useCallback(() => {
+    if (!routine) return;
+
+    setRoutines((prev) => [...prev, routine]);
+    resetRoutine();
+    router.back();
+  }, [routine, setRoutines, resetRoutine]);
+
+  useLayoutEffect(() => {
+    navigation.setOptions({
+      headerRight: () => {
+        return (
+          <EvilIcons
+            name="check"
+            color={"black"}
+            size={22}
+            onPress={handleSubmit}
+          />
+        );
+      },
+    });
+  }, [navigation, handleSubmit]);
 
   return (
-    <View style={styles.container}>
-      {fields.map((field) => (
-        <Controller
-          key={field.key}
-          control={control}
-          name={field.key}
-          render={({ field: { onChange, value } }) => (
-            <>
-              <TextInput
-                placeholder={field.placeholder}
-                placeholderTextColor="black"
-                style={styles.input}
-                textAlignVertical="center"
-                value={value}
-                onChangeText={onChange}
-              />
-              {errors[field.key] && (
-                <AppError>{errors[field.key]?.message}</AppError>
-              )}
-            </>
-          )}
-        />
-      ))}
-      <Button onPress={() => router.push("../../(modals)/exercise")}>
-        Add Exercise
-      </Button>
-
-      <Button onPressIn={handleSubmit(onSubmit)}>Save Routine</Button>
+    <View>
+      <WorkoutForm setDraft={setRoutine} setDraft={routine} />
     </View>
   );
 }
 
-const styles = StyleSheet.create({
-  container: { padding: 16 },
-  input: {
-    borderWidth: 1,
-    borderColor: "#ccc",
-    padding: 12,
-    marginBottom: 8,
-    borderRadius: 6,
-  },
-});
+const styles = StyleSheet.create({});

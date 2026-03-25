@@ -13,16 +13,12 @@ export default function ExerciseList({ exercises }: Props) {
   const [modalVisible, setModalVisible] = useState<boolean>(false);
   const [exercise, setExercise] = useState<Exercise | null>(null);
 
-  const { workoutExercises, setWorkoutExercises } = useWorkoutContext();
-
   return (
     <>
       <ExerciseDetailsModal
         modalVisible={modalVisible}
         setModalVisible={setModalVisible}
         exercise={exercise}
-        workoutExercises={workoutExercises}
-        setWorkoutExercises={setWorkoutExercises}
       />
       <FlatList
         data={exercises}

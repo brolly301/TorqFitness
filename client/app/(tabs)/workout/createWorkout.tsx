@@ -1,26 +1,57 @@
 import { StyleSheet, Text, View } from "react-native";
-import React, { useLayoutEffect } from "react";
+import React, { useCallback, useLayoutEffect } from "react";
 import WorkoutForm from "@/components/workout/WorkoutForm";
 import { useWorkoutContext } from "@/context/WorkoutContext";
-import { useNavigation } from "expo-router";
+import { router, useNavigation } from "expo-router";
 import EvilIcons from "@expo/vector-icons/EvilIcons";
 
 export default function StartWorkoutScreen() {
-  const { workouts, setWorkouts } = useWorkoutContext();
+  const { workout, setWorkout, setWorkouts, resetWorkout } =
+    useWorkoutContext();
 
   const navigation = useNavigation();
+
+  console.log(workout);
+
+  const handleSubmit = useCallback(() => {
+    if (!workout.startedAt) return;
+
+    const completedAt = new Date().toISOString();
+    const duration = Math.floor(
+      (new Date(completedAt).getTime() -
+        new Date(workout.startedAt).getTime()) /
+        1000,
+    );
+
+    const finalWorkout = {
+      ...workout,
+      completedAt,
+      duration,
+    };
+
+    setWorkouts((prev) => [...prev, finalWorkout]);
+    resetWorkout();
+    router.back();
+  }, [workout, setWorkouts, resetWorkout]);
 
   useLayoutEffect(() => {
     navigation.setOptions({
       headerRight: () => {
-        return <EvilIcons name="check" color={"black"} size={22} />;
+        return (
+          <EvilIcons
+            name="check"
+            color={"black"}
+            size={22}
+            onPress={handleSubmit}
+          />
+        );
       },
     });
-  }, [navigation]);
+  }, [navigation, handleSubmit]);
 
   return (
     <View>
-      <WorkoutForm setWorkouts={setWorkouts} workouts={workouts} />
+      <WorkoutForm setWorkout={setWorkout} workout={workout} />
     </View>
   );
 }

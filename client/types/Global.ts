@@ -17,6 +17,7 @@ export type Workout = {
   description?: string;
   startedAt: string | null;
   completedAt: string | null;
+  duration: number;
   exercises: WorkoutExercise[];
   notes?: string;
 };

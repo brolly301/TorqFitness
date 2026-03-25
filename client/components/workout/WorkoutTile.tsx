@@ -1,16 +1,21 @@
 import { StyleSheet, Text, View } from "react-native";
 import React from "react";
 import Feather from "@expo/vector-icons/Feather";
+import { Workout } from "@/types/Global";
 
-export default function WorkoutTile() {
+type Props = {
+  workout: Workout;
+};
+
+export default function WorkoutTile({ workout }: Props) {
   return (
     <View style={styles.container}>
       <View>
-        <Text style={styles.name}>Full body workout</Text>
-        <Text style={styles.date}>Tuesday, 20:17</Text>
+        <Text style={styles.name}>{workout.name}</Text>
+        <Text style={styles.date}>{workout.startedAt}</Text>
       </View>
       <View>
-        <Text style={styles.exercises}>6 exercises</Text>
+        <Text style={styles.exercises}>{workout.exercises.length}</Text>
         <Text style={styles.volume}>5200kg</Text>
       </View>
       <Feather name="arrow-right" />

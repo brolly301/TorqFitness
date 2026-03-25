@@ -1,33 +1,86 @@
 import { StyleSheet, Text, TextInput, View } from "react-native";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Button } from "@react-navigation/elements";
 import { router } from "expo-router";
 import Timer from "./Timer";
 import { Workout } from "@/types/Global";
-import { useWorkoutContext } from "@/context/WorkoutContext";
 import { useExerciseContext } from "@/context/ExerciseContext";
+import * as crypto from "expo-crypto";
 
 type Props = {
-  workouts: Workout[];
-  setWorkouts: React.Dispatch<React.SetStateAction<Workout[]>>;
+  workout: Workout;
+  setWorkout: React.Dispatch<React.SetStateAction<Workout>>;
 };
 
-export default function WorkoutForm({ workouts, setWorkouts }: Props) {
-  const [formData, setFormData] = useState({
-    name: "",
-    decription: "",
-  });
-
-  const { workoutExercises, setWorkoutExercises } = useWorkoutContext();
+export default function WorkoutForm({ workout, setWorkout }: Props) {
   const { exercises } = useExerciseContext();
 
-  const exerciseList = workoutExercises.map((we) => {
+  useEffect(() => {
+    const startedAt = new Date().toISOString();
+
+    setWorkout((prev) => ({
+      ...prev,
+      startedAt,
+    }));
+  }, []);
+
+  const exerciseList = workout.exercises.map((we) => {
     const details = exercises.find((ex) => ex.id === we.exerciseId);
 
     return { ...we, details };
   });
 
-  const handleSubmit = () => {};
+  const addSet = (exerciseId: string) => {
+    setWorkout((prev) => ({
+      ...prev,
+      exercises: prev.exercises.map((exercise) => {
+        return exercise.id === exerciseId
+          ? {
+              ...exercise,
+              sets: [
+                ...exercise.sets,
+                {
+                  id: crypto.randomUUID(),
+                  order: exercise.sets.length + 1,
+                  reps: 0,
+                  weight: null,
+                },
+              ],
+            }
+          : exercise;
+      }),
+    }));
+  };
+
+  const updateForm = (
+    field: "name" | "description" | "notes",
+    value: string,
+  ) => {
+    setWorkout((prev) => {
+      return { ...prev, [field]: value };
+    });
+  };
+
+  const updateSet = (
+    exerciseId: string,
+    setId: string,
+    field: "reps" | "weight",
+    value: number | null,
+  ) => {
+    setWorkout((prev) => ({
+      ...prev,
+      exercises: prev.exercises.map((exercise) => {
+        return exercise.id === exerciseId
+          ? {
+              ...exercise,
+              sets: exercise.sets.map((set) => {
+                return set.id === setId ? { ...set, [field]: value } : set;
+              }),
+            }
+          : exercise;
+      }),
+    }));
+  };
 
   return (
     <>
@@ -36,48 +89,74 @@ export default function WorkoutForm({ workouts, setWorkouts }: Props) {
         <TextInput
           placeholder="Workout #1"
           placeholderTextColor={"black"}
-          // onChangeText={}
+          onChangeText={(text) => updateForm("name", text)}
           style={styles.nameInput}
         />
         <TextInput
           placeholder="Enter description"
           placeholderTextColor={"black"}
-          // onChangeText={}
+          onChangeText={(text) => updateForm("description", text)}
+          style={styles.nameInput}
+        />
+        <TextInput
+          placeholder="Enter workout notes"
+          placeholderTextColor={"black"}
+          onChangeText={(text) => updateForm("notes", text)}
           style={styles.nameInput}
         />
         {exerciseList
           ? exerciseList.map((exercise) => {
               return (
-                <View style={styles.workoutContainer}>
+                <View key={exercise.id} style={styles.workoutContainer}>
                   <Text>{exercise.details?.name}</Text>
+                  <View style={styles.headerContainer}>
+                    <View style={styles.exerciseInputContainer}>
+                      <Text>Set</Text>
+                    </View>
+                    <View style={styles.exerciseInputContainer}>
+                      <Text>Reps</Text>
+                    </View>
+                    <View style={styles.exerciseInputContainer}>
+                      <Text>Weight</Text>
+                    </View>
+                  </View>
                   {exercise.sets.map((set) => {
                     return (
-                      <View style={styles.exerciseContainer}>
+                      <View key={set.id} style={styles.exerciseContainer}>
                         <View style={styles.exerciseInputContainer}>
-                          <Text>Set</Text>
                           <TextInput
                             placeholder={set.order.toString()}
                             placeholderTextColor={"black"}
-                            // onChangeText={}
                             style={styles.nameInput}
                           />
                         </View>
                         <View style={styles.exerciseInputContainer}>
-                          <Text>Reps</Text>
-
                           <TextInput
                             placeholder={set.reps.toString()}
                             placeholderTextColor={"black"}
-                            // onChangeText={}
+                            onChangeText={(text) =>
+                              updateSet(
+                                exercise.id,
+                                set.id,
+                                "reps",
+                                parseInt(text),
+                              )
+                            }
                             style={styles.nameInput}
                           />
                         </View>
                         <View style={styles.exerciseInputContainer}>
-                          <Text>kg</Text>
                           <TextInput
                             placeholder={set.weight?.toString()}
                             placeholderTextColor={"black"}
-                            // onChangeText={}
+                            onChangeText={(text) =>
+                              updateSet(
+                                exercise.id,
+                                set.id,
+                                "weight",
+                                parseInt(text),
+                              )
+                            }
                             style={styles.nameInput}
                           />
                         </View>
@@ -85,7 +164,7 @@ export default function WorkoutForm({ workouts, setWorkouts }: Props) {
                     );
                   })}
 
-                  <Button>Add set</Button>
+                  <Button onPressIn={() => addSet(exercise.id)}>Add set</Button>
                 </View>
               );
             })
@@ -116,11 +195,20 @@ const styles = StyleSheet.create({
     flexDirection: "column",
     justifyContent: "space-between",
     alignItems: "center",
+    flex: 1,
   },
   exerciseContainer: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
     textAlign: "center",
+    gap: 8,
+  },
+  headerContainer: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    textAlign: "center",
+    gap: 8,
   },
 });

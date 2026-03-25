@@ -1,12 +1,50 @@
-import { createContext, ReactNode, useContext } from "react";
+import { Routine } from "@/types/Global";
+import { createContext, ReactNode, useContext, useState } from "react";
+import * as crypto from "expo-crypto";
 
-type RoutineContextType = {};
+type RoutineContextType = {
+  routine: Routine;
+  setRoutine: React.Dispatch<React.SetStateAction<Routine>>;
+  routines: Routine[];
+  setRoutines: React.Dispatch<React.SetStateAction<Routine[]>>;
+  resetRoutine: () => void;
+};
 
 const RoutineContext = createContext<RoutineContextType | null>(null);
 
 export const RoutineProvider = ({ children }: { children: ReactNode }) => {
+  const [routine, setRoutine] = useState<Routine>({
+    id: crypto.randomUUID(),
+    name: "",
+    description: "",
+    exercises: [],
+    notes: "",
+  });
+
+  const [routines, setRoutines] = useState<Routine[]>([]);
+
+  const resetRoutine = () => {
+    setRoutine({
+      id: crypto.randomUUID(),
+      name: "",
+      description: "",
+      exercises: [],
+      notes: "",
+    });
+  };
+
   return (
-    <RoutineContext.Provider value={{}}>{children}</RoutineContext.Provider>
+    <RoutineContext.Provider
+      value={{
+        routine,
+        resetRoutine,
+        routines,
+        setRoutine,
+        setRoutines,
+      }}
+    >
+      {children}
+    </RoutineContext.Provider>
   );
 };
 
