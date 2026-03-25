@@ -3,13 +3,13 @@ import React, { useState } from "react";
 import { Exercise } from "@/types/Global";
 import ExerciseItem from "./ExerciseItem";
 import ExerciseDetailsModal from "../modals/exercises/ExerciseDetailsModal";
-import { useWorkoutContext } from "@/context/WorkoutContext";
 
 type Props = {
   exercises: Exercise[];
+  target: "workout" | "routine";
 };
 
-export default function ExerciseList({ exercises }: Props) {
+export default function ExerciseList({ exercises, target }: Props) {
   const [modalVisible, setModalVisible] = useState<boolean>(false);
   const [exercise, setExercise] = useState<Exercise | null>(null);
 
@@ -19,6 +19,7 @@ export default function ExerciseList({ exercises }: Props) {
         modalVisible={modalVisible}
         setModalVisible={setModalVisible}
         exercise={exercise}
+        target={target}
       />
       <FlatList
         data={exercises}

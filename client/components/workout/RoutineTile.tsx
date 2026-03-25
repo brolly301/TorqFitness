@@ -1,16 +1,23 @@
 import { StyleSheet, Text, View } from "react-native";
 import React from "react";
 import Feather from "@expo/vector-icons/Feather";
+import { Routine } from "@/types/Global";
 
-export default function RoutineTile() {
+type Props = {
+  routine: Routine;
+};
+
+export default function RoutineTile({ routine }: Props) {
   return (
     <View style={styles.container}>
       <View>
-        <Text style={styles.name}>Chest & Trices</Text>
+        <Text style={styles.name}>{routine.name}</Text>
         <Text style={styles.date}>Last used - Monday, 10:39</Text>
       </View>
       <View>
-        <Text style={styles.exercises}>4 exercises</Text>
+        <Text style={styles.exercises}>
+          {routine.exercises.length} exercises
+        </Text>
         <Text style={styles.volume}>Chest, Triceps</Text>
       </View>
       <Feather name="arrow-right" />

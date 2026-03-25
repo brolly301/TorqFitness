@@ -5,9 +5,11 @@ import WorkoutTile from "@/components/workout/WorkoutTile";
 import RoutineTile from "@/components/workout/RoutineTile";
 import { router } from "expo-router";
 import { useWorkoutContext } from "@/context/WorkoutContext";
+import { useRoutineContext } from "@/context/RoutineContext";
 
 export default function WorkoutScreen() {
   const { workouts } = useWorkoutContext();
+  const { routines } = useRoutineContext();
 
   return (
     <View>
@@ -21,9 +23,9 @@ export default function WorkoutScreen() {
         return <WorkoutTile key={workout.id} workout={workout} />;
       })}
       <Text style={styles.subTitle}>My Routines</Text>
-      <RoutineTile />
-      <RoutineTile />
-      <RoutineTile />
+      {routines.map((routine) => {
+        return <RoutineTile key={routine.id} routine={routine} />;
+      })}
     </View>
   );
 }

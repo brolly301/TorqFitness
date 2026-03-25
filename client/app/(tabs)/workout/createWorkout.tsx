@@ -1,5 +1,5 @@
 import { StyleSheet, Text, View } from "react-native";
-import React, { useCallback, useLayoutEffect } from "react";
+import React, { useCallback, useEffect, useLayoutEffect } from "react";
 import WorkoutForm from "@/components/workout/WorkoutForm";
 import { useWorkoutContext } from "@/context/WorkoutContext";
 import { router, useNavigation } from "expo-router";
@@ -11,7 +11,12 @@ export default function StartWorkoutScreen() {
 
   const navigation = useNavigation();
 
-  console.log(workout);
+  useEffect(() => {
+    setWorkout((prev) => ({
+      ...prev,
+      startedAt: new Date().toISOString(),
+    }));
+  }, []);
 
   const handleSubmit = useCallback(() => {
     if (!workout.startedAt) return;
@@ -51,7 +56,7 @@ export default function StartWorkoutScreen() {
 
   return (
     <View>
-      <WorkoutForm setWorkout={setWorkout} workout={workout} />
+      <WorkoutForm setDraft={setWorkout} draft={workout} target={"workout"} />
     </View>
   );
 }

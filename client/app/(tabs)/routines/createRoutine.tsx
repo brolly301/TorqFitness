@@ -36,7 +36,7 @@ export default function CreateRoutineScreen() {
 
   return (
     <View>
-      <WorkoutForm setDraft={setRoutine} setDraft={routine} />
+      <WorkoutForm setDraft={setRoutine} draft={routine} target={"routine"} />
     </View>
   );
 }

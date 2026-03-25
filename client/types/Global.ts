@@ -11,54 +11,36 @@ export type Exercise = {
   instructions: string[];
 };
 
-export type Workout = {
+export type WorkoutSet = {
   id: string;
-  name: string;
-  description?: string;
-  startedAt: string | null;
-  completedAt: string | null;
-  duration: number;
-  exercises: WorkoutExercise[];
-  notes?: string;
+  order: number;
+  reps: number;
+  weight?: number | null;
 };
 
 export type WorkoutExercise = {
   id: string;
   exerciseId: string;
   order: number;
-  sets: PerformedSet[];
+  sets: WorkoutSet[];
   notes?: string;
 };
 
-export type PerformedSet = {
-  id: string;
-  order: number;
-  reps: number;
-  weight?: number | null;
-};
-
-export type Routine = {
+export type WorkoutDraft = {
   id: string;
   name: string;
   description?: string;
-  exercises: RoutineExercise[];
+  exercises: WorkoutExercise[];
   notes?: string;
 };
 
-export type RoutineExercise = {
-  id: string;
-  exerciseId: string;
-  order: number;
-  sets: RoutineSet[];
-  notes?: string;
+export type Workout = WorkoutDraft & {
+  startedAt: string | null;
+  completedAt: string | null;
+  duration: number;
 };
 
-export type RoutineSet = {
-  id: string;
-  order: number;
-  reps: number;
-  weight?: number | null;
-};
+export type Routine = WorkoutDraft;
 
 export type Setting = {
   id: string;

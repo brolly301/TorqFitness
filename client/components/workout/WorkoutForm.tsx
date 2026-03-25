@@ -3,35 +3,33 @@ import React, { useEffect, useState } from "react";
 import { Button } from "@react-navigation/elements";
 import { router } from "expo-router";
 import Timer from "./Timer";
-import { Workout } from "@/types/Global";
+import { WorkoutDraft } from "@/types/Global";
 import { useExerciseContext } from "@/context/ExerciseContext";
 import * as crypto from "expo-crypto";
 
-type Props = {
-  workout: Workout;
-  setWorkout: React.Dispatch<React.SetStateAction<Workout>>;
+type Props<T extends WorkoutDraft> = {
+  draft: T;
+  setDraft: React.Dispatch<React.SetStateAction<T>>;
+  showTimer?: boolean;
+  target: "workout" | "routine";
 };
 
-export default function WorkoutForm({ workout, setWorkout }: Props) {
+export default function WorkoutForm<T extends WorkoutDraft>({
+  draft,
+  setDraft,
+  showTimer,
+  target,
+}: Props<T>) {
   const { exercises } = useExerciseContext();
 
-  useEffect(() => {
-    const startedAt = new Date().toISOString();
-
-    setWorkout((prev) => ({
-      ...prev,
-      startedAt,
-    }));
-  }, []);
-
-  const exerciseList = workout.exercises.map((we) => {
+  const exerciseList = draft.exercises.map((we) => {
     const details = exercises.find((ex) => ex.id === we.exerciseId);
 
     return { ...we, details };
   });
 
   const addSet = (exerciseId: string) => {
-    setWorkout((prev) => ({
+    setDraft((prev) => ({
       ...prev,
       exercises: prev.exercises.map((exercise) => {
         return exercise.id === exerciseId
@@ -56,7 +54,7 @@ export default function WorkoutForm({ workout, setWorkout }: Props) {
     field: "name" | "description" | "notes",
     value: string,
   ) => {
-    setWorkout((prev) => {
+    setDraft((prev) => {
       return { ...prev, [field]: value };
     });
   };
@@ -67,7 +65,7 @@ export default function WorkoutForm({ workout, setWorkout }: Props) {
     field: "reps" | "weight",
     value: number | null,
   ) => {
-    setWorkout((prev) => ({
+    setDraft((prev) => ({
       ...prev,
       exercises: prev.exercises.map((exercise) => {
         return exercise.id === exerciseId
@@ -170,7 +168,14 @@ export default function WorkoutForm({ workout, setWorkout }: Props) {
             })
           : null}
 
-        <Button onPress={() => router.push("../../(modals)/exercise")}>
+        <Button
+          onPress={() =>
+            router.push({
+              pathname: "../../(modals)/exercise",
+              params: { target },
+            })
+          }
+        >
           Add Exercise
         </Button>
       </View>
