@@ -11,6 +11,8 @@ export default function StartWorkoutScreen() {
 
   const navigation = useNavigation();
 
+  console.log(workout);
+
   useEffect(() => {
     setWorkout((prev) => ({
       ...prev,
