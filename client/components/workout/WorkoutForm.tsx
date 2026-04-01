@@ -5,7 +5,9 @@ import { router } from "expo-router";
 import Timer from "./Timer";
 import { WorkoutDraft } from "@/types/Global";
 import { useExerciseContext } from "@/context/ExerciseContext";
-import * as crypto from "expo-crypto";
+import { addSet, removeExercise, updateSet } from "@/utils/workoutUtil";
+import { capitalizeWords } from "@/utils/helpers";
+import EvilIcons from "@expo/vector-icons/EvilIcons";
 
 type Props<T extends WorkoutDraft> = {
   draft: T;
@@ -28,28 +30,6 @@ export default function WorkoutForm<T extends WorkoutDraft>({
     return { ...we, details };
   });
 
-  const addSet = (exerciseId: string) => {
-    setDraft((prev) => ({
-      ...prev,
-      exercises: prev.exercises.map((exercise) => {
-        return exercise.id === exerciseId
-          ? {
-              ...exercise,
-              sets: [
-                ...exercise.sets,
-                {
-                  id: crypto.randomUUID(),
-                  order: exercise.sets.length + 1,
-                  reps: 0,
-                  weight: null,
-                },
-              ],
-            }
-          : exercise;
-      }),
-    }));
-  };
-
   const updateForm = (
     field: "name" | "description" | "notes",
     value: string,
@@ -57,27 +37,6 @@ export default function WorkoutForm<T extends WorkoutDraft>({
     setDraft((prev) => {
       return { ...prev, [field]: value };
     });
-  };
-
-  const updateSet = (
-    exerciseId: string,
-    setId: string,
-    field: "reps" | "weight",
-    value: number | null,
-  ) => {
-    setDraft((prev) => ({
-      ...prev,
-      exercises: prev.exercises.map((exercise) => {
-        return exercise.id === exerciseId
-          ? {
-              ...exercise,
-              sets: exercise.sets.map((set) => {
-                return set.id === setId ? { ...set, [field]: value } : set;
-              }),
-            }
-          : exercise;
-      }),
-    }));
   };
 
   return (
@@ -106,7 +65,17 @@ export default function WorkoutForm<T extends WorkoutDraft>({
           ? exerciseList.map((exercise) => {
               return (
                 <View key={exercise.id} style={styles.workoutContainer}>
-                  <Text>{exercise.details?.name}</Text>
+                  <View style={styles.nameButtonContainer}>
+                    <Text style={styles.exerciseName}>
+                      {capitalizeWords(exercise.details?.name ?? "")}
+                    </Text>
+                    <EvilIcons
+                      onPress={() => removeExercise(setDraft, exercise.id)}
+                      name="trash"
+                      size={30}
+                      color={"red"}
+                    />
+                  </View>
                   <View style={styles.headerContainer}>
                     <View style={styles.exerciseInputContainer}>
                       <Text>Set</Text>
@@ -134,6 +103,7 @@ export default function WorkoutForm<T extends WorkoutDraft>({
                             placeholderTextColor={"black"}
                             onChangeText={(text) =>
                               updateSet(
+                                setDraft,
                                 exercise.id,
                                 set.id,
                                 "reps",
@@ -149,6 +119,7 @@ export default function WorkoutForm<T extends WorkoutDraft>({
                             placeholderTextColor={"black"}
                             onChangeText={(text) =>
                               updateSet(
+                                setDraft,
                                 exercise.id,
                                 set.id,
                                 "weight",
@@ -162,7 +133,9 @@ export default function WorkoutForm<T extends WorkoutDraft>({
                     );
                   })}
 
-                  <Button onPressIn={() => addSet(exercise.id)}>Add set</Button>
+                  <Button onPressIn={() => addSet(setDraft, exercise.id)}>
+                    Add set
+                  </Button>
                 </View>
               );
             })
@@ -194,6 +167,7 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     borderWidth: 1,
     padding: 10,
+    marginBottom: 10,
   },
   exerciseInputContainer: {
     textAlign: "center",
@@ -201,6 +175,7 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     alignItems: "center",
     flex: 1,
+    marginBottom: 10,
   },
   exerciseContainer: {
     flexDirection: "row",
@@ -215,5 +190,15 @@ const styles = StyleSheet.create({
     alignItems: "center",
     textAlign: "center",
     gap: 8,
+  },
+  nameButtonContainer: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: 10,
+  },
+  exerciseName: {
+    fontSize: 16,
+    fontWeight: "bold",
   },
 });

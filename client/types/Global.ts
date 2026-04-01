@@ -1,5 +1,10 @@
 import { ReactNode } from "react";
 
+export type ModalProps = {
+  modalVisible: boolean;
+  setModalVisible: React.Dispatch<React.SetStateAction<boolean>>;
+};
+
 export type Exercise = {
   id: string;
   name: string;

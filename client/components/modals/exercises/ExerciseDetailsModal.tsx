@@ -2,7 +2,7 @@ import { Modal, Pressable, StyleSheet, Text, View } from "react-native";
 import React, { useState } from "react";
 import { Button } from "@react-navigation/elements";
 import EvilIcons from "@expo/vector-icons/EvilIcons";
-import { Exercise, WorkoutExercise } from "@/types/Global";
+import { Exercise, ModalProps, WorkoutExercise } from "@/types/Global";
 import DetailsTab from "./DetailsTab";
 import ChartsTab from "./ChartsTab";
 import RecordsTab from "./RecordsTab";
@@ -13,9 +13,7 @@ import * as crypto from "expo-crypto";
 import { useWorkoutContext } from "@/context/WorkoutContext";
 import { useRoutineContext } from "@/context/RoutineContext";
 
-type Props = {
-  setModalVisible: React.Dispatch<React.SetStateAction<boolean>>;
-  modalVisible: boolean;
+type Props = ModalProps & {
   exercise: Exercise | null;
   target: "workout" | "routine";
 };

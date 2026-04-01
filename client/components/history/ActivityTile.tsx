@@ -1,26 +1,38 @@
-import { FlatList, StyleSheet, Text, View } from "react-native";
-import React from "react";
+import { Pressable, StyleSheet, Text, View } from "react-native";
+import React, { useState } from "react";
 import { Workout } from "@/types/Global";
-import exercises from "../../constants/exercises.json";
+import WorkoutDetailsModal from "../modals/history/WorkoutDetailsModal";
 
 type Props = {
   workout: Workout;
 };
 
 export default function ActivityTile({ workout }: Props) {
+  const [modalVisible, setModalVisible] = useState<boolean>(false);
+
   return (
-    <View style={styles.container}>
-      <Text style={styles.name}>{workout.name}</Text>
-      <Text style={styles.description}>{workout.description}</Text>
-      <Text style={styles.date}>{workout.startTime}</Text>
-      {workout.exercises.map((exercise) => {
-        return (
-          <View style={styles.exerciseContainer}>
-            <Text style={styles.exerciseName}>{exercise.exerciseId}</Text>
-          </View>
-        );
-      })}
-    </View>
+    <>
+      <WorkoutDetailsModal
+        modalVisible={modalVisible}
+        setModalVisible={setModalVisible}
+        workout={workout}
+      />
+      <Pressable
+        style={styles.container}
+        onPress={() => setModalVisible(!modalVisible)}
+      >
+        <Text style={styles.name}>{workout.name}</Text>
+        <Text style={styles.description}>{workout.description}</Text>
+        <Text style={styles.date}>{workout.startedAt}</Text>
+        {workout.exercises.map((exercise) => {
+          return (
+            <View style={styles.exerciseContainer}>
+              <Text style={styles.exerciseName}>{exercise.exerciseId}</Text>
+            </View>
+          );
+        })}
+      </Pressable>
+    </>
   );
 }
 

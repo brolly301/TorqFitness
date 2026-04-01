@@ -8,6 +8,8 @@ type WorkoutContextType = {
   workouts: Workout[];
   setWorkouts: React.Dispatch<React.SetStateAction<Workout[]>>;
   resetWorkout: () => void;
+  deleteWorkout: (id: string) => void;
+  updateWorkout: (workout: Workout) => void;
 };
 
 const WorkoutContext = createContext<WorkoutContextType | null>(null);
@@ -17,8 +19,8 @@ export const WorkoutProvider = ({ children }: { children: ReactNode }) => {
     id: crypto.randomUUID(),
     name: "",
     description: "",
-    startedAt: "",
-    completedAt: "",
+    startedAt: null,
+    completedAt: null,
     duration: 0,
     exercises: [],
     notes: "",
@@ -39,6 +41,20 @@ export const WorkoutProvider = ({ children }: { children: ReactNode }) => {
     });
   };
 
+  const deleteWorkout = (id: string) => {
+    setWorkouts((prev) => prev.filter((workout) => workout.id !== id));
+  };
+
+  const updateWorkout = (updatedWorkout: Workout) => {
+    setWorkouts((prev) =>
+      prev.map((workout) =>
+        workout.id === updatedWorkout.id
+          ? { ...workout, ...updatedWorkout }
+          : workout,
+      ),
+    );
+  };
+
   return (
     <WorkoutContext.Provider
       value={{
@@ -47,6 +63,8 @@ export const WorkoutProvider = ({ children }: { children: ReactNode }) => {
         workouts,
         setWorkouts,
         resetWorkout,
+        deleteWorkout,
+        updateWorkout,
       }}
     >
       {children}

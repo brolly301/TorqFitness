@@ -8,6 +8,8 @@ type RoutineContextType = {
   routines: Routine[];
   setRoutines: React.Dispatch<React.SetStateAction<Routine[]>>;
   resetRoutine: () => void;
+  deleteRoutine: (id: string) => void;
+  updateRoutine: (routine: Routine) => void;
 };
 
 const RoutineContext = createContext<RoutineContextType | null>(null);
@@ -33,6 +35,20 @@ export const RoutineProvider = ({ children }: { children: ReactNode }) => {
     });
   };
 
+  const deleteRoutine = (id: string) => {
+    setRoutines((prev) => prev.filter((routine) => routine.id !== id));
+  };
+
+  const updateRoutine = (updatedRoutine: Routine) => {
+    setRoutines((prev) =>
+      prev.map((routine) =>
+        routine.id === updatedRoutine.id
+          ? { ...routine, ...updateRoutine }
+          : routine,
+      ),
+    );
+  };
+
   return (
     <RoutineContext.Provider
       value={{
@@ -41,6 +57,8 @@ export const RoutineProvider = ({ children }: { children: ReactNode }) => {
         routines,
         setRoutine,
         setRoutines,
+        deleteRoutine,
+        updateRoutine,
       }}
     >
       {children}
