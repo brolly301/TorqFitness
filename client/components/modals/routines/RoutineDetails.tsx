@@ -1,12 +1,17 @@
-import { FlatList, StyleSheet, Text, TextInput, View } from "react-native";
+import {
+  FlatList,
+  Pressable,
+  StyleSheet,
+  Text,
+  TextInput,
+  View,
+} from "react-native";
 import React, { useRef } from "react";
-import EvilIcons from "@expo/vector-icons/EvilIcons";
 import { capitalizeWords } from "@/utils/helpers";
 import { router } from "expo-router";
 import { Routine } from "@/types/Global";
 import exercises from "../../../constants/exercises.json";
 import { useRoutineContext } from "@/context/RoutineContext";
-import { Image } from "expo-image";
 
 type Props = {
   routine: Routine;
@@ -16,8 +21,6 @@ type Props = {
 export default function RoutineDetails({ routine, setModalVisible }: Props) {
   const { deleteRoutine } = useRoutineContext();
 
-  const expoImageRef = useRef<Image>(null);
-
   const exerciseList = routine.exercises.map((rtEx) => {
     const details = exercises.find(
       (exercise) => exercise.id === rtEx.exerciseId,
@@ -25,22 +28,30 @@ export default function RoutineDetails({ routine, setModalVisible }: Props) {
     return { ...rtEx, details };
   });
 
+  const totalSets = routine.exercises.reduce(
+    (total, ex) => total + ex.sets.length,
+    0,
+  );
+
   return (
     <View style={styles.container}>
       <View style={styles.iconContainer}>
-        <EvilIcons
-          name="trash"
-          size={40}
-          color={"red"}
+        <Pressable
+          style={styles.buttonContainer}
           onPress={() => {
             deleteRoutine(routine.id);
           }}
-        />
-        <Text style={styles.name}>{routine.name}</Text>
-        <EvilIcons
-          name="pencil"
-          size={40}
-          color={"black"}
+        >
+          <Text style={styles.buttonText}>Delete</Text>
+        </Pressable>
+        <Pressable
+          style={[
+            styles.buttonContainer,
+            {
+              borderColor: "rgba(6, 134, 12, 0.44)",
+              backgroundColor: "rgba(6, 134, 12, 0.2)",
+            },
+          ]}
           onPress={() => {
             router.navigate({
               pathname: "/(tabs)/routines/editRoutine",
@@ -48,22 +59,30 @@ export default function RoutineDetails({ routine, setModalVisible }: Props) {
             });
             setModalVisible(false);
           }}
-        />
+        >
+          <Text
+            style={[styles.buttonText, { color: "rgba(6, 134, 12, 0.44)" }]}
+          >
+            Edit
+          </Text>
+        </Pressable>
       </View>
       <FlatList
         data={exerciseList}
         keyExtractor={(item) => item.id}
         ListHeaderComponent={() => {
           return (
-            <View>
-              <View>
-                <Text style={{ fontSize: 16, fontWeight: "bold" }}>
-                  Summary
+            <View style={styles.overviewContainer}>
+              <Text style={styles.name}>{routine.name}</Text>
+              <Text style={styles.notes}>{routine.notes}</Text>
+              <View style={styles.hr} />
+              <View style={{ flexDirection: "row", alignItems: "center" }}>
+                <Text style={styles.exerciseLength}>
+                  {routine.exercises.length} Exercise
                 </Text>
-                <Text>{routine.description}</Text>
-                <Text>{routine.exercises.length} Exercise</Text>
+                <Text style={{ fontSize: 18 }}> • </Text>
+                <Text style={styles.setLength}>{totalSets} Sets</Text>
               </View>
-              <Text>Exercises</Text>
             </View>
           );
         }}
@@ -74,29 +93,16 @@ export default function RoutineDetails({ routine, setModalVisible }: Props) {
                 <Text style={styles.exerciseName}>
                   {capitalizeWords(item.details?.name ?? "")}
                 </Text>
-                <Text style={styles.exerciseName}>
-                  {capitalizeWords(item.details?.bodyParts[0] ?? "")}
-                </Text>
-                <Text style={styles.exerciseName}>
+                <Text style={styles.exerciseMuscle}>
                   {capitalizeWords(item.details?.primaryMuscles[0] ?? "")} &{" "}
                   {capitalizeWords(item.details?.secondaryMuscles[0] ?? "")}
                 </Text>
-                <Image
-                  style={styles.gif}
-                  ref={expoImageRef}
-                  source={item.details?.gifUrl}
-                  onLoad={() => {
-                    expoImageRef.current?.stopAnimating();
-                  }}
-                />
               </View>
-              {item.sets.map((set) => {
-                return (
-                  <View>
-                    <Text>{item.sets.length} Sets</Text>
-                  </View>
-                );
-              })}
+              <View style={{ flexDirection: "row" }}>
+                {Array.from({ length: item.sets.length }, (_, i) => (
+                  <Text>•</Text>
+                ))}
+              </View>
             </View>
           );
         }}
@@ -114,29 +120,60 @@ const styles = StyleSheet.create({
   },
 
   routineContainer: {
-    marginTop: 20,
+    marginTop: 15,
     borderRadius: 10,
     borderWidth: 1,
     padding: 10,
-    marginBottom: 10,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
   },
 
   nameButtonContainer: {
     // flexDirection: "row",
-    // justifyContent: "space-between",
-    alignItems: "flex-start",
-    marginBottom: 10,
+    justifyContent: "center",
   },
   exerciseName: {
-    fontSize: 16,
+    fontSize: 18,
     fontWeight: "bold",
+    marginBottom: 2,
+  },
+  exerciseMuscle: {
+    fontSize: 15,
+    fontWeight: "400",
   },
   name: {
-    fontSize: 20,
+    fontSize: 22,
     fontWeight: "bold",
+    marginBottom: 5,
   },
-  gif: {
-    width: 65,
-    height: 65,
+  overviewContainer: {
+    marginTop: 20,
+  },
+  notes: {
+    fontSize: 16,
+  },
+  exerciseLength: { fontSize: 16 },
+  setLength: { fontSize: 16 },
+  hr: {
+    marginVertical: 10,
+    height: 1,
+    width: "100%",
+    backgroundColor: "black",
+  },
+  buttonContainer: {
+    padding: 7.5,
+    flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "center",
+    borderWidth: 1,
+    borderColor: "rgba(255, 0, 0, 0.6)",
+    backgroundColor: "rgba(255, 0, 0, 0.2)",
+    borderRadius: 10,
+  },
+  buttonText: {
+    fontSize: 14,
+    fontWeight: "bold",
+    color: "rgba(255, 0, 0, 0.6)",
   },
 });
