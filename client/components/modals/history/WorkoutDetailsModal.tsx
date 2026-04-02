@@ -2,7 +2,6 @@ import { Modal, Pressable, StyleSheet, Text, View } from "react-native";
 import React, { useState } from "react";
 import { ModalProps, Workout } from "@/types/Global";
 import WorkoutDetails from "./WorkoutDetails";
-import WorkoutEditForm from "./WorkoutEditForm";
 
 type Props = ModalProps & { workout: Workout };
 
@@ -11,27 +10,25 @@ export default function WorkoutDetailsModal({
   setModalVisible,
   workout,
 }: Props) {
-  const [activeEdit, setActiveEdit] = useState<boolean>(false);
-
   return (
-    <Modal visible={modalVisible}>
-      <View style={styles.centeredView}>
-        <Pressable
-          onPress={() => {
-            setModalVisible(!modalVisible);
-            setActiveEdit(false);
-          }}
-          style={StyleSheet.absoluteFill}
-        />
-        <View style={styles.modalView}>
-          {!activeEdit ? (
-            <WorkoutDetails workout={workout} setActiveEdit={setActiveEdit} />
-          ) : (
-            <WorkoutEditForm setActiveEdit={setActiveEdit} workout={workout} />
-          )}
+    <>
+      <Modal visible={modalVisible}>
+        <View style={styles.centeredView}>
+          <Pressable
+            onPress={() => {
+              setModalVisible(!modalVisible);
+            }}
+            style={StyleSheet.absoluteFill}
+          />
+          <View style={styles.modalView}>
+            <WorkoutDetails
+              workout={workout}
+              setModalVisible={setModalVisible}
+            />
+          </View>
         </View>
-      </View>
-    </Modal>
+      </Modal>
+    </>
   );
 }
 

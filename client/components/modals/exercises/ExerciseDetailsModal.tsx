@@ -1,21 +1,16 @@
 import { Modal, Pressable, StyleSheet, Text, View } from "react-native";
 import React, { useState } from "react";
-import { Button } from "@react-navigation/elements";
 import EvilIcons from "@expo/vector-icons/EvilIcons";
-import { Exercise, ModalProps, WorkoutExercise } from "@/types/Global";
+import { Exercise, ModalProps } from "@/types/Global";
 import DetailsTab from "./DetailsTab";
 import ChartsTab from "./ChartsTab";
 import RecordsTab from "./RecordsTab";
 import HistoryTab from "./HistoryTab";
 import { capitalizeWords } from "@/utils/helpers";
-import { router, usePathname } from "expo-router";
-import * as crypto from "expo-crypto";
-import { useWorkoutContext } from "@/context/WorkoutContext";
-import { useRoutineContext } from "@/context/RoutineContext";
 
 type Props = ModalProps & {
   exercise: Exercise | null;
-  target: "workout" | "routine";
+  handleAddExercise: (exerciseId: string) => void;
 };
 
 type TabName = "Details" | "Records" | "History" | "Charts";
@@ -24,7 +19,7 @@ export default function ExerciseDetailsModal({
   modalVisible,
   setModalVisible,
   exercise,
-  target,
+  handleAddExercise,
 }: Props) {
   const [tab, setTab] = useState<TabName>("Details");
   const tabName: TabName[] = ["Details", "History", "Records", "Charts"];
@@ -44,45 +39,11 @@ export default function ExerciseDetailsModal({
     }
   };
 
-  const { setWorkout } = useWorkoutContext();
-  const { setRoutine } = useRoutineContext();
-
   const handleSubmit = () => {
     if (!exercise) return;
 
-    const newExercise = {
-      id: crypto.randomUUID(),
-      exerciseId: exercise.id,
-      order: 1,
-      sets: [{ id: crypto.randomUUID(), order: 1, reps: 0, weight: null }],
-      notes: "",
-    };
-
-    if (target === "workout") {
-      setWorkout((prev) => ({
-        ...prev,
-        exercises: [
-          ...prev.exercises,
-          {
-            ...newExercise,
-            order: prev.exercises.length + 1,
-          },
-        ],
-      }));
-    } else {
-      setRoutine((prev) => ({
-        ...prev,
-        exercises: [
-          ...prev.exercises,
-          {
-            ...newExercise,
-            order: prev.exercises.length + 1,
-          },
-        ],
-      }));
-    }
-
-    router.back();
+    handleAddExercise(exercise.id);
+    setModalVisible(false);
   };
 
   return (

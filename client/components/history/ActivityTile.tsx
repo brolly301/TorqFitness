@@ -17,6 +17,7 @@ export default function ActivityTile({ workout }: Props) {
         setModalVisible={setModalVisible}
         workout={workout}
       />
+
       <Pressable
         style={styles.container}
         onPress={() => setModalVisible(!modalVisible)}

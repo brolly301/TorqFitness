@@ -22,6 +22,12 @@ export default function _layout() {
           },
         }}
       />
+      <Stack.Screen
+        name="editRoutine"
+        options={{
+          title: "Edit Routine",
+        }}
+      />
     </Stack>
   );
 }

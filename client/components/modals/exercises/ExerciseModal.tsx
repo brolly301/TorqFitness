@@ -1,15 +1,21 @@
 import { Modal, Pressable, StyleSheet, Text, View } from "react-native";
-import React from "react";
-import { ModalProps, Routine } from "@/types/Global";
-import RoutineDetails from "./RoutineDetails";
+import React, { useState } from "react";
+import AppSearchBar from "@/components/ui/AppSearchBar";
+import ExerciseList from "@/components/exercises/ExerciseList";
+import exercises from "@/constants/exercises.json";
+import { ModalProps } from "@/types/Global";
 
-type Props = ModalProps & { routine: Routine };
+type Props = ModalProps & {
+  handleAddExercise: (exerciseId: string) => void;
+};
 
-export default function RoutineDetailsModal({
+export default function ExerciseModal({
   modalVisible,
   setModalVisible,
-  routine,
+  handleAddExercise,
 }: Props) {
+  const [search, setSearch] = useState<string>("");
+
   return (
     <Modal visible={modalVisible}>
       <View style={styles.centeredView}>
@@ -18,7 +24,11 @@ export default function RoutineDetailsModal({
           style={StyleSheet.absoluteFill}
         />
         <View style={styles.modalView}>
-          <RoutineDetails routine={routine} setModalVisible={setModalVisible} />
+          <AppSearchBar setSearch={setSearch} />
+          <ExerciseList
+            exercises={exercises}
+            handleAddExercise={handleAddExercise}
+          />
         </View>
       </View>
     </Modal>
@@ -40,9 +50,5 @@ const styles = StyleSheet.create({
     paddingTop: 15,
     paddingHorizontal: 15,
     paddingBottom: 26,
-  },
-  iconContainer: {
-    flexDirection: "row",
-    justifyContent: "space-between",
   },
 });

@@ -19,6 +19,12 @@ export default function _layout() {
           },
         }}
       />
+      <Stack.Screen
+        name="editWorkout"
+        options={{
+          title: "Edit Workout",
+        }}
+      />
     </Stack>
   );
 }

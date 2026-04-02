@@ -1,51 +1,32 @@
 import { StyleSheet, Text, View } from "react-native";
-import React, {
-  useCallback,
-  useEffect,
-  useLayoutEffect,
-  useState,
-} from "react";
-import WorkoutForm from "@/components/workout/WorkoutForm";
+import React, { useCallback, useLayoutEffect, useState } from "react";
+import { router, useLocalSearchParams, useNavigation } from "expo-router";
 import { useWorkoutContext } from "@/context/WorkoutContext";
-import { router, useNavigation } from "expo-router";
-import EvilIcons from "@expo/vector-icons/EvilIcons";
+import { Workout } from "@/types/Global";
 import ExerciseModal from "@/components/modals/exercises/ExerciseModal";
+import WorkoutForm from "@/components/workout/WorkoutForm";
 import * as crypto from "expo-crypto";
+import EvilIcons from "@expo/vector-icons/EvilIcons";
 
-export default function StartWorkoutScreen() {
-  const { workout, setWorkout, setWorkouts, resetWorkout } =
-    useWorkoutContext();
-
+export default function EditWorkoutScreen() {
+  const { workoutId } = useLocalSearchParams();
+  const { workouts, setWorkouts } = useWorkoutContext();
   const [modalVisible, setModalVisible] = useState<boolean>(false);
 
+  const workoutDetails = workouts.find((wk) => wk.id === workoutId);
+
   const navigation = useNavigation();
-  useEffect(() => {
-    setWorkout((prev) => ({
-      ...prev,
-      startedAt: new Date().toISOString(),
-    }));
-  }, []);
+
+  if (!workoutDetails) return;
+
+  const [formData, setFormData] = useState<Workout>(workoutDetails);
 
   const handleSubmit = useCallback(() => {
-    if (!workout.startedAt) return;
-
-    const completedAt = new Date().toISOString();
-    const duration = Math.floor(
-      (new Date(completedAt).getTime() -
-        new Date(workout.startedAt).getTime()) /
-        1000,
+    setWorkouts((prev) =>
+      prev.map((workout) => (workout.id === formData.id ? formData : workout)),
     );
-
-    const finalWorkout = {
-      ...workout,
-      completedAt,
-      duration,
-    };
-
-    setWorkouts((prev) => [...prev, finalWorkout]);
-    resetWorkout();
     router.back();
-  }, [workout, setWorkouts, resetWorkout]);
+  }, [formData, setWorkouts]);
 
   useLayoutEffect(() => {
     navigation.setOptions({
@@ -71,7 +52,7 @@ export default function StartWorkoutScreen() {
       notes: "",
     };
 
-    setWorkout((prev) => ({
+    setFormData((prev) => ({
       ...prev,
       exercises: [
         ...prev.exercises,
@@ -91,8 +72,8 @@ export default function StartWorkoutScreen() {
         handleAddExercise={handleAddExercise}
       />
       <WorkoutForm
-        setDraft={setWorkout}
-        draft={workout}
+        setDraft={setFormData}
+        draft={formData}
         setModalVisible={setModalVisible}
       />
     </>

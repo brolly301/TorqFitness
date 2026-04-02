@@ -6,13 +6,14 @@ import EvilIcons from "@expo/vector-icons/EvilIcons";
 import { useWorkoutContext } from "@/context/WorkoutContext";
 import { capitalizeWords } from "@/utils/helpers";
 import { Button } from "@react-navigation/elements";
+import { router } from "expo-router";
 
 type Props = {
   workout: Workout;
-  setActiveEdit: React.Dispatch<React.SetStateAction<boolean>>;
+  setModalVisible: React.Dispatch<React.SetStateAction<boolean>>;
 };
 
-export default function WorkoutDetails({ workout, setActiveEdit }: Props) {
+export default function WorkoutDetails({ workout, setModalVisible }: Props) {
   const { deleteWorkout } = useWorkoutContext();
 
   const exerciseList = workout.exercises.map((we) => {
@@ -36,7 +37,13 @@ export default function WorkoutDetails({ workout, setActiveEdit }: Props) {
           name="pencil"
           size={40}
           color={"black"}
-          onPress={() => setActiveEdit(true)}
+          onPress={() => {
+            router.navigate({
+              pathname: "/(tabs)/history/editWorkout",
+              params: { workoutId: workout.id },
+            });
+            setModalVisible(false);
+          }}
         />
       </View>
       <FlatList

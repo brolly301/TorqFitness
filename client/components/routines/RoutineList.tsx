@@ -1,10 +1,22 @@
-import { StyleSheet, Text, View } from "react-native";
+import { FlatList, StyleSheet, Text, View } from "react-native";
 import React from "react";
+import { Routine } from "@/types/Global";
+import RoutineTile from "./RoutineTile";
 
-export default function RoutineList() {
+type Props = {
+  routines: Routine[];
+};
+
+export default function RoutineList({ routines }: Props) {
   return (
     <View>
-      <Text>RoutineList</Text>
+      <FlatList
+        data={routines}
+        keyExtractor={(item) => item.id}
+        renderItem={({ item }) => {
+          return <RoutineTile routine={item} />;
+        }}
+      />
     </View>
   );
 }

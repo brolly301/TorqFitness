@@ -3,7 +3,7 @@ import React, { useEffect, useState } from "react";
 import { Button } from "@react-navigation/elements";
 import { router } from "expo-router";
 import Timer from "./Timer";
-import { WorkoutDraft } from "@/types/Global";
+import { ModalProps, WorkoutDraft } from "@/types/Global";
 import { useExerciseContext } from "@/context/ExerciseContext";
 import { addSet, removeExercise, updateSet } from "@/utils/workoutUtil";
 import { capitalizeWords } from "@/utils/helpers";
@@ -13,14 +13,13 @@ type Props<T extends WorkoutDraft> = {
   draft: T;
   setDraft: React.Dispatch<React.SetStateAction<T>>;
   showTimer?: boolean;
-  target: "workout" | "routine";
-};
+} & Pick<ModalProps, "setModalVisible">;
 
 export default function WorkoutForm<T extends WorkoutDraft>({
   draft,
   setDraft,
   showTimer,
-  target,
+  setModalVisible,
 }: Props<T>) {
   const { exercises } = useExerciseContext();
 
@@ -46,18 +45,21 @@ export default function WorkoutForm<T extends WorkoutDraft>({
         <TextInput
           placeholder="Workout #1"
           placeholderTextColor={"black"}
+          value={draft.name}
           onChangeText={(text) => updateForm("name", text)}
           style={styles.nameInput}
         />
         <TextInput
           placeholder="Enter description"
           placeholderTextColor={"black"}
+          value={draft.description}
           onChangeText={(text) => updateForm("description", text)}
           style={styles.nameInput}
         />
         <TextInput
           placeholder="Enter workout notes"
           placeholderTextColor={"black"}
+          value={draft.notes}
           onChangeText={(text) => updateForm("notes", text)}
           style={styles.nameInput}
         />
@@ -140,17 +142,7 @@ export default function WorkoutForm<T extends WorkoutDraft>({
               );
             })
           : null}
-
-        <Button
-          onPress={() =>
-            router.push({
-              pathname: "../../(modals)/exercise",
-              params: { target },
-            })
-          }
-        >
-          Add Exercise
-        </Button>
+        <Button onPress={() => setModalVisible(true)}>Add Exercise</Button>
       </View>
     </>
   );
