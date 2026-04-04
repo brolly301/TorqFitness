@@ -6,12 +6,18 @@ import WorkoutForm from "@/components/workout/WorkoutForm";
 import EvilIcons from "@expo/vector-icons/EvilIcons";
 import ExerciseModal from "@/components/modals/exercises/ExerciseModal";
 import * as crypto from "expo-crypto";
+import { Routine } from "@/types/Global";
 
 export default function CreateRoutineScreen() {
-  const { resetRoutine, routine, setRoutine, setRoutines } =
-    useRoutineContext();
+  const { setRoutines } = useRoutineContext();
 
   const [modalVisible, setModalVisible] = useState<boolean>(false);
+  const [routine, setRoutine] = useState<Routine>({
+    id: crypto.randomUUID(),
+    name: "",
+    exercises: [],
+    notes: "",
+  });
 
   const navigation = useNavigation();
 
@@ -19,9 +25,8 @@ export default function CreateRoutineScreen() {
     if (!routine) return;
 
     setRoutines((prev) => [...prev, routine]);
-    resetRoutine();
     router.back();
-  }, [routine, setRoutines, resetRoutine]);
+  }, [routine, setRoutines]);
 
   useLayoutEffect(() => {
     navigation.setOptions({

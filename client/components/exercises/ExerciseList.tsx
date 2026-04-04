@@ -6,10 +6,15 @@ import ExerciseDetailsModal from "../modals/exercises/ExerciseDetailsModal";
 
 type Props = {
   exercises: Exercise[];
-  handleAddExercise: (exerciseId: string) => void;
+  handleAddExercise?: (exerciseId: string) => void;
+  showAddButton?: boolean;
 };
 
-export default function ExerciseList({ exercises, handleAddExercise }: Props) {
+export default function ExerciseList({
+  showAddButton = true,
+  exercises,
+  handleAddExercise,
+}: Props) {
   const [modalVisible, setModalVisible] = useState<boolean>(false);
   const [exercise, setExercise] = useState<Exercise | null>(null);
 
@@ -20,6 +25,7 @@ export default function ExerciseList({ exercises, handleAddExercise }: Props) {
         setModalVisible={setModalVisible}
         exercise={exercise}
         handleAddExercise={handleAddExercise}
+        showAddButton={showAddButton}
       />
       <FlatList
         data={exercises}

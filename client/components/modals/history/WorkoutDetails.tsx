@@ -1,12 +1,12 @@
 import { FlatList, StyleSheet, Text, TextInput, View } from "react-native";
 import React, { useState } from "react";
 import { Workout } from "@/types/Global";
-import exercises from "../../../constants/exercises.json";
 import EvilIcons from "@expo/vector-icons/EvilIcons";
 import { useWorkoutContext } from "@/context/WorkoutContext";
 import { capitalizeWords } from "@/utils/helpers";
 import { Button } from "@react-navigation/elements";
 import { router } from "expo-router";
+import { useExerciseContext } from "@/context/ExerciseContext";
 
 type Props = {
   workout: Workout;
@@ -15,6 +15,7 @@ type Props = {
 
 export default function WorkoutDetails({ workout, setModalVisible }: Props) {
   const { deleteWorkout } = useWorkoutContext();
+  const { exercises } = useExerciseContext();
 
   const exerciseList = workout.exercises.map((we) => {
     const details = exercises.find((ex) => ex.id === we.exerciseId);
@@ -55,11 +56,6 @@ export default function WorkoutDetails({ workout, setModalVisible }: Props) {
               <TextInput
                 style={styles.input}
                 value={workout.name}
-                editable={false}
-              />
-              <TextInput
-                style={styles.input}
-                value={workout.description}
                 editable={false}
               />
               <TextInput

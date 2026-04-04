@@ -10,8 +10,8 @@ import React, { useRef } from "react";
 import { capitalizeWords } from "@/utils/helpers";
 import { router } from "expo-router";
 import { Routine } from "@/types/Global";
-import exercises from "../../../constants/exercises.json";
 import { useRoutineContext } from "@/context/RoutineContext";
+import { useExerciseContext } from "@/context/ExerciseContext";
 
 type Props = {
   routine: Routine;
@@ -20,6 +20,7 @@ type Props = {
 
 export default function RoutineDetails({ routine, setModalVisible }: Props) {
   const { deleteRoutine } = useRoutineContext();
+  const { exercises } = useExerciseContext();
 
   const exerciseList = routine.exercises.map((rtEx) => {
     const details = exercises.find(

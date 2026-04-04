@@ -11,10 +11,20 @@ import { router, useNavigation } from "expo-router";
 import EvilIcons from "@expo/vector-icons/EvilIcons";
 import ExerciseModal from "@/components/modals/exercises/ExerciseModal";
 import * as crypto from "expo-crypto";
+import { Workout } from "@/types/Global";
 
 export default function StartWorkoutScreen() {
-  const { workout, setWorkout, setWorkouts, resetWorkout } =
-    useWorkoutContext();
+  const { setWorkouts } = useWorkoutContext();
+
+  const [workout, setWorkout] = useState<Workout>({
+    id: crypto.randomUUID(),
+    name: "",
+    startedAt: null,
+    completedAt: null,
+    duration: 0,
+    exercises: [],
+    notes: "",
+  });
 
   const [modalVisible, setModalVisible] = useState<boolean>(false);
 
@@ -43,9 +53,8 @@ export default function StartWorkoutScreen() {
     };
 
     setWorkouts((prev) => [...prev, finalWorkout]);
-    resetWorkout();
     router.back();
-  }, [workout, setWorkouts, resetWorkout]);
+  }, [workout, setWorkouts]);
 
   useLayoutEffect(() => {
     navigation.setOptions({

@@ -1,12 +1,11 @@
 import { StyleSheet, Text, TextInput, View } from "react-native";
 import React, { useEffect, useState } from "react";
 import { Button } from "@react-navigation/elements";
-import { router } from "expo-router";
 import Timer from "./Timer";
 import { ModalProps, WorkoutDraft } from "@/types/Global";
 import { useExerciseContext } from "@/context/ExerciseContext";
 import { addSet, removeExercise, updateSet } from "@/utils/workoutUtil";
-import { capitalizeWords } from "@/utils/helpers";
+import { capitalizeWords, formatDate } from "@/utils/helpers";
 import EvilIcons from "@expo/vector-icons/EvilIcons";
 
 type Props<T extends WorkoutDraft> = {
@@ -29,40 +28,59 @@ export default function WorkoutForm<T extends WorkoutDraft>({
     return { ...we, details };
   });
 
-  const updateForm = (
-    field: "name" | "description" | "notes",
-    value: string,
-  ) => {
+  const updateForm = (field: "name" | "notes", value: string) => {
     setDraft((prev) => {
       return { ...prev, [field]: value };
     });
   };
 
+  const date = new Date();
+
+  const totalVolume = exerciseList.reduce((workoutTotal, exercise) => {
+    const exerciseVolume = exercise.sets.reduce(
+      (setTotal, set) => Number(set.reps) * Number(set.weight) + setTotal,
+      0,
+    );
+    return workoutTotal + exerciseVolume;
+  }, 0);
+
+  const totalSets = exerciseList.reduce(
+    (total, exercise) => total + exercise.sets.length,
+    0,
+  );
+
   return (
     <>
       <View>
-        <Timer />
-        <TextInput
-          placeholder="Workout #1"
-          placeholderTextColor={"black"}
-          value={draft.name}
-          onChangeText={(text) => updateForm("name", text)}
-          style={styles.nameInput}
-        />
-        <TextInput
-          placeholder="Enter description"
-          placeholderTextColor={"black"}
-          value={draft.description}
-          onChangeText={(text) => updateForm("description", text)}
-          style={styles.nameInput}
-        />
+        <View style={styles.nameTimer}>
+          <View>
+            <TextInput
+              placeholder="Workout #1"
+              placeholderTextColor={"black"}
+              value={draft.name}
+              onChangeText={(text) => updateForm("name", text)}
+              style={styles.nameInput}
+            />
+            <View style={{ flexDirection: "row" }}>
+              <Text>Volume {totalVolume}kg</Text>
+              <Text> • </Text>
+              <Text>{totalSets} sets</Text>
+            </View>
+          </View>
+          <View>
+            <Text style={styles.date}>{formatDate(date)}</Text>
+            <Timer />
+          </View>
+        </View>
+        <View style={styles.hr} />
         <TextInput
           placeholder="Enter workout notes"
           placeholderTextColor={"black"}
           value={draft.notes}
           onChangeText={(text) => updateForm("notes", text)}
-          style={styles.nameInput}
+          style={styles.notesInput}
         />
+        <View style={styles.hr} />
         {exerciseList
           ? exerciseList.map((exercise) => {
               return (
@@ -150,9 +168,17 @@ export default function WorkoutForm<T extends WorkoutDraft>({
 
 const styles = StyleSheet.create({
   nameInput: {
-    borderWidth: 1,
-    padding: 10,
-    borderRadius: 10,
+    fontSize: 24,
+  },
+  notesInput: {
+    fontSize: 18,
+  },
+  date: { fontSize: 22 },
+  nameTimer: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "flex-start",
+    // marginBottom: 15,
   },
   workoutContainer: {
     marginTop: 20,
@@ -192,5 +218,10 @@ const styles = StyleSheet.create({
   exerciseName: {
     fontSize: 16,
     fontWeight: "bold",
+  },
+  hr: {
+    height: 1,
+    backgroundColor: "black",
+    marginVertical: 15,
   },
 });

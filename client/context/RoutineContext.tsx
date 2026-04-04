@@ -3,11 +3,8 @@ import { createContext, ReactNode, useContext, useState } from "react";
 import * as crypto from "expo-crypto";
 
 type RoutineContextType = {
-  routine: Routine;
-  setRoutine: React.Dispatch<React.SetStateAction<Routine>>;
   routines: Routine[];
   setRoutines: React.Dispatch<React.SetStateAction<Routine[]>>;
-  resetRoutine: () => void;
   deleteRoutine: (id: string) => void;
   updateRoutine: (routine: Routine) => void;
 };
@@ -18,7 +15,6 @@ export const RoutineProvider = ({ children }: { children: ReactNode }) => {
   const [routine, setRoutine] = useState<Routine>({
     id: crypto.randomUUID(),
     name: "",
-    description: "",
     exercises: [],
     notes: "",
   });
@@ -29,7 +25,6 @@ export const RoutineProvider = ({ children }: { children: ReactNode }) => {
     setRoutine({
       id: crypto.randomUUID(),
       name: "",
-      description: "",
       exercises: [],
       notes: "",
     });
@@ -52,10 +47,7 @@ export const RoutineProvider = ({ children }: { children: ReactNode }) => {
   return (
     <RoutineContext.Provider
       value={{
-        routine,
-        resetRoutine,
         routines,
-        setRoutine,
         setRoutines,
         deleteRoutine,
         updateRoutine,

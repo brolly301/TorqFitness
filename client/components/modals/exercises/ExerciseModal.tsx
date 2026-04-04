@@ -2,8 +2,8 @@ import { Modal, Pressable, StyleSheet, Text, View } from "react-native";
 import React, { useState } from "react";
 import AppSearchBar from "@/components/ui/AppSearchBar";
 import ExerciseList from "@/components/exercises/ExerciseList";
-import exercises from "@/constants/exercises.json";
 import { ModalProps } from "@/types/Global";
+import { useExerciseContext } from "@/context/ExerciseContext";
 
 type Props = ModalProps & {
   handleAddExercise: (exerciseId: string) => void;
@@ -15,6 +15,7 @@ export default function ExerciseModal({
   handleAddExercise,
 }: Props) {
   const [search, setSearch] = useState<string>("");
+  const { exercises } = useExerciseContext();
 
   return (
     <Modal visible={modalVisible}>

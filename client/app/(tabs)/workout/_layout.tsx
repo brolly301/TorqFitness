@@ -8,7 +8,7 @@ export default function _layout() {
       <Stack.Screen
         name="createWorkout"
         options={{
-          title: "Start Workout",
+          title: "",
         }}
       />
     </Stack>

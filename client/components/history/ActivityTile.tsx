@@ -23,7 +23,6 @@ export default function ActivityTile({ workout }: Props) {
         onPress={() => setModalVisible(!modalVisible)}
       >
         <Text style={styles.name}>{workout.name}</Text>
-        <Text style={styles.description}>{workout.description}</Text>
         <Text style={styles.date}>{workout.startedAt}</Text>
         {workout.exercises.map((exercise) => {
           return (
@@ -49,9 +48,7 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: "600",
   },
-  description: {
-    fontSize: 16,
-  },
+
   date: {
     fontSize: 14,
   },

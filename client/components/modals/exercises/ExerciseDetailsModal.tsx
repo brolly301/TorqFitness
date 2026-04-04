@@ -10,7 +10,8 @@ import { capitalizeWords } from "@/utils/helpers";
 
 type Props = ModalProps & {
   exercise: Exercise | null;
-  handleAddExercise: (exerciseId: string) => void;
+  handleAddExercise?: (exerciseId: string) => void;
+  showAddButton: boolean;
 };
 
 type TabName = "Details" | "Records" | "History" | "Charts";
@@ -20,6 +21,7 @@ export default function ExerciseDetailsModal({
   setModalVisible,
   exercise,
   handleAddExercise,
+  showAddButton,
 }: Props) {
   const [tab, setTab] = useState<TabName>("Details");
   const tabName: TabName[] = ["Details", "History", "Records", "Charts"];
@@ -42,7 +44,9 @@ export default function ExerciseDetailsModal({
   const handleSubmit = () => {
     if (!exercise) return;
 
-    handleAddExercise(exercise.id);
+    if (handleAddExercise) {
+      handleAddExercise(exercise.id);
+    }
     setModalVisible(false);
   };
 
@@ -61,9 +65,11 @@ export default function ExerciseDetailsModal({
               color={"black"}
               onPress={() => setModalVisible(!modalVisible)}
             />
-            <Pressable style={styles.addButton} onPress={handleSubmit}>
-              <Text style={styles.addButtonText}>Add</Text>
-            </Pressable>
+            {showAddButton && (
+              <Pressable style={styles.addButton} onPress={handleSubmit}>
+                <Text style={styles.addButtonText}>Add</Text>
+              </Pressable>
+            )}
           </View>
           <Text style={styles.exercise}>
             {exercise?.name ? capitalizeWords(exercise?.name) : ""}

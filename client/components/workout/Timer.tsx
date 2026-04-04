@@ -17,9 +17,9 @@ export default function Timer() {
 
   return (
     <View style={styles.timeContainer}>
-      <Text>{hour.toString().padStart(2, "0")}:</Text>
-      <Text>{minute.toString().padStart(2, "0")}:</Text>
-      <Text>{second.toString().padStart(2, "0")}</Text>
+      <Text style={styles.time}>{hour.toString().padStart(2, "0")}:</Text>
+      <Text style={styles.time}>{minute.toString().padStart(2, "0")}:</Text>
+      <Text style={styles.time}>{second.toString().padStart(2, "0")}</Text>
     </View>
   );
 }
@@ -27,5 +27,8 @@ export default function Timer() {
 const styles = StyleSheet.create({
   timeContainer: {
     flexDirection: "row",
+  },
+  time: {
+    fontSize: 22,
   },
 });

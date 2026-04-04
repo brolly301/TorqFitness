@@ -34,7 +34,6 @@ export type WorkoutExercise = {
 export type WorkoutDraft = {
   id: string;
   name: string;
-  description?: string;
   exercises: WorkoutExercise[];
   notes?: string;
 };
