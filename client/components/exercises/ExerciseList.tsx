@@ -1,5 +1,5 @@
 import { FlatList, Pressable, StyleSheet, Text, View } from "react-native";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Exercise } from "@/types/Global";
 import ExerciseItem from "./ExerciseItem";
 import ExerciseDetailsModal from "../modals/exercises/ExerciseDetailsModal";

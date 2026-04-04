@@ -11,3 +11,6 @@ export const formatDate = (date: Date | string) =>
     month: "short",
     year: "numeric",
   });
+
+export const normalize = (text: string) =>
+  text.toLowerCase().replace(/[\s-]/g, "");

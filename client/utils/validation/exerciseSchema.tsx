@@ -1,30 +1,25 @@
 import * as z from "zod";
 
+const stringArrayField = (fieldName: string) =>
+  z
+    .array(
+      z
+        .string()
+        .trim()
+        .min(1, `${fieldName} items cannot be empty.`)
+        .max(60, `${fieldName} items must not exceed 60 characters.`),
+    )
+    .min(1, `${fieldName} must contain at least 1 item.`);
+
 export const exerciseSchema = z.object({
   name: z
     .string()
-    .nonempty("Name is required.")
+    .trim()
+    .min(1, "Name is required.")
     .max(60, "Name must not exceed 60 characters."),
-  description: z
-    .string()
-    .min(5, "Description must contain more than 5 characters.")
-    .max(1000, "Description must not exceed 1000 characters."),
-  primaryMuscles: z
-    .string()
-    .min(5, "Primary muscles must contain more than 5 characters.")
-    .max(1000, "Primary muscles must not exceed 1000 characters."),
-  secondaryMuscles: z
-    .string()
-    .min(5, "Secondary muscles must contain more than 5 characters.")
-    .max(1000, "Secondary muscles must not exceed 1000 characters."),
-  bodyParts: z
-    .string()
-    .min(5, "Body parts must contain more than 5 characters.")
-    .max(1000, "Body parts must not exceed 1000 characters."),
-  equipment: z
-    .string()
-    .min(5, "Equipment must contain more than 5 characters.")
-    .max(1000, "Equipment must not exceed 1000 characters."),
+  bodyParts: stringArrayField("Body parts"),
+  primaryMuscles: stringArrayField("Primary muscles"),
+  equipment: stringArrayField("Equipment"),
 });
 
 export type ExerciseSchema = z.infer<typeof exerciseSchema>;

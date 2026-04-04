@@ -8,12 +8,12 @@ export type ModalProps = {
 export type Exercise = {
   id: string;
   name: string;
-  gifUrl: string;
+  gifUrl?: string;
   bodyParts: string[];
   primaryMuscles: string[];
-  secondaryMuscles: string[];
+  secondaryMuscles?: string[];
   equipment: string[];
-  instructions: string[];
+  instructions?: string[];
 };
 
 export type WorkoutSet = {

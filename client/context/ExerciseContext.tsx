@@ -16,11 +16,7 @@ type ExerciseContextType = {
 const ExerciseContext = createContext<ExerciseContextType | null>(null);
 
 export const ExerciseProvider = ({ children }: { children: ReactNode }) => {
-  const [exercises, setExercises] = useState<Exercise[]>([]);
-
-  useEffect(() => {
-    setExercises(exercisesJSON);
-  }, []);
+  const [exercises, setExercises] = useState<Exercise[]>(exercisesJSON);
 
   return (
     <ExerciseContext.Provider value={{ exercises, setExercises }}>

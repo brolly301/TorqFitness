@@ -25,7 +25,10 @@ export default function ExerciseItem({ exercise }: Props) {
         <Text style={styles.name}>{capitalizeWords(exercise.name)}</Text>
         <Text style={styles.primaryMuscle}>{exercise.bodyParts[0]}</Text>
         <Text style={styles.primaryMuscle}>
-          {exercise.primaryMuscles[0]} & {exercise.secondaryMuscles[1]}
+          {exercise.primaryMuscles[0]}
+          {exercise.secondaryMuscles?.[0] && (
+            <Text> & {exercise.secondaryMuscles[0]}</Text>
+          )}
         </Text>
       </View>
     </View>

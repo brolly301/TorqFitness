@@ -4,6 +4,7 @@ import AppSearchBar from "@/components/ui/AppSearchBar";
 import ExerciseList from "@/components/exercises/ExerciseList";
 import { ModalProps } from "@/types/Global";
 import { useExerciseContext } from "@/context/ExerciseContext";
+import { normalize } from "@/utils/helpers";
 
 type Props = ModalProps & {
   handleAddExercise: (exerciseId: string) => void;
@@ -17,6 +18,10 @@ export default function ExerciseModal({
   const [search, setSearch] = useState<string>("");
   const { exercises } = useExerciseContext();
 
+  const filteredExercises = exercises.filter((exercise) =>
+    normalize(exercise.name).includes(normalize(search)),
+  );
+
   return (
     <Modal visible={modalVisible}>
       <View style={styles.centeredView}>
@@ -27,7 +32,7 @@ export default function ExerciseModal({
         <View style={styles.modalView}>
           <AppSearchBar setSearch={setSearch} />
           <ExerciseList
-            exercises={exercises}
+            exercises={filteredExercises}
             handleAddExercise={handleAddExercise}
           />
         </View>
