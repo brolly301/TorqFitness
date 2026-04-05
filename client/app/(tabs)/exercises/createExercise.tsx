@@ -4,8 +4,8 @@ import { useForm, Controller } from "react-hook-form";
 import AppError from "@/components/ui/AppError";
 import { Button } from "@react-navigation/elements";
 import {
+  ExerciseFormValues,
   exerciseSchema,
-  ExerciseSchema,
 } from "@/utils/validation/exerciseSchema";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useExerciseContext } from "@/context/ExerciseContext";
@@ -22,7 +22,7 @@ export default function CreateExerciseScreen() {
     control,
     handleSubmit,
     formState: { errors },
-  } = useForm<ExerciseSchema>({
+  } = useForm<ExerciseFormValues>({
     resolver: zodResolver(exerciseSchema),
     defaultValues: {
       name: "",
@@ -35,7 +35,7 @@ export default function CreateExerciseScreen() {
 
   const { exercises, setExercises } = useExerciseContext();
 
-  const onSubmit = (data: ExerciseSchema) => {
+  const onSubmit = (data: ExerciseFormValues) => {
     const exercise = {
       id: crypto.randomUUID(),
       gifUrl: "https://static.exercisedb.dev/media/MCkqdKE.gif",

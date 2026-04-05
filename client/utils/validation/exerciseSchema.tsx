@@ -1,4 +1,4 @@
-import * as z from "zod";
+import * as z from "zod/v4";
 
 const stringArrayField = (fieldName: string) =>
   z
@@ -22,4 +22,4 @@ export const exerciseSchema = z.object({
   equipment: stringArrayField("Equipment"),
 });
 
-export type ExerciseSchema = z.infer<typeof exerciseSchema>;
+export type ExerciseFormValues = z.infer<typeof exerciseSchema>;

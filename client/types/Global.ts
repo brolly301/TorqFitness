@@ -5,6 +5,12 @@ export type ModalProps = {
   setModalVisible: React.Dispatch<React.SetStateAction<boolean>>;
 };
 
+export type FormField<T> = {
+  name: keyof T;
+  placeholder: string;
+  secureTextEntry?: boolean;
+};
+
 export type Exercise = {
   id: string;
   name: string;
