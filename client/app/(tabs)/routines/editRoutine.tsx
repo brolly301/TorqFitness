@@ -8,6 +8,8 @@ import WorkoutForm from "@/components/workout/WorkoutForm";
 import * as crypto from "expo-crypto";
 import EvilIcons from "@expo/vector-icons/EvilIcons";
 import { useRoutineContext } from "@/context/RoutineContext";
+import DiscardModal from "@/components/modals/confirmation/DiscardModal";
+import FinishModal from "@/components/modals/confirmation/FinishModal";
 
 export default function EditRoutineScreen() {
   const { routineId } = useLocalSearchParams();
@@ -21,6 +23,10 @@ export default function EditRoutineScreen() {
   if (!routineDetails) return;
 
   const [formData, setFormData] = useState<Routine>(routineDetails);
+
+  const [finishModalVisible, setFinishModalVisible] = useState<boolean>(false);
+  const [discardModalVisible, setDiscardModalVisible] =
+    useState<boolean>(false);
 
   const handleSubmit = useCallback(() => {
     setRoutines((prev) =>
@@ -37,7 +43,17 @@ export default function EditRoutineScreen() {
             name="check"
             color={"black"}
             size={22}
-            onPress={handleSubmit}
+            onPress={() => setFinishModalVisible(true)}
+          />
+        );
+      },
+      headerLeft: () => {
+        return (
+          <EvilIcons
+            name="chevron-left"
+            color={"black"}
+            size={32}
+            onPress={() => setDiscardModalVisible(true)}
           />
         );
       },
@@ -67,6 +83,18 @@ export default function EditRoutineScreen() {
 
   return (
     <>
+      <DiscardModal
+        modalVisible={discardModalVisible}
+        setModalVisible={setDiscardModalVisible}
+        placeholder="discard your changes?"
+        onConfirm={() => router.back()}
+      />
+      <FinishModal
+        modalVisible={finishModalVisible}
+        setModalVisible={setFinishModalVisible}
+        onConfirm={handleSubmit}
+        placeholder={"editing this routine?"}
+      />
       <ExerciseModal
         modalVisible={modalVisible}
         setModalVisible={setModalVisible}

@@ -9,6 +9,7 @@ import {
   primaryMuscles,
 } from "@/constants/exerciseDropdowns";
 import { Exercise, ModalProps } from "@/types/Global";
+import DeleteModal from "../modals/confirmation/DeleteModal";
 
 type Props = { exercise: Exercise | null } & Pick<
   ModalProps,
@@ -19,6 +20,15 @@ export default function ExerciseEditForm({ exercise, setModalVisible }: Props) {
   if (!exercise) return null;
 
   const [exerciseData, setExerciseData] = useState<Exercise>(exercise);
+
+  const [deleteModalVisible, setDeleteModalVisible] = useState<boolean>(false);
+
+  const isDisabled =
+    !exercise.name.trim() ||
+    exercise.primaryMuscles.length === 0 ||
+    exercise.bodyParts.length === 0 ||
+    exercise.equipment.length === 0;
+
   const { updateExercise, archiveExercise } = useExerciseContext();
 
   const handleSubmit = () => {
@@ -26,74 +36,85 @@ export default function ExerciseEditForm({ exercise, setModalVisible }: Props) {
     setModalVisible(false);
   };
 
+  const onConfirm = () => {
+    archiveExercise(exerciseData.id);
+    setModalVisible(false);
+  };
+
   return (
-    <View style={styles.container}>
-      <TextInput
-        placeholder="Name"
-        placeholderTextColor="black"
-        style={styles.input}
-        textAlignVertical="center"
-        value={exerciseData.name}
-        onChangeText={(text) =>
-          setExerciseData((prev) => ({ ...prev, name: text }))
-        }
+    <>
+      <DeleteModal
+        modalVisible={deleteModalVisible}
+        setModalVisible={setDeleteModalVisible}
+        placeholder="workout"
+        onConfirm={onConfirm}
       />
+      <View style={styles.container}>
+        <TextInput
+          placeholder="Name"
+          placeholderTextColor="black"
+          style={styles.input}
+          textAlignVertical="center"
+          value={exerciseData.name}
+          onChangeText={(text) =>
+            setExerciseData((prev) => ({ ...prev, name: text }))
+          }
+        />
 
-      <AppDropdown
-        selected={exerciseData.primaryMuscles[0] || ""}
-        data={primaryMuscles}
-        setSelected={(selected) =>
-          setExerciseData((prev) => ({
-            ...prev,
-            primaryMuscles: selected ? [selected] : [],
-          }))
-        }
-        placeholder="Select a muscle"
-      />
+        <AppDropdown
+          selected={exerciseData.primaryMuscles[0] || ""}
+          data={primaryMuscles}
+          setSelected={(selected) =>
+            setExerciseData((prev) => ({
+              ...prev,
+              primaryMuscles: selected ? [selected] : [],
+            }))
+          }
+          placeholder="Select a muscle"
+        />
 
-      <AppDropdown
-        selected={exerciseData.bodyParts[0] || ""}
-        data={bodyParts}
-        setSelected={(selected) =>
-          setExerciseData((prev) => ({
-            ...prev,
-            bodyParts: selected ? [selected] : [],
-          }))
-        }
-        placeholder="Select a body part"
-      />
+        <AppDropdown
+          selected={exerciseData.bodyParts[0] || ""}
+          data={bodyParts}
+          setSelected={(selected) =>
+            setExerciseData((prev) => ({
+              ...prev,
+              bodyParts: selected ? [selected] : [],
+            }))
+          }
+          placeholder="Select a body part"
+        />
 
-      <AppDropdown
-        selected={exerciseData.equipment[0] || ""}
-        data={equipment}
-        setSelected={(selected) =>
-          setExerciseData((prev) => ({
-            ...prev,
-            equipment: selected ? [selected] : [],
-          }))
-        }
-        placeholder="Select equipment"
-      />
+        <AppDropdown
+          selected={exerciseData.equipment[0] || ""}
+          data={equipment}
+          setSelected={(selected) =>
+            setExerciseData((prev) => ({
+              ...prev,
+              equipment: selected ? [selected] : [],
+            }))
+          }
+          placeholder="Select equipment"
+        />
 
-      <Button
-        disabled={!exerciseData.name.trim()}
-        onPress={handleSubmit}
-        style={{
-          backgroundColor: !exerciseData.name.trim() ? "red" : "green",
-        }}
-      >
-        Save Exercise
-      </Button>
-
-      <Button
-        onPress={() => {
-          archiveExercise(exerciseData.id);
-          setModalVisible(false);
-        }}
-      >
-        Archive Exercise
-      </Button>
-    </View>
+        <Button
+          disabled={isDisabled}
+          onPress={handleSubmit}
+          style={{
+            backgroundColor: isDisabled ? "red" : "green",
+          }}
+        >
+          Save Exercise
+        </Button>
+        <Button
+          onPress={() => {
+            setDeleteModalVisible(true);
+          }}
+        >
+          Archive Exercise
+        </Button>
+      </View>
+    </>
   );
 }
 

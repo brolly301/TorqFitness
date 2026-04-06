@@ -7,6 +7,7 @@ import { capitalizeWords } from "@/utils/helpers";
 import { Button } from "@react-navigation/elements";
 import { router } from "expo-router";
 import { useExerciseContext } from "@/context/ExerciseContext";
+import DeleteModal from "../confirmation/DeleteModal";
 
 type Props = {
   workout: Workout;
@@ -17,6 +18,8 @@ export default function WorkoutDetails({ workout, setModalVisible }: Props) {
   const { deleteWorkout } = useWorkoutContext();
   const { exercises } = useExerciseContext();
 
+  const [deleteModalVisible, setDeleteModalVisible] = useState<boolean>(false);
+
   const exerciseList = workout.exercises.map((we) => {
     const details = exercises.find((ex) => ex.id === we.exerciseId);
 
@@ -24,102 +27,110 @@ export default function WorkoutDetails({ workout, setModalVisible }: Props) {
   });
 
   return (
-    <View style={styles.container}>
-      <View style={styles.iconContainer}>
-        <EvilIcons
-          name="trash"
-          size={40}
-          color={"red"}
-          onPress={() => {
-            deleteWorkout(workout.id);
+    <>
+      <DeleteModal
+        modalVisible={deleteModalVisible}
+        setModalVisible={setDeleteModalVisible}
+        placeholder="workout"
+        onConfirm={() => deleteWorkout(workout.id)}
+      />
+      <View style={styles.container}>
+        <View style={styles.iconContainer}>
+          <EvilIcons
+            name="trash"
+            size={40}
+            color={"red"}
+            onPress={() => {
+              setDeleteModalVisible(true);
+            }}
+          />
+          <EvilIcons
+            name="pencil"
+            size={40}
+            color={"black"}
+            onPress={() => {
+              router.navigate({
+                pathname: "/(tabs)/history/editWorkout",
+                params: { workoutId: workout.id },
+              });
+              setModalVisible(false);
+            }}
+          />
+        </View>
+        <FlatList
+          data={exerciseList}
+          keyExtractor={(item) => item.id}
+          ListHeaderComponent={() => {
+            return (
+              <View>
+                <TextInput
+                  style={styles.input}
+                  value={workout.name}
+                  editable={false}
+                />
+                <TextInput
+                  style={styles.input}
+                  value={workout.notes}
+                  editable={false}
+                />
+              </View>
+            );
           }}
-        />
-        <EvilIcons
-          name="pencil"
-          size={40}
-          color={"black"}
-          onPress={() => {
-            router.navigate({
-              pathname: "/(tabs)/history/editWorkout",
-              params: { workoutId: workout.id },
-            });
-            setModalVisible(false);
+          renderItem={({ item }) => {
+            return (
+              <View key={item.id} style={styles.workoutContainer}>
+                <View style={styles.nameButtonContainer}>
+                  <Text style={styles.exerciseName}>
+                    {capitalizeWords(item.details?.name ?? "")}
+                  </Text>
+                </View>
+                <View style={styles.headerContainer}>
+                  <View style={styles.exerciseInputContainer}>
+                    <Text>Set</Text>
+                  </View>
+                  <View style={styles.exerciseInputContainer}>
+                    <Text>Reps</Text>
+                  </View>
+                  <View style={styles.exerciseInputContainer}>
+                    <Text>Weight</Text>
+                  </View>
+                </View>
+                {item.sets.map((set) => {
+                  return (
+                    <View key={set.id} style={styles.exerciseContainer}>
+                      <View style={styles.exerciseInputContainer}>
+                        <TextInput
+                          placeholder={set.order.toString()}
+                          placeholderTextColor={"black"}
+                          style={styles.nameInput}
+                          editable={false}
+                        />
+                      </View>
+                      <View style={styles.exerciseInputContainer}>
+                        <TextInput
+                          placeholder={set.reps.toString()}
+                          placeholderTextColor={"black"}
+                          editable={false}
+                          style={styles.nameInput}
+                        />
+                      </View>
+                      <View style={styles.exerciseInputContainer}>
+                        <TextInput
+                          placeholder={set.weight?.toString()}
+                          placeholderTextColor={"black"}
+                          editable={false}
+                          style={styles.nameInput}
+                        />
+                      </View>
+                    </View>
+                  );
+                })}
+              </View>
+            );
           }}
         />
       </View>
-      <FlatList
-        data={exerciseList}
-        keyExtractor={(item) => item.id}
-        ListHeaderComponent={() => {
-          return (
-            <View>
-              <TextInput
-                style={styles.input}
-                value={workout.name}
-                editable={false}
-              />
-              <TextInput
-                style={styles.input}
-                value={workout.notes}
-                editable={false}
-              />
-            </View>
-          );
-        }}
-        renderItem={({ item }) => {
-          return (
-            <View key={item.id} style={styles.workoutContainer}>
-              <View style={styles.nameButtonContainer}>
-                <Text style={styles.exerciseName}>
-                  {capitalizeWords(item.details?.name ?? "")}
-                </Text>
-              </View>
-              <View style={styles.headerContainer}>
-                <View style={styles.exerciseInputContainer}>
-                  <Text>Set</Text>
-                </View>
-                <View style={styles.exerciseInputContainer}>
-                  <Text>Reps</Text>
-                </View>
-                <View style={styles.exerciseInputContainer}>
-                  <Text>Weight</Text>
-                </View>
-              </View>
-              {item.sets.map((set) => {
-                return (
-                  <View key={set.id} style={styles.exerciseContainer}>
-                    <View style={styles.exerciseInputContainer}>
-                      <TextInput
-                        placeholder={set.order.toString()}
-                        placeholderTextColor={"black"}
-                        style={styles.nameInput}
-                        editable={false}
-                      />
-                    </View>
-                    <View style={styles.exerciseInputContainer}>
-                      <TextInput
-                        placeholder={set.reps.toString()}
-                        placeholderTextColor={"black"}
-                        editable={false}
-                        style={styles.nameInput}
-                      />
-                    </View>
-                    <View style={styles.exerciseInputContainer}>
-                      <TextInput
-                        placeholder={set.weight?.toString()}
-                        placeholderTextColor={"black"}
-                        editable={false}
-                        style={styles.nameInput}
-                      />
-                    </View>
-                  </View>
-                );
-              })}
-            </View>
-          );
-        }}
-      />
-    </View>
+    </>
   );
 }
 

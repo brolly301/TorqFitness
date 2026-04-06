@@ -7,6 +7,8 @@ import ExerciseModal from "@/components/modals/exercises/ExerciseModal";
 import WorkoutForm from "@/components/workout/WorkoutForm";
 import * as crypto from "expo-crypto";
 import EvilIcons from "@expo/vector-icons/EvilIcons";
+import DiscardModal from "@/components/modals/confirmation/DiscardModal";
+import FinishModal from "@/components/modals/confirmation/FinishModal";
 
 export default function EditWorkoutScreen() {
   const { workoutId } = useLocalSearchParams();
@@ -20,6 +22,10 @@ export default function EditWorkoutScreen() {
   if (!workoutDetails) return;
 
   const [formData, setFormData] = useState<Workout>(workoutDetails);
+
+  const [finishModalVisible, setFinishModalVisible] = useState<boolean>(false);
+  const [discardModalVisible, setDiscardModalVisible] =
+    useState<boolean>(false);
 
   const handleSubmit = useCallback(() => {
     setWorkouts((prev) =>
@@ -36,7 +42,17 @@ export default function EditWorkoutScreen() {
             name="check"
             color={"black"}
             size={22}
-            onPress={handleSubmit}
+            onPress={() => setFinishModalVisible(true)}
+          />
+        );
+      },
+      headerLeft: () => {
+        return (
+          <EvilIcons
+            name="chevron-left"
+            color={"black"}
+            size={32}
+            onPress={() => setDiscardModalVisible(true)}
           />
         );
       },
@@ -66,6 +82,18 @@ export default function EditWorkoutScreen() {
 
   return (
     <>
+      <DiscardModal
+        modalVisible={discardModalVisible}
+        setModalVisible={setDiscardModalVisible}
+        placeholder="discard your changes?"
+        onConfirm={() => router.back()}
+      />
+      <FinishModal
+        modalVisible={finishModalVisible}
+        setModalVisible={setFinishModalVisible}
+        onConfirm={handleSubmit}
+        placeholder={"editing this workout?"}
+      />
       <ExerciseModal
         modalVisible={modalVisible}
         setModalVisible={setModalVisible}

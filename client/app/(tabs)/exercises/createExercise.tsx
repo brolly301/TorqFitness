@@ -21,6 +21,12 @@ export default function CreateExerciseScreen() {
     userCreated: true,
   });
 
+  const isDisabled =
+    !exercise.name.trim() ||
+    exercise.primaryMuscles.length === 0 ||
+    exercise.bodyParts.length === 0 ||
+    exercise.equipment.length === 0;
+
   const { setExercises } = useExerciseContext();
 
   const handleSubmit = () => {
@@ -73,9 +79,9 @@ export default function CreateExerciseScreen() {
         placeholder="Select equipment"
       />
       <Button
-        disabled={!exercise.name.trim() ? true : false}
+        disabled={isDisabled}
         onPressIn={handleSubmit}
-        style={{ backgroundColor: !exercise.name.trim() ? "red" : "green" }}
+        style={{ backgroundColor: isDisabled ? "red" : "green" }}
       >
         Save Exercise
       </Button>

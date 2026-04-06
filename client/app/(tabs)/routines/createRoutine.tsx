@@ -1,4 +1,4 @@
-import { StyleSheet, View } from "react-native";
+import { StyleSheet } from "react-native";
 import React, { useCallback, useLayoutEffect, useState } from "react";
 import { router, useNavigation } from "expo-router";
 import { useRoutineContext } from "@/context/RoutineContext";
@@ -7,17 +7,23 @@ import EvilIcons from "@expo/vector-icons/EvilIcons";
 import ExerciseModal from "@/components/modals/exercises/ExerciseModal";
 import * as crypto from "expo-crypto";
 import { Routine } from "@/types/Global";
+import FinishModal from "@/components/modals/confirmation/FinishModal";
+import DiscardModal from "@/components/modals/confirmation/DiscardModal";
 
 export default function CreateRoutineScreen() {
   const { setRoutines } = useRoutineContext();
 
-  const [modalVisible, setModalVisible] = useState<boolean>(false);
   const [routine, setRoutine] = useState<Routine>({
     id: crypto.randomUUID(),
     name: "",
     exercises: [],
     notes: "",
   });
+
+  const [modalVisible, setModalVisible] = useState<boolean>(false);
+  const [finishModalVisible, setFinishModalVisible] = useState<boolean>(false);
+  const [discardModalVisible, setDiscardModalVisible] =
+    useState<boolean>(false);
 
   const navigation = useNavigation();
 
@@ -36,12 +42,22 @@ export default function CreateRoutineScreen() {
             name="check"
             color={"black"}
             size={22}
-            onPress={handleSubmit}
+            onPress={() => setFinishModalVisible(true)}
+          />
+        );
+      },
+      headerLeft: () => {
+        return (
+          <EvilIcons
+            name="chevron-left"
+            color={"black"}
+            size={32}
+            onPress={() => setDiscardModalVisible(true)}
           />
         );
       },
     });
-  }, [navigation, handleSubmit]);
+  }, [navigation, finishModalVisible]);
 
   const handleAddExercise = (exerciseId: string) => {
     const newExercise = {
@@ -66,6 +82,18 @@ export default function CreateRoutineScreen() {
 
   return (
     <>
+      <DiscardModal
+        modalVisible={discardModalVisible}
+        setModalVisible={setDiscardModalVisible}
+        placeholder="discard your current workout?"
+        onConfirm={() => router.back()}
+      />
+      <FinishModal
+        modalVisible={finishModalVisible}
+        setModalVisible={setFinishModalVisible}
+        onConfirm={handleSubmit}
+        placeholder="with this routine?"
+      />
       <ExerciseModal
         modalVisible={modalVisible}
         setModalVisible={setModalVisible}

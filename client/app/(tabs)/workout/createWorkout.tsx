@@ -12,6 +12,8 @@ import EvilIcons from "@expo/vector-icons/EvilIcons";
 import ExerciseModal from "@/components/modals/exercises/ExerciseModal";
 import * as crypto from "expo-crypto";
 import { Workout } from "@/types/Global";
+import FinishModal from "@/components/modals/confirmation/FinishModal";
+import DiscardModal from "@/components/modals/confirmation/DiscardModal";
 
 export default function StartWorkoutScreen() {
   const { setWorkouts } = useWorkoutContext();
@@ -27,6 +29,9 @@ export default function StartWorkoutScreen() {
   });
 
   const [modalVisible, setModalVisible] = useState<boolean>(false);
+  const [finishModalVisible, setFinishModalVisible] = useState<boolean>(false);
+  const [discardModalVisible, setDiscardModalVisible] =
+    useState<boolean>(false);
 
   const navigation = useNavigation();
   useEffect(() => {
@@ -64,12 +69,22 @@ export default function StartWorkoutScreen() {
             name="check"
             color={"black"}
             size={22}
-            onPress={handleSubmit}
+            onPress={() => setFinishModalVisible(true)}
+          />
+        );
+      },
+      headerLeft: () => {
+        return (
+          <EvilIcons
+            name="chevron-left"
+            color={"black"}
+            size={32}
+            onPress={() => setDiscardModalVisible(true)}
           />
         );
       },
     });
-  }, [navigation, handleSubmit]);
+  }, [navigation, finishModalVisible]);
 
   const handleAddExercise = (exerciseId: string) => {
     const newExercise = {
@@ -94,6 +109,18 @@ export default function StartWorkoutScreen() {
 
   return (
     <>
+      <DiscardModal
+        modalVisible={discardModalVisible}
+        setModalVisible={setDiscardModalVisible}
+        placeholder="discard your current workout?"
+        onConfirm={() => router.back()}
+      />
+      <FinishModal
+        modalVisible={finishModalVisible}
+        setModalVisible={setFinishModalVisible}
+        onConfirm={handleSubmit}
+        placeholder={"with this workout?"}
+      />
       <ExerciseModal
         modalVisible={modalVisible}
         setModalVisible={setModalVisible}

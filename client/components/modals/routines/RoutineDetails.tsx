@@ -6,12 +6,13 @@ import {
   TextInput,
   View,
 } from "react-native";
-import React, { useRef } from "react";
+import React, { useRef, useState } from "react";
 import { capitalizeWords } from "@/utils/helpers";
 import { router } from "expo-router";
 import { Routine } from "@/types/Global";
 import { useRoutineContext } from "@/context/RoutineContext";
 import { useExerciseContext } from "@/context/ExerciseContext";
+import DeleteModal from "../confirmation/DeleteModal";
 
 type Props = {
   routine: Routine;
@@ -21,6 +22,8 @@ type Props = {
 export default function RoutineDetails({ routine, setModalVisible }: Props) {
   const { deleteRoutine } = useRoutineContext();
   const { exercises } = useExerciseContext();
+
+  const [deleteModalVisible, setDeleteModalVisible] = useState<boolean>(false);
 
   const exerciseList = routine.exercises.map((rtEx) => {
     const details = exercises.find(
@@ -35,80 +38,88 @@ export default function RoutineDetails({ routine, setModalVisible }: Props) {
   );
 
   return (
-    <View style={styles.container}>
-      <View style={styles.iconContainer}>
-        <Pressable
-          style={styles.buttonContainer}
-          onPress={() => {
-            deleteRoutine(routine.id);
-          }}
-        >
-          <Text style={styles.buttonText}>Delete</Text>
-        </Pressable>
-        <Pressable
-          style={[
-            styles.buttonContainer,
-            {
-              borderColor: "rgba(6, 134, 12, 0.44)",
-              backgroundColor: "rgba(6, 134, 12, 0.2)",
-            },
-          ]}
-          onPress={() => {
-            router.navigate({
-              pathname: "/(tabs)/routines/editRoutine",
-              params: { routineId: routine.id },
-            });
-            setModalVisible(false);
-          }}
-        >
-          <Text
-            style={[styles.buttonText, { color: "rgba(6, 134, 12, 0.44)" }]}
-          >
-            Edit
-          </Text>
-        </Pressable>
-      </View>
-      <FlatList
-        data={exerciseList}
-        keyExtractor={(item) => item.id}
-        ListHeaderComponent={() => {
-          return (
-            <View style={styles.overviewContainer}>
-              <Text style={styles.name}>{routine.name}</Text>
-              <Text style={styles.notes}>{routine.notes}</Text>
-              <View style={styles.hr} />
-              <View style={{ flexDirection: "row", alignItems: "center" }}>
-                <Text style={styles.exerciseLength}>
-                  {routine.exercises.length} Exercise
-                </Text>
-                <Text style={{ fontSize: 18 }}> • </Text>
-                <Text style={styles.setLength}>{totalSets} Sets</Text>
-              </View>
-            </View>
-          );
-        }}
-        renderItem={({ item }) => {
-          return (
-            <View key={item.id} style={styles.routineContainer}>
-              <View style={styles.nameButtonContainer}>
-                <Text style={styles.exerciseName}>
-                  {capitalizeWords(item.details?.name ?? "")}
-                </Text>
-                <Text style={styles.exerciseMuscle}>
-                  {capitalizeWords(item.details?.primaryMuscles[0] ?? "")} &{" "}
-                  {capitalizeWords(item.details?.secondaryMuscles[0] ?? "")}
-                </Text>
-              </View>
-              <View style={{ flexDirection: "row" }}>
-                {Array.from({ length: item.sets.length }, (_, i) => (
-                  <Text>•</Text>
-                ))}
-              </View>
-            </View>
-          );
-        }}
+    <>
+      <DeleteModal
+        modalVisible={deleteModalVisible}
+        setModalVisible={setDeleteModalVisible}
+        placeholder="routine"
+        onConfirm={() => deleteRoutine(routine.id)}
       />
-    </View>
+      <View style={styles.container}>
+        <View style={styles.iconContainer}>
+          <Pressable
+            style={styles.buttonContainer}
+            onPress={() => {
+              setDeleteModalVisible(true);
+            }}
+          >
+            <Text style={styles.buttonText}>Delete</Text>
+          </Pressable>
+          <Pressable
+            style={[
+              styles.buttonContainer,
+              {
+                borderColor: "rgba(6, 134, 12, 0.44)",
+                backgroundColor: "rgba(6, 134, 12, 0.2)",
+              },
+            ]}
+            onPress={() => {
+              router.navigate({
+                pathname: "/(tabs)/routines/editRoutine",
+                params: { routineId: routine.id },
+              });
+              setModalVisible(false);
+            }}
+          >
+            <Text
+              style={[styles.buttonText, { color: "rgba(6, 134, 12, 0.44)" }]}
+            >
+              Edit
+            </Text>
+          </Pressable>
+        </View>
+        <FlatList
+          data={exerciseList}
+          keyExtractor={(item) => item.id}
+          ListHeaderComponent={() => {
+            return (
+              <View style={styles.overviewContainer}>
+                <Text style={styles.name}>{routine.name}</Text>
+                <Text style={styles.notes}>{routine.notes}</Text>
+                <View style={styles.hr} />
+                <View style={{ flexDirection: "row", alignItems: "center" }}>
+                  <Text style={styles.exerciseLength}>
+                    {routine.exercises.length} Exercise
+                  </Text>
+                  <Text style={{ fontSize: 18 }}> • </Text>
+                  <Text style={styles.setLength}>{totalSets} Sets</Text>
+                </View>
+              </View>
+            );
+          }}
+          renderItem={({ item }) => {
+            return (
+              <View key={item.id} style={styles.routineContainer}>
+                <View style={styles.nameButtonContainer}>
+                  <Text style={styles.exerciseName}>
+                    {capitalizeWords(item.details?.name ?? "")}
+                  </Text>
+                  <Text style={styles.exerciseMuscle}>
+                    {capitalizeWords(item.details?.primaryMuscles[0] ?? "")} &{" "}
+                    {capitalizeWords(item.details?.secondaryMuscles[0] ?? "")}
+                  </Text>
+                </View>
+                <View style={{ flexDirection: "row" }}>
+                  {Array.from({ length: item.sets.length }, (_, i) => (
+                    <Text>•</Text>
+                  ))}
+                </View>
+              </View>
+            );
+          }}
+        />
+      </View>
+    </>
   );
 }
 
