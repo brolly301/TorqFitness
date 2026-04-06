@@ -1,13 +1,6 @@
 import { StyleSheet, TextInput, View } from "react-native";
-import React from "react";
-import { useForm, Controller } from "react-hook-form";
-import AppError from "@/components/ui/AppError";
+import React, { useState } from "react";
 import { Button } from "@react-navigation/elements";
-import {
-  ExerciseFormValues,
-  exerciseSchema,
-} from "@/utils/validation/exerciseSchema";
-import { zodResolver } from "@hookform/resolvers/zod";
 import { useExerciseContext } from "@/context/ExerciseContext";
 import * as crypto from "expo-crypto";
 import AppDropdown from "@/components/ui/AppDropdown";
@@ -16,111 +9,76 @@ import {
   equipment,
   primaryMuscles,
 } from "@/constants/exerciseDropdowns";
+import { Exercise } from "@/types/Global";
 
 export default function CreateExerciseScreen() {
-  const {
-    control,
-    handleSubmit,
-    formState: { errors },
-  } = useForm<ExerciseFormValues>({
-    resolver: zodResolver(exerciseSchema),
-    defaultValues: {
-      name: "",
-      primaryMuscles: [],
-      bodyParts: [],
-      equipment: [],
-    },
-    mode: "onChange",
+  const [exercise, setExercise] = useState<Exercise>({
+    id: crypto.randomUUID(),
+    name: "",
+    primaryMuscles: [],
+    bodyParts: [],
+    equipment: [],
+    userCreated: true,
   });
 
-  const { exercises, setExercises } = useExerciseContext();
+  const { setExercises } = useExerciseContext();
 
-  const onSubmit = (data: ExerciseFormValues) => {
-    const exercise = {
-      id: crypto.randomUUID(),
-      gifUrl: "https://static.exercisedb.dev/media/MCkqdKE.gif",
-      userCreated: true,
-      ...data,
-    };
-
+  const handleSubmit = () => {
     setExercises((prev) => [...prev, exercise]);
   };
 
   return (
     <View style={styles.container}>
-      <Controller
-        key={"name"}
-        control={control}
-        name={"name"}
-        render={({ field: { onChange, value } }) => (
-          <>
-            <TextInput
-              placeholder="Name"
-              placeholderTextColor="black"
-              style={styles.input}
-              textAlignVertical="center"
-              value={value}
-              onChangeText={onChange}
-            />
-            {errors.name && <AppError>{errors.name.message}</AppError>}
-          </>
-        )}
+      <TextInput
+        placeholder="Name"
+        placeholderTextColor="black"
+        style={styles.input}
+        textAlignVertical="center"
+        value={exercise.name}
+        onChangeText={(text) =>
+          setExercise((prev) => ({ ...prev, name: text }))
+        }
       />
-      <Controller
-        key={"primaryMuscles"}
-        control={control}
-        name={"primaryMuscles"}
-        render={({ field: { onChange, value } }) => (
-          <>
-            <AppDropdown
-              selected={value[0] || ""}
-              data={primaryMuscles}
-              setSelected={(selected) => onChange(selected ? [selected] : [])}
-              placeholder="Select a muscle"
-            />
-            {errors.primaryMuscles && (
-              <AppError>{errors.primaryMuscles.message}</AppError>
-            )}
-          </>
-        )}
+      <AppDropdown
+        selected={exercise.primaryMuscles[0] || ""}
+        data={primaryMuscles}
+        setSelected={(selected) =>
+          setExercise((prev) => ({
+            ...prev,
+            primaryMuscles: selected ? [selected] : [],
+          }))
+        }
+        placeholder="Select a muscle"
       />
-      <Controller
-        key={"bodyParts"}
-        control={control}
-        name={"bodyParts"}
-        render={({ field: { onChange, value } }) => (
-          <>
-            <AppDropdown
-              selected={value[0] || ""}
-              data={bodyParts}
-              setSelected={(selected) => onChange(selected ? [selected] : [])}
-              placeholder="Select a body part"
-            />
-            {errors.bodyParts && (
-              <AppError>{errors.bodyParts.message}</AppError>
-            )}
-          </>
-        )}
+      <AppDropdown
+        selected={exercise.bodyParts[0] || ""}
+        data={bodyParts}
+        setSelected={(selected) =>
+          setExercise((prev) => ({
+            ...prev,
+            bodyParts: selected ? [selected] : [],
+          }))
+        }
+        placeholder="Select a body part"
       />
-      <Controller
-        key={"equipment"}
-        control={control}
-        name={"equipment"}
-        render={({ field: { onChange, value } }) => (
-          <>
-            <AppDropdown
-              selected={value[0] || ""}
-              data={equipment}
-              setSelected={(selected) => onChange(selected ? [selected] : [])}
-              placeholder="Select equipment"
-            />
-            {errors.equipment && (
-              <AppError>{errors.equipment.message}</AppError>
-            )}
-          </>
-        )}
+      <AppDropdown
+        selected={exercise.equipment[0] || ""}
+        data={equipment}
+        setSelected={(selected) =>
+          setExercise((prev) => ({
+            ...prev,
+            equipment: selected ? [selected] : [],
+          }))
+        }
+        placeholder="Select equipment"
       />
-      <Button onPressIn={handleSubmit(onSubmit)}>Save Exercise</Button>
+      <Button
+        disabled={!exercise.name.trim() ? true : false}
+        onPressIn={handleSubmit}
+        style={{ backgroundColor: !exercise.name.trim() ? "red" : "green" }}
+      >
+        Save Exercise
+      </Button>
     </View>
   );
 }
@@ -135,6 +93,3 @@ const styles = StyleSheet.create({
     borderRadius: 6,
   },
 });
-
-{
-}

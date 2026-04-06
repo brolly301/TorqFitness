@@ -7,14 +7,11 @@ import {
   useState,
 } from "react";
 import exercisesJSON from "../constants/exercises.json";
-import { ExerciseFormValues } from "@/utils/validation/exerciseSchema";
-
-type UpdateExerciseInput = ExerciseFormValues & { id: string };
 
 type ExerciseContextType = {
   exercises: Exercise[];
   setExercises: React.Dispatch<React.SetStateAction<Exercise[]>>;
-  updateExercise: (updatedExercise: UpdateExerciseInput) => void;
+  updateExercise: (updatedExercise: Exercise) => void;
   archiveExercise: (exerciseId: string) => void;
 };
 
@@ -23,12 +20,10 @@ const ExerciseContext = createContext<ExerciseContextType | null>(null);
 export const ExerciseProvider = ({ children }: { children: ReactNode }) => {
   const [exercises, setExercises] = useState<Exercise[]>(exercisesJSON);
 
-  const updateExercise = (updatedExercise: UpdateExerciseInput) => {
+  const updateExercise = (updatedExercise: Exercise) => {
     setExercises((prev) => {
       return prev.map((exercise) =>
-        exercise.id === updatedExercise.id
-          ? { ...exercise, ...updatedExercise }
-          : exercise,
+        exercise.id === updatedExercise.id ? updatedExercise : exercise,
       );
     });
   };

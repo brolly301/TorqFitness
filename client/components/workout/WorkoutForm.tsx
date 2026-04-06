@@ -7,6 +7,8 @@ import { useExerciseContext } from "@/context/ExerciseContext";
 import { addSet, removeExercise, updateSet } from "@/utils/workoutUtil";
 import { capitalizeWords, formatDate } from "@/utils/helpers";
 import EvilIcons from "@expo/vector-icons/EvilIcons";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
 
 type Props<T extends WorkoutDraft> = {
   draft: T;
