@@ -4,21 +4,24 @@ import Providers from "./providers";
 import { useUserContext } from "@/context/UserContext";
 
 function RootStack() {
-  // const pathname = usePathname();
+  const pathname = usePathname();
 
-  // if (pathname === "/") {
-  //   return <Redirect href="/profile" />;
-  // }
+  if (pathname === "/") {
+    return <Redirect href="/profile" />;
+  }
 
   const { user } = useUserContext();
 
   return (
     <Stack>
-      {user ? (
+      {/* {user ? (
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
       ) : (
         <Stack.Screen name="(auth)" options={{ headerShown: false }} />
-      )}
+      )} */}
+
+      <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+
       <Stack.Screen name="+not-found" />
     </Stack>
   );

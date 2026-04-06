@@ -18,8 +18,10 @@ export default function ExerciseModal({
   const [search, setSearch] = useState<string>("");
   const { exercises } = useExerciseContext();
 
-  const filteredExercises = exercises.filter((exercise) =>
-    normalize(exercise.name).includes(normalize(search)),
+  const filteredExercises = exercises.filter(
+    (exercise) =>
+      normalize(exercise.name).includes(normalize(search)) &&
+      !exercise.archived,
   );
 
   return (

@@ -1,23 +1,28 @@
-import { StyleSheet, TextInput, View } from "react-native";
+import { StyleSheet, Text, TextInput, View } from "react-native";
 import React from "react";
-import { useForm, Controller } from "react-hook-form";
-import AppError from "@/components/ui/AppError";
-import { Button } from "@react-navigation/elements";
+import { Controller, useForm } from "react-hook-form";
 import {
   ExerciseFormValues,
   exerciseSchema,
 } from "@/utils/validation/exerciseSchema";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useExerciseContext } from "@/context/ExerciseContext";
-import * as crypto from "expo-crypto";
-import AppDropdown from "@/components/ui/AppDropdown";
+import AppError from "../ui/AppError";
+import AppDropdown from "../ui/AppDropdown";
+import { Button } from "@react-navigation/elements";
 import {
   bodyParts,
   equipment,
   primaryMuscles,
 } from "@/constants/exerciseDropdowns";
+import { Exercise, ModalProps } from "@/types/Global";
 
-export default function CreateExerciseScreen() {
+type Props = { exercise: Exercise | null } & Pick<
+  ModalProps,
+  "setModalVisible"
+>;
+
+export default function ExerciseEditForm({ exercise, setModalVisible }: Props) {
   const {
     control,
     handleSubmit,
@@ -33,17 +38,13 @@ export default function CreateExerciseScreen() {
     mode: "onChange",
   });
 
-  const { exercises, setExercises } = useExerciseContext();
+  const { updateExercise, archiveExercise } = useExerciseContext();
 
   const onSubmit = (data: ExerciseFormValues) => {
-    const exercise = {
-      id: crypto.randomUUID(),
-      gifUrl: "https://static.exercisedb.dev/media/MCkqdKE.gif",
-      userCreated: true,
-      ...data,
-    };
+    if (!exercise) return;
 
-    setExercises((prev) => [...prev, exercise]);
+    updateExercise({ id: exercise.id, ...data });
+    setModalVisible(false);
   };
 
   return (
@@ -120,7 +121,16 @@ export default function CreateExerciseScreen() {
           </>
         )}
       />
-      <Button onPressIn={handleSubmit(onSubmit)}>Save Exercise</Button>
+      <Button onPressIn={handleSubmit(onSubmit)}>Save Changes</Button>
+      <Button
+        onPressIn={() => {
+          if (!exercise) return;
+          archiveExercise(exercise.id);
+          setModalVisible(false);
+        }}
+      >
+        Archive Exercise
+      </Button>
     </View>
   );
 }
@@ -135,6 +145,3 @@ const styles = StyleSheet.create({
     borderRadius: 6,
   },
 });
-
-{
-}

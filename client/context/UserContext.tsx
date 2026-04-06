@@ -15,7 +15,12 @@ type UserContextType = {
 const UserContext = createContext<UserContextType | null>(null);
 
 export const UserProvider = ({ children }: { children: ReactNode }) => {
-  const [user, setUser] = useState<User | null>(null);
+  const [user, setUser] = useState<User | null>({
+    id: "1",
+    email: "marcrobertjohn@gmail.com",
+    firstName: "Marc",
+    surname: "Brolly",
+  });
 
   const login = (data: LoginFormValues) => {
     const fakeUser = {

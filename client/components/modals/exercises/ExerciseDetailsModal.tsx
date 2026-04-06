@@ -7,6 +7,7 @@ import ChartsTab from "./ChartsTab";
 import RecordsTab from "./RecordsTab";
 import HistoryTab from "./HistoryTab";
 import { capitalizeWords } from "@/utils/helpers";
+import ExerciseEditModal from "./ExerciseEditModal";
 
 type Props = ModalProps & {
   exercise: Exercise | null;
@@ -25,6 +26,8 @@ export default function ExerciseDetailsModal({
 }: Props) {
   const [tab, setTab] = useState<TabName>("Details");
   const tabName: TabName[] = ["Details", "History", "Records", "Charts"];
+
+  const [editModalVisible, setEditModalVisible] = useState<boolean>(false);
 
   const renderTab = () => {
     switch (tab) {
@@ -51,46 +54,64 @@ export default function ExerciseDetailsModal({
   };
 
   return (
-    <Modal visible={modalVisible} transparent animationType="fade">
-      <View style={styles.centeredView}>
-        <Pressable
-          onPress={() => setModalVisible(!modalVisible)}
-          style={StyleSheet.absoluteFill}
-        />
-        <View style={styles.modalView}>
-          <View style={styles.iconContainer}>
-            <EvilIcons
-              name="close"
-              size={22}
-              color={"black"}
-              onPress={() => setModalVisible(!modalVisible)}
-            />
-            {showAddButton && (
-              <Pressable style={styles.addButton} onPress={handleSubmit}>
-                <Text style={styles.addButtonText}>Add</Text>
-              </Pressable>
-            )}
-          </View>
-          <Text style={styles.exercise}>
-            {exercise?.name ? capitalizeWords(exercise?.name) : ""}
-          </Text>
-          <View style={styles.tabRowContainer}>
-            {tabName.map((tab) => {
-              return (
-                <Pressable
-                  key={tab}
-                  style={styles.tab}
-                  onPress={() => setTab(tab)}
-                >
-                  <Text style={styles.tabLabel}>{tab}</Text>
+    <>
+      <ExerciseEditModal
+        modalVisible={editModalVisible}
+        setModalVisible={setEditModalVisible}
+        exercise={exercise}
+      />
+      <Modal visible={modalVisible} transparent animationType="fade">
+        <View style={styles.centeredView}>
+          <Pressable
+            onPress={() => setModalVisible(!modalVisible)}
+            style={StyleSheet.absoluteFill}
+          />
+          <View style={styles.modalView}>
+            <View style={styles.iconContainer}>
+              <EvilIcons
+                name="close"
+                size={22}
+                color={"black"}
+                onPress={() => setModalVisible(!modalVisible)}
+              />
+              {showAddButton && (
+                <Pressable style={styles.addButton} onPress={handleSubmit}>
+                  <Text style={styles.addButtonText}>Add</Text>
                 </Pressable>
-              );
-            })}
+              )}
+              {exercise?.userCreated && (
+                <Pressable
+                  style={styles.addButton}
+                  onPress={() => {
+                    setModalVisible(false);
+                    setEditModalVisible(true);
+                  }}
+                >
+                  <Text style={styles.addButtonText}>Edit</Text>
+                </Pressable>
+              )}
+            </View>
+            <Text style={styles.exercise}>
+              {exercise?.name ? capitalizeWords(exercise?.name) : ""}
+            </Text>
+            <View style={styles.tabRowContainer}>
+              {tabName.map((tab) => {
+                return (
+                  <Pressable
+                    key={tab}
+                    style={styles.tab}
+                    onPress={() => setTab(tab)}
+                  >
+                    <Text style={styles.tabLabel}>{tab}</Text>
+                  </Pressable>
+                );
+              })}
+            </View>
+            <>{renderTab()}</>
           </View>
-          <>{renderTab()}</>
         </View>
-      </View>
-    </Modal>
+      </Modal>
+    </>
   );
 }
 

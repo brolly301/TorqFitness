@@ -20,6 +20,8 @@ export type Exercise = {
   secondaryMuscles?: string[];
   equipment: string[];
   instructions?: string[];
+  archived?: boolean;
+  userCreated?: boolean;
 };
 
 export type WorkoutSet = {

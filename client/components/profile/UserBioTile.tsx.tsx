@@ -1,7 +1,10 @@
 import { Image, StyleSheet, Text, View } from "react-native";
 import React from "react";
+import { useUserContext } from "@/context/UserContext";
 
 export default function UserBioTile() {
+  const { user } = useUserContext();
+
   return (
     <View style={styles.container}>
       <Image
@@ -9,7 +12,9 @@ export default function UserBioTile() {
         style={styles.profileImage}
       />
       <View style={styles.textContainer}>
-        <Text style={styles.name}>Marc Brolly</Text>
+        <Text style={styles.name}>
+          {user?.firstName} {user?.surname}
+        </Text>
         <Text style={styles.workouts}>207 Workouts</Text>
         <Text style={styles.member}>Member since March 2024</Text>
       </View>
