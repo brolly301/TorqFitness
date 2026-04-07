@@ -1,11 +1,5 @@
 import { Exercise } from "@/types/Global";
-import {
-  createContext,
-  ReactNode,
-  useContext,
-  useEffect,
-  useState,
-} from "react";
+import { createContext, ReactNode, useContext, useState } from "react";
 import exercisesJSON from "../constants/exercises.json";
 
 type ExerciseContextType = {

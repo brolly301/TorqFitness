@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View } from "react-native";
+import { Pressable, StyleSheet, Text, View } from "react-native";
 import React, {
   useCallback,
   useEffect,
@@ -18,6 +18,7 @@ import DiscardModal from "@/components/modals/confirmation/DiscardModal";
 import AppWrapper from "@/components/ui/AppWrapper";
 import { Theme } from "@/types/Theme";
 import { useAppTheme } from "@/hooks/useAppTheme";
+import Feather from "@expo/vector-icons/Feather";
 
 export default function StartWorkoutScreen() {
   const { theme, scale } = useAppTheme();
@@ -135,6 +136,25 @@ export default function StartWorkoutScreen() {
       />
       <AppWrapper>
         <View style={styles.container}>
+          <View style={styles.header}>
+            <Pressable
+              onPress={() => setDiscardModalVisible(true)}
+              hitSlop={10}
+              style={styles.headerIconContainer}
+            >
+              <Feather name="arrow-left" color={"black"} size={24} />
+            </Pressable>
+            <Pressable
+              style={styles.headerIconContainer}
+              onPress={() => setFinishModalVisible(true)}
+              hitSlop={10}
+            >
+              <Text style={[styles.headerText, { color: theme.buttonPrimary }]}>
+                Finish
+              </Text>
+              <Feather name="check" color={theme.buttonPrimary} size={24} />
+            </Pressable>
+          </View>
           <WorkoutForm
             setDraft={setWorkout}
             draft={workout}
@@ -149,4 +169,20 @@ export default function StartWorkoutScreen() {
 const makeStyles = (theme: Theme, scale: number) =>
   StyleSheet.create({
     container: { padding: 16 * scale, backgroundColor: theme.background },
+    header: {
+      flexDirection: "row",
+      justifyContent: "space-between",
+      alignItems: "center",
+      // marginTop: 40,
+      marginBottom: 30,
+    },
+    headerText: {
+      fontSize: 20,
+      fontWeight: "600",
+      marginRight: 4,
+    },
+    headerIconContainer: {
+      flexDirection: "row",
+      alignItems: "center",
+    },
   });

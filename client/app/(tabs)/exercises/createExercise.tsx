@@ -1,29 +1,12 @@
-import {
-  Pressable,
-  StatusBar,
-  StyleSheet,
-  Text,
-  TextInput,
-  View,
-} from "react-native";
+import { Pressable, StyleSheet, Text, View } from "react-native";
 import React, { useMemo, useState } from "react";
-import { Button } from "@react-navigation/elements";
-import { useExerciseContext } from "@/context/ExerciseContext";
 import * as crypto from "expo-crypto";
-import AppDropdown from "@/components/ui/AppDropdown";
-import {
-  bodyParts,
-  equipment,
-  primaryMuscles,
-} from "@/constants/exerciseDropdowns";
 import { Exercise } from "@/types/Global";
 import { Theme } from "@/types/Theme";
 import { useAppTheme } from "@/hooks/useAppTheme";
 import ExerciseForm from "@/components/exercises/ExerciseForm";
-import EvilIcons from "@expo/vector-icons/EvilIcons";
 import Feather from "@expo/vector-icons/Feather";
 import { router } from "expo-router";
-import { SafeAreaView } from "react-native-safe-area-context";
 import AppWrapper from "@/components/ui/AppWrapper";
 
 export default function CreateExerciseScreen() {

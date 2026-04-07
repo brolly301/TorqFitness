@@ -27,7 +27,7 @@ const themes: Record<ThemeType, Theme> = {
 };
 
 export const ThemeProvider = ({ children }: { children: ReactNode }) => {
-  const [themeType, setThemeType] = useState<ThemeType>("purple");
+  const [themeType, setThemeType] = useState<ThemeType>("light");
 
   const theme = useMemo(() => themes[themeType], [themeType]);
 
