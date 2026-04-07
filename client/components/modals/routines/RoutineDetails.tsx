@@ -6,13 +6,15 @@ import {
   TextInput,
   View,
 } from "react-native";
-import React, { useRef, useState } from "react";
+import React, { useMemo, useRef, useState } from "react";
 import { capitalizeWords } from "@/utils/helpers";
 import { router } from "expo-router";
 import { Routine } from "@/types/Global";
 import { useRoutineContext } from "@/context/RoutineContext";
 import { useExerciseContext } from "@/context/ExerciseContext";
 import DeleteModal from "../confirmation/DeleteModal";
+import { useAppTheme } from "@/hooks/useAppTheme";
+import { Theme } from "@/types/Theme";
 
 type Props = {
   routine: Routine;
@@ -20,6 +22,9 @@ type Props = {
 };
 
 export default function RoutineDetails({ routine, setModalVisible }: Props) {
+  const { theme, scale } = useAppTheme();
+  const styles = useMemo(() => makeStyles(theme, scale), [theme, scale]);
+
   const { deleteRoutine } = useRoutineContext();
   const { exercises } = useExerciseContext();
 
@@ -123,69 +128,70 @@ export default function RoutineDetails({ routine, setModalVisible }: Props) {
   );
 }
 
-const styles = StyleSheet.create({
-  container: {},
-  iconContainer: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-  },
+export const makeStyles = (theme: Theme, scale: number) =>
+  StyleSheet.create({
+    container: {},
+    iconContainer: {
+      flexDirection: "row",
+      justifyContent: "space-between",
+      alignItems: "center",
+    },
 
-  routineContainer: {
-    marginTop: 15,
-    borderRadius: 10,
-    borderWidth: 1,
-    padding: 10,
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-  },
+    routineContainer: {
+      marginTop: 15 * scale,
+      borderRadius: 10,
+      borderWidth: 1,
+      padding: 10 * scale,
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "space-between",
+    },
 
-  nameButtonContainer: {
-    // flexDirection: "row",
-    justifyContent: "center",
-  },
-  exerciseName: {
-    fontSize: 18,
-    fontWeight: "bold",
-    marginBottom: 2,
-  },
-  exerciseMuscle: {
-    fontSize: 15,
-    fontWeight: "400",
-  },
-  name: {
-    fontSize: 22,
-    fontWeight: "bold",
-    marginBottom: 5,
-  },
-  overviewContainer: {
-    marginTop: 20,
-  },
-  notes: {
-    fontSize: 16,
-  },
-  exerciseLength: { fontSize: 16 },
-  setLength: { fontSize: 16 },
-  hr: {
-    marginVertical: 10,
-    height: 1,
-    width: "100%",
-    backgroundColor: "black",
-  },
-  buttonContainer: {
-    padding: 7.5,
-    flexDirection: "row",
-    justifyContent: "center",
-    alignItems: "center",
-    borderWidth: 1,
-    borderColor: "rgba(255, 0, 0, 0.6)",
-    backgroundColor: "rgba(255, 0, 0, 0.2)",
-    borderRadius: 10,
-  },
-  buttonText: {
-    fontSize: 14,
-    fontWeight: "bold",
-    color: "rgba(255, 0, 0, 0.6)",
-  },
-});
+    nameButtonContainer: {
+      // flexDirection: "row",
+      justifyContent: "center",
+    },
+    exerciseName: {
+      fontSize: 18 * scale,
+      fontWeight: "bold",
+      marginBottom: 2 * scale,
+    },
+    exerciseMuscle: {
+      fontSize: 15 * scale,
+      fontWeight: "400",
+    },
+    name: {
+      fontSize: 22,
+      fontWeight: "bold",
+      marginBottom: 5 * scale,
+    },
+    overviewContainer: {
+      marginTop: 20 * scale,
+    },
+    notes: {
+      fontSize: 16 * scale,
+    },
+    exerciseLength: { fontSize: 16 * scale },
+    setLength: { fontSize: 16 * scale },
+    hr: {
+      marginVertical: 10 * scale,
+      height: 1,
+      width: "100%",
+      backgroundColor: "black",
+    },
+    buttonContainer: {
+      padding: 7.5 * scale,
+      flexDirection: "row",
+      justifyContent: "center",
+      alignItems: "center",
+      borderWidth: 1,
+      borderColor: "rgba(255, 0, 0, 0.6)",
+      backgroundColor: "rgba(255, 0, 0, 0.2)",
+      borderRadius: 10,
+    },
+    buttonText: {
+      fontSize: 14 * scale,
+      fontWeight: "bold",
+      color: "rgba(255, 0, 0, 0.6)",
+    },
+  });

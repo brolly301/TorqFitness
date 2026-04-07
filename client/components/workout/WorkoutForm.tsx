@@ -1,5 +1,5 @@
 import { StyleSheet, Text, TextInput, View } from "react-native";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { Button } from "@react-navigation/elements";
 import Timer from "./Timer";
 import { ModalProps, WorkoutDraft } from "@/types/Global";
@@ -9,6 +9,8 @@ import { capitalizeWords, formatDate } from "@/utils/helpers";
 import EvilIcons from "@expo/vector-icons/EvilIcons";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useAppTheme } from "@/hooks/useAppTheme";
+import { Theme } from "@/types/Theme";
 
 type Props<T extends WorkoutDraft> = {
   draft: T;
@@ -22,6 +24,9 @@ export default function WorkoutForm<T extends WorkoutDraft>({
   showTimer,
   setModalVisible,
 }: Props<T>) {
+  const { theme, scale } = useAppTheme();
+  const styles = useMemo(() => makeStyles(theme, scale), [theme, scale]);
+
   const { exercises } = useExerciseContext();
 
   const exerciseList = draft.exercises.map((we) => {
@@ -168,62 +173,63 @@ export default function WorkoutForm<T extends WorkoutDraft>({
   );
 }
 
-const styles = StyleSheet.create({
-  nameInput: {
-    fontSize: 24,
-  },
-  notesInput: {
-    fontSize: 18,
-  },
-  date: { fontSize: 22 },
-  nameTimer: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "flex-start",
-    // marginBottom: 15,
-  },
-  workoutContainer: {
-    marginTop: 20,
-    borderRadius: 10,
-    borderWidth: 1,
-    padding: 10,
-    marginBottom: 10,
-  },
-  exerciseInputContainer: {
-    textAlign: "center",
-    flexDirection: "column",
-    justifyContent: "space-between",
-    alignItems: "center",
-    flex: 1,
-    marginBottom: 10,
-  },
-  exerciseContainer: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    textAlign: "center",
-    gap: 8,
-  },
-  headerContainer: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    textAlign: "center",
-    gap: 8,
-  },
-  nameButtonContainer: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    marginBottom: 10,
-  },
-  exerciseName: {
-    fontSize: 16,
-    fontWeight: "bold",
-  },
-  hr: {
-    height: 1,
-    backgroundColor: "black",
-    marginVertical: 15,
-  },
-});
+export const makeStyles = (theme: Theme, scale: number) =>
+  StyleSheet.create({
+    nameInput: {
+      fontSize: 24 * scale,
+    },
+    notesInput: {
+      fontSize: 18 * scale,
+    },
+    date: { fontSize: 22 * scale },
+    nameTimer: {
+      flexDirection: "row",
+      justifyContent: "space-between",
+      alignItems: "flex-start",
+      // marginBottom: 15,
+    },
+    workoutContainer: {
+      marginTop: 20 * scale,
+      borderRadius: 10 * scale,
+      borderWidth: 1 * scale,
+      padding: 10 * scale,
+      marginBottom: 10 * scale,
+    },
+    exerciseInputContainer: {
+      textAlign: "center",
+      flexDirection: "column",
+      justifyContent: "space-between",
+      alignItems: "center",
+      flex: 1,
+      marginBottom: 10 * scale,
+    },
+    exerciseContainer: {
+      flexDirection: "row",
+      justifyContent: "space-between",
+      alignItems: "center",
+      textAlign: "center",
+      gap: 8 * scale,
+    },
+    headerContainer: {
+      flexDirection: "row",
+      justifyContent: "space-between",
+      alignItems: "center",
+      textAlign: "center",
+      gap: 8 * scale,
+    },
+    nameButtonContainer: {
+      flexDirection: "row",
+      justifyContent: "space-between",
+      alignItems: "center",
+      marginBottom: 10 * scale,
+    },
+    exerciseName: {
+      fontSize: 16 * scale,
+      fontWeight: "bold",
+    },
+    hr: {
+      height: 1 * scale,
+      backgroundColor: theme.background,
+      marginVertical: 15 * scale,
+    },
+  });

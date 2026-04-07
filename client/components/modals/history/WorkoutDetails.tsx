@@ -1,5 +1,5 @@
 import { FlatList, StyleSheet, Text, TextInput, View } from "react-native";
-import React, { useState } from "react";
+import React, { useMemo, useState } from "react";
 import { Workout } from "@/types/Global";
 import EvilIcons from "@expo/vector-icons/EvilIcons";
 import { useWorkoutContext } from "@/context/WorkoutContext";
@@ -8,6 +8,8 @@ import { Button } from "@react-navigation/elements";
 import { router } from "expo-router";
 import { useExerciseContext } from "@/context/ExerciseContext";
 import DeleteModal from "../confirmation/DeleteModal";
+import { useAppTheme } from "@/hooks/useAppTheme";
+import { Theme } from "@/types/Theme";
 
 type Props = {
   workout: Workout;
@@ -15,6 +17,9 @@ type Props = {
 };
 
 export default function WorkoutDetails({ workout, setModalVisible }: Props) {
+  const { theme, scale } = useAppTheme();
+  const styles = useMemo(() => makeStyles(theme, scale), [theme, scale]);
+
   const { deleteWorkout } = useWorkoutContext();
   const { exercises } = useExerciseContext();
 
@@ -134,61 +139,62 @@ export default function WorkoutDetails({ workout, setModalVisible }: Props) {
   );
 }
 
-const styles = StyleSheet.create({
-  container: {},
-  iconContainer: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-  },
-  input: {
-    borderRadius: 10,
-    borderWidth: 1,
-    borderColor: "black",
-    padding: 10,
-    marginBottom: 10,
-  },
-  nameInput: {
-    borderWidth: 1,
-    padding: 10,
-    borderRadius: 10,
-  },
-  workoutContainer: {
-    marginTop: 20,
-    borderRadius: 10,
-    borderWidth: 1,
-    padding: 10,
-    marginBottom: 10,
-  },
-  exerciseInputContainer: {
-    textAlign: "center",
-    flexDirection: "column",
-    justifyContent: "space-between",
-    alignItems: "center",
-    flex: 1,
-    marginBottom: 10,
-  },
-  exerciseContainer: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    textAlign: "center",
-    gap: 8,
-  },
-  headerContainer: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    textAlign: "center",
-    gap: 8,
-  },
-  nameButtonContainer: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    marginBottom: 10,
-  },
-  exerciseName: {
-    fontSize: 16,
-    fontWeight: "bold",
-  },
-});
+export const makeStyles = (theme: Theme, scale: number) =>
+  StyleSheet.create({
+    container: {},
+    iconContainer: {
+      flexDirection: "row",
+      justifyContent: "space-between",
+    },
+    input: {
+      borderRadius: 10,
+      borderWidth: 1,
+      borderColor: "black",
+      padding: 10 * scale,
+      marginBottom: 10 * scale,
+    },
+    nameInput: {
+      borderWidth: 1,
+      padding: 10 * scale,
+      borderRadius: 10,
+    },
+    workoutContainer: {
+      marginTop: 20 * scale,
+      borderRadius: 10,
+      borderWidth: 1,
+      padding: 10 * scale,
+      marginBottom: 10 * scale,
+    },
+    exerciseInputContainer: {
+      textAlign: "center",
+      flexDirection: "column",
+      justifyContent: "space-between",
+      alignItems: "center",
+      flex: 1,
+      marginBottom: 10 * scale,
+    },
+    exerciseContainer: {
+      flexDirection: "row",
+      justifyContent: "space-between",
+      alignItems: "center",
+      textAlign: "center",
+      gap: 8,
+    },
+    headerContainer: {
+      flexDirection: "row",
+      justifyContent: "space-between",
+      alignItems: "center",
+      textAlign: "center",
+      gap: 8,
+    },
+    nameButtonContainer: {
+      flexDirection: "row",
+      justifyContent: "space-between",
+      alignItems: "center",
+      marginBottom: 10 * scale,
+    },
+    exerciseName: {
+      fontSize: 16 * scale,
+      fontWeight: "bold",
+    },
+  });

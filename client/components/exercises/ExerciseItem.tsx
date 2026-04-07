@@ -1,14 +1,18 @@
 import { StyleSheet, Text, View } from "react-native";
-import React, { useRef } from "react";
+import React, { useMemo, useRef } from "react";
 import { Exercise } from "@/types/Global";
 import { Image } from "expo-image";
 import { capitalizeWords } from "@/utils/helpers";
+import { Theme } from "@/types/Theme";
+import { useAppTheme } from "@/hooks/useAppTheme";
 
 type Props = {
   exercise: Exercise;
 };
 
 export default function ExerciseItem({ exercise }: Props) {
+  const { theme, scale } = useAppTheme();
+  const styles = useMemo(() => makeStyles(theme, scale), [theme, scale]);
   const expoImageRef = useRef<Image>(null);
 
   return (
@@ -35,25 +39,26 @@ export default function ExerciseItem({ exercise }: Props) {
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    padding: 10,
-    backgroundColor: "white",
-    borderRadius: 10,
-    marginVertical: 5,
-    flexDirection: "row",
-  },
-  name: {
-    fontSize: 20,
-    fontWeight: "600",
-    marginBottom: 5,
-  },
-  primaryMuscle: {
-    fontSize: 14,
-  },
-  gif: {
-    width: 65,
-    height: 65,
-  },
-  textContainer: {},
-});
+export const makeStyles = (theme: Theme, scale: number) =>
+  StyleSheet.create({
+    container: {
+      padding: 10 * scale,
+      backgroundColor: theme.background,
+      borderRadius: 10 * scale,
+      marginVertical: 5 * scale,
+      flexDirection: "row",
+    },
+    name: {
+      fontSize: 20 * scale,
+      fontWeight: "600",
+      marginBottom: 5 * scale,
+    },
+    primaryMuscle: {
+      fontSize: 14 * scale,
+    },
+    gif: {
+      width: 65,
+      height: 65,
+    },
+    textContainer: {},
+  });

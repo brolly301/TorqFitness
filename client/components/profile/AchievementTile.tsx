@@ -1,10 +1,15 @@
 import { StyleSheet, Text, View } from "react-native";
-import React from "react";
+import React, { useMemo } from "react";
 import TileWrapper from "./TileWrapper";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import FontAwesome5 from "@expo/vector-icons/FontAwesome5";
+import { useAppTheme } from "@/hooks/useAppTheme";
+import { Theme } from "@/types/Theme";
 
 export default function AchievementTile() {
+  const { theme, scale } = useAppTheme();
+  const styles = useMemo(() => makeStyles(theme, scale), [theme, scale]);
+
   return (
     <TileWrapper title="Achievements">
       <View style={styles.container}>
@@ -38,18 +43,19 @@ export default function AchievementTile() {
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-  },
-  tileContainer: {
-    flexDirection: "row",
-  },
-  tile: {
-    marginLeft: 10,
-    justifyContent: "center",
-    alignItems: "center",
-  },
-});
+export const makeStyles = (theme: Theme, scale: number) =>
+  StyleSheet.create({
+    container: {
+      flexDirection: "row",
+      justifyContent: "space-between",
+      alignItems: "center",
+    },
+    tileContainer: {
+      flexDirection: "row",
+    },
+    tile: {
+      marginLeft: 10 * scale,
+      justifyContent: "center",
+      alignItems: "center",
+    },
+  });

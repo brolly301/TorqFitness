@@ -1,14 +1,19 @@
 import { Pressable, StyleSheet, Text, View } from "react-native";
-import React, { useState } from "react";
+import React, { useMemo, useState } from "react";
 import { Routine } from "@/types/Global";
 import Feather from "@expo/vector-icons/Feather";
 import RoutineDetailsModal from "../modals/routines/RoutineDetailsModal";
+import { Theme } from "@/types/Theme";
+import { useAppTheme } from "@/hooks/useAppTheme";
 
 type Props = {
   routine: Routine;
 };
 
 export default function RoutineTile({ routine }: Props) {
+  const { theme, scale } = useAppTheme();
+  const styles = useMemo(() => makeStyles(theme, scale), [theme, scale]);
+
   const [modalVisible, setModalVisible] = useState<boolean>(false);
 
   return (
@@ -35,32 +40,33 @@ export default function RoutineTile({ routine }: Props) {
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    backgroundColor: "white",
-    padding: 10,
-    borderRadius: 10,
-    marginBottom: 10,
-  },
-  name: {
-    fontSize: 18,
-    fontWeight: "600",
-    marginBottom: 10,
-  },
-  date: {
-    fontSize: 14,
-    fontWeight: "400",
-  },
-  exercises: {
-    fontSize: 16,
-    fontWeight: "400",
-    marginBottom: 10,
-  },
-  volume: {
-    fontSize: 16,
-    fontWeight: "400",
-  },
-});
+export const makeStyles = (theme: Theme, scale: number) =>
+  StyleSheet.create({
+    container: {
+      flexDirection: "row",
+      justifyContent: "space-between",
+      alignItems: "center",
+      backgroundColor: theme.background,
+      padding: 10 * scale,
+      borderRadius: 10,
+      marginBottom: 10 * scale,
+    },
+    name: {
+      fontSize: 18 * scale,
+      fontWeight: "600",
+      marginBottom: 10 * scale,
+    },
+    date: {
+      fontSize: 14 * scale,
+      fontWeight: "400",
+    },
+    exercises: {
+      fontSize: 16 * scale,
+      fontWeight: "400",
+      marginBottom: 10 * scale,
+    },
+    volume: {
+      fontSize: 16 * scale,
+      fontWeight: "400",
+    },
+  });

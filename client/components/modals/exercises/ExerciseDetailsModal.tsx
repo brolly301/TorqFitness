@@ -1,5 +1,5 @@
 import { Modal, Pressable, StyleSheet, Text, View } from "react-native";
-import React, { useState } from "react";
+import React, { useMemo, useState } from "react";
 import EvilIcons from "@expo/vector-icons/EvilIcons";
 import { Exercise, ModalProps } from "@/types/Global";
 import DetailsTab from "./DetailsTab";
@@ -8,6 +8,8 @@ import RecordsTab from "./RecordsTab";
 import HistoryTab from "./HistoryTab";
 import { capitalizeWords } from "@/utils/helpers";
 import ExerciseEditModal from "./ExerciseEditModal";
+import { Theme } from "@/types/Theme";
+import { useAppTheme } from "@/hooks/useAppTheme";
 
 type Props = ModalProps & {
   exercise: Exercise | null;
@@ -24,6 +26,8 @@ export default function ExerciseDetailsModal({
   handleAddExercise,
   showAddButton,
 }: Props) {
+  const { theme, scale } = useAppTheme();
+  const styles = useMemo(() => makeStyles(theme, scale), [theme, scale]);
   const [tab, setTab] = useState<TabName>("Details");
   const tabName: TabName[] = ["Details", "History", "Records", "Charts"];
 
@@ -115,61 +119,63 @@ export default function ExerciseDetailsModal({
   );
 }
 
-const styles = StyleSheet.create({
-  centeredView: {
-    justifyContent: "center",
-    alignItems: "center",
-    flex: 1,
-    backgroundColor: "rgba(0,0,0,0.6)",
-  },
-  modalView: {
-    width: "89%",
-    height: "60%",
-    borderRadius: 12,
-    backgroundColor: "white",
-    paddingTop: 15,
-    paddingHorizontal: 15,
-    paddingBottom: 26,
-  },
-  closeButton: {
-    alignSelf: "flex-end",
-  },
-  exercise: {
-    fontSize: 20,
-    fontWeight: "600",
-    textAlign: "center",
-    marginBottom: 15,
-  },
-  tabRowContainer: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-  },
-  tab: {
-    paddingVertical: 8,
-    paddingHorizontal: 16,
-    borderRadius: 6,
-    backgroundColor: "#8cec7f",
-    marginHorizontal: 4,
-  },
-  tabLabel: {
-    color: "#fff",
-    fontWeight: "700",
-  },
-  iconContainer: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    marginBottom: 15,
-  },
-  addButton: {
-    paddingVertical: 8,
-    paddingHorizontal: 16,
-    borderRadius: 6,
-    backgroundColor: "#7facec",
-    marginHorizontal: 4,
-  },
-  addButtonText: {
-    color: "white",
-  },
-});
+export const makeStyles = (theme: Theme, scale: number) =>
+  StyleSheet.create({
+    centeredView: {
+      justifyContent: "center",
+      alignItems: "center",
+      flex: 1,
+      backgroundColor: "rgba(0,0,0,0.6)",
+    },
+    modalView: {
+      width: "89%",
+      height: "60%",
+      borderRadius: 12,
+      backgroundColor: "white",
+      paddingTop: 15,
+      paddingHorizontal: 15,
+      paddingBottom: 26,
+    },
+    closeButton: {
+      alignSelf: "flex-end",
+    },
+    exercise: {
+      fontSize: 20 * scale,
+      fontWeight: "600",
+      textAlign: "center",
+      marginBottom: 15 * scale,
+    },
+    tabRowContainer: {
+      flexDirection: "row",
+      justifyContent: "space-between",
+      alignItems: "center",
+    },
+    tab: {
+      paddingVertical: 8 * scale,
+      paddingHorizontal: 16 * scale,
+      borderRadius: 6,
+      backgroundColor: theme.focus,
+      marginHorizontal: 4 * scale,
+    },
+    tabLabel: {
+      color: theme.textPrimary,
+
+      fontWeight: "700",
+    },
+    iconContainer: {
+      flexDirection: "row",
+      justifyContent: "space-between",
+      alignItems: "center",
+      marginBottom: 15 * scale,
+    },
+    addButton: {
+      paddingVertical: 8 * scale,
+      paddingHorizontal: 16 * scale,
+      borderRadius: 6,
+      backgroundColor: theme.focus,
+      marginHorizontal: 4 * scale,
+    },
+    addButtonText: {
+      color: theme.textPrimary,
+    },
+  });

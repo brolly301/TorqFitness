@@ -1,7 +1,11 @@
 import { StyleSheet, Text, View } from "react-native";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
+import { useAppTheme } from "@/hooks/useAppTheme";
+import { Theme } from "@/types/Theme";
 
 export default function Timer() {
+  const { theme, scale } = useAppTheme();
+  const styles = useMemo(() => makeStyles(theme, scale), [theme, scale]);
   const [time, setTime] = useState<number>(0);
 
   useEffect(() => {
@@ -24,11 +28,12 @@ export default function Timer() {
   );
 }
 
-const styles = StyleSheet.create({
-  timeContainer: {
-    flexDirection: "row",
-  },
-  time: {
-    fontSize: 22,
-  },
-});
+export const makeStyles = (theme: Theme, scale: number) =>
+  StyleSheet.create({
+    timeContainer: {
+      flexDirection: "row",
+    },
+    time: {
+      fontSize: 22 * scale,
+    },
+  });

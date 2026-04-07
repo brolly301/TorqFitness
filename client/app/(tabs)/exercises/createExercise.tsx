@@ -1,5 +1,5 @@
 import { StyleSheet, TextInput, View } from "react-native";
-import React, { useState } from "react";
+import React, { useMemo, useState } from "react";
 import { Button } from "@react-navigation/elements";
 import { useExerciseContext } from "@/context/ExerciseContext";
 import * as crypto from "expo-crypto";
@@ -10,8 +10,13 @@ import {
   primaryMuscles,
 } from "@/constants/exerciseDropdowns";
 import { Exercise } from "@/types/Global";
+import { Theme } from "@/types/Theme";
+import { useAppTheme } from "@/hooks/useAppTheme";
 
 export default function CreateExerciseScreen() {
+  const { theme, scale } = useAppTheme();
+  const styles = useMemo(() => makeStyles(theme, scale), [theme, scale]);
+
   const [exercise, setExercise] = useState<Exercise>({
     id: crypto.randomUUID(),
     name: "",
@@ -89,13 +94,14 @@ export default function CreateExerciseScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-  container: { padding: 16 },
-  input: {
-    borderWidth: 1,
-    borderColor: "#ccc",
-    padding: 12,
-    marginBottom: 8,
-    borderRadius: 6,
-  },
-});
+export const makeStyles = (theme: Theme, scale: number) =>
+  StyleSheet.create({
+    container: { padding: 16 * scale },
+    input: {
+      borderWidth: 1 * scale,
+      borderColor: theme.border,
+      padding: 12 * scale,
+      marginBottom: 8 * scale,
+      borderRadius: 6 * scale,
+    },
+  });

@@ -1,5 +1,5 @@
 import { StyleSheet, TextInput, View } from "react-native";
-import React, { useState } from "react";
+import React, { useMemo, useState } from "react";
 import { useExerciseContext } from "@/context/ExerciseContext";
 import AppDropdown from "../ui/AppDropdown";
 import { Button } from "@react-navigation/elements";
@@ -10,6 +10,8 @@ import {
 } from "@/constants/exerciseDropdowns";
 import { Exercise, ModalProps } from "@/types/Global";
 import DeleteModal from "../modals/confirmation/DeleteModal";
+import { Theme } from "@/types/Theme";
+import { useAppTheme } from "@/hooks/useAppTheme";
 
 type Props = { exercise: Exercise | null } & Pick<
   ModalProps,
@@ -17,6 +19,8 @@ type Props = { exercise: Exercise | null } & Pick<
 >;
 
 export default function ExerciseEditForm({ exercise, setModalVisible }: Props) {
+  const { theme, scale } = useAppTheme();
+  const styles = useMemo(() => makeStyles(theme, scale), [theme, scale]);
   if (!exercise) return null;
 
   const [exerciseData, setExerciseData] = useState<Exercise>(exercise);
@@ -118,13 +122,14 @@ export default function ExerciseEditForm({ exercise, setModalVisible }: Props) {
   );
 }
 
-const styles = StyleSheet.create({
-  container: { padding: 16 },
-  input: {
-    borderWidth: 1,
-    borderColor: "#ccc",
-    padding: 12,
-    marginBottom: 8,
-    borderRadius: 6,
-  },
-});
+export const makeStyles = (theme: Theme, scale: number) =>
+  StyleSheet.create({
+    container: { padding: 16 * scale },
+    input: {
+      borderWidth: 1 * scale,
+      borderColor: theme.border,
+      padding: 12 * scale,
+      marginBottom: 8 * scale,
+      borderRadius: 6 * scale,
+    },
+  });

@@ -1,8 +1,12 @@
 import { StyleSheet, Text, View } from "react-native";
-import React from "react";
+import React, { useMemo } from "react";
 import TileWrapper from "./TileWrapper";
+import { useAppTheme } from "@/hooks/useAppTheme";
+import { Theme } from "@/types/Theme";
 
 export default function ProgressTile() {
+  const { theme, scale } = useAppTheme();
+  const styles = useMemo(() => makeStyles(theme, scale), [theme, scale]);
   return (
     <TileWrapper title="Progress">
       <View style={styles.tilesContainer}>
@@ -33,19 +37,20 @@ export default function ProgressTile() {
   );
 }
 
-const styles = StyleSheet.create({
-  progressContainer: {
-    borderWidth: 10,
-    borderColor: "rgb(59, 184, 90)",
-    borderRadius: 100,
-    width: 120,
-    height: 120,
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  tilesContainer: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-  },
-});
+export const makeStyles = (theme: Theme, scale: number) =>
+  StyleSheet.create({
+    progressContainer: {
+      borderWidth: 10,
+      borderColor: "rgb(59, 184, 90)",
+      borderRadius: 100,
+      width: 120,
+      height: 120,
+      justifyContent: "center",
+      alignItems: "center",
+    },
+    tilesContainer: {
+      flexDirection: "row",
+      justifyContent: "space-between",
+      alignItems: "center",
+    },
+  });

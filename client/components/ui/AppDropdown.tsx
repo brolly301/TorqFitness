@@ -1,5 +1,7 @@
 import { Pressable, StyleSheet, Text, View } from "react-native";
-import React, { useState } from "react";
+import React, { useMemo, useState } from "react";
+import { useAppTheme } from "@/hooks/useAppTheme";
+import { Theme } from "@/types/Theme";
 
 type Props = {
   data: string[];
@@ -14,6 +16,9 @@ export default function AppDropdown({
   setSelected,
   placeholder = "Select an option",
 }: Props) {
+  const { theme, scale } = useAppTheme();
+  const styles = useMemo(() => makeStyles(theme, scale), [theme, scale]);
+
   const [active, setActive] = useState<boolean>(false);
 
   const handleSelected = (item: string) => {
@@ -47,28 +52,29 @@ export default function AppDropdown({
   );
 }
 
-const styles = StyleSheet.create({
-  wrapper: {
-    gap: 6,
-  },
-  container: {
-    borderRadius: 10,
-    borderWidth: 1,
-    borderColor: "black",
-    padding: 10,
-    backgroundColor: "white",
-  },
-  dropdown: {
-    borderWidth: 1,
-    borderColor: "black",
-    borderRadius: 10,
-    marginTop: 4,
-    overflow: "hidden",
-    backgroundColor: "white",
-  },
-  item: {
-    padding: 10,
-    borderBottomWidth: 1,
-    borderBottomColor: "#ddd",
-  },
-});
+export const makeStyles = (theme: Theme, scale: number) =>
+  StyleSheet.create({
+    wrapper: {
+      gap: 6 * scale,
+    },
+    container: {
+      borderRadius: 10 * scale,
+      borderWidth: 1 * scale,
+      borderColor: theme.border,
+      padding: 10 * scale,
+      backgroundColor: theme.background,
+    },
+    dropdown: {
+      borderWidth: 1 * scale,
+      borderColor: theme.border,
+      borderRadius: 10 * scale,
+      marginTop: 4 * scale,
+      overflow: "hidden",
+      backgroundColor: theme.background,
+    },
+    item: {
+      padding: 10 * scale,
+      borderBottomWidth: 1 * scale,
+      borderBottomColor: theme.border,
+    },
+  });

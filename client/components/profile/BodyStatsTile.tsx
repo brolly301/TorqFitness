@@ -1,8 +1,12 @@
 import { StyleSheet, Text, View } from "react-native";
-import React from "react";
+import React, { useMemo } from "react";
 import TileWrapper from "./TileWrapper";
+import { useAppTheme } from "@/hooks/useAppTheme";
+import { Theme } from "@/types/Theme";
 
 export default function BodyStatsTile() {
+  const { theme, scale } = useAppTheme();
+  const styles = useMemo(() => makeStyles(theme, scale), [theme, scale]);
   return (
     <TileWrapper title="Body Statistics">
       <View style={styles.container}>
@@ -31,21 +35,22 @@ export default function BodyStatsTile() {
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-  },
-  statsContainer: {},
-  label: {
-    fontSize: 16,
-    fontWeight: "500",
-    marginBottom: 5,
-  },
-  value: {
-    fontSize: 14,
-    fontWeight: "400",
-    marginBottom: 15,
-  },
-});
+export const makeStyles = (theme: Theme, scale: number) =>
+  StyleSheet.create({
+    container: {
+      flexDirection: "row",
+      justifyContent: "space-between",
+      alignItems: "center",
+    },
+    statsContainer: {},
+    label: {
+      fontSize: 16 * scale,
+      fontWeight: "500",
+      marginBottom: 5 * scale,
+    },
+    value: {
+      fontSize: 14 * scale,
+      fontWeight: "400",
+      marginBottom: 15 * scale,
+    },
+  });

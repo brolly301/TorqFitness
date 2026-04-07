@@ -1,12 +1,17 @@
 import { StyleSheet, Text, TextInput, View } from "react-native";
-import React from "react";
+import React, { useMemo } from "react";
 import FontAwesome6 from "@expo/vector-icons/FontAwesome6";
+import { useAppTheme } from "@/hooks/useAppTheme";
+import { Theme } from "@/types/Theme";
 
 type Props = {
   setSearch: React.Dispatch<React.SetStateAction<string>>;
 };
 
 export default function AppSearchBar({ setSearch }: Props) {
+  const { theme, scale } = useAppTheme();
+  const styles = useMemo(() => makeStyles(theme, scale), [theme, scale]);
+
   return (
     <View style={styles.container}>
       <FontAwesome6 name="magnifying-glass" size={14} color="black" />
@@ -20,17 +25,18 @@ export default function AppSearchBar({ setSearch }: Props) {
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    borderWidth: 1,
-    borderColor: "black",
-    borderRadius: 20,
-    padding: 10,
-    flexDirection: "row",
-    alignItems: "center",
-  },
-  input: {
-    width: "100%",
-    marginLeft: 10,
-  },
-});
+export const makeStyles = (theme: Theme, scale: number) =>
+  StyleSheet.create({
+    container: {
+      borderWidth: 1 * scale,
+      borderColor: theme.background,
+      borderRadius: 20 * scale,
+      padding: 10 * scale,
+      flexDirection: "row",
+      alignItems: "center",
+    },
+    input: {
+      width: "100%",
+      marginLeft: 10 * scale,
+    },
+  });
