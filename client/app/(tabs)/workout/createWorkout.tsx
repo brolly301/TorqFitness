@@ -3,6 +3,7 @@ import React, {
   useCallback,
   useEffect,
   useLayoutEffect,
+  useMemo,
   useState,
 } from "react";
 import WorkoutForm from "@/components/workout/WorkoutForm";
@@ -14,8 +15,14 @@ import * as crypto from "expo-crypto";
 import { Workout } from "@/types/Global";
 import FinishModal from "@/components/modals/confirmation/FinishModal";
 import DiscardModal from "@/components/modals/confirmation/DiscardModal";
+import AppWrapper from "@/components/ui/AppWrapper";
+import { Theme } from "@/types/Theme";
+import { useAppTheme } from "@/hooks/useAppTheme";
 
 export default function StartWorkoutScreen() {
+  const { theme, scale } = useAppTheme();
+  const styles = useMemo(() => makeStyles(theme, scale), [theme, scale]);
+
   const { setWorkouts } = useWorkoutContext();
 
   const [workout, setWorkout] = useState<Workout>({
@@ -126,13 +133,20 @@ export default function StartWorkoutScreen() {
         setModalVisible={setModalVisible}
         handleAddExercise={handleAddExercise}
       />
-      <WorkoutForm
-        setDraft={setWorkout}
-        draft={workout}
-        setModalVisible={setModalVisible}
-      />
+      <AppWrapper>
+        <View style={styles.container}>
+          <WorkoutForm
+            setDraft={setWorkout}
+            draft={workout}
+            setModalVisible={setModalVisible}
+          />
+        </View>
+      </AppWrapper>
     </>
   );
 }
 
-const styles = StyleSheet.create({});
+const makeStyles = (theme: Theme, scale: number) =>
+  StyleSheet.create({
+    container: { padding: 16 * scale, backgroundColor: theme.background },
+  });

@@ -1,10 +1,9 @@
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import { router, Stack } from "expo-router";
-import { Text } from "react-native";
 
 export default function _layout() {
   return (
-    <Stack>
+    <Stack screenOptions={{ headerShown: false }}>
       <Stack.Screen
         name="index"
         options={{
@@ -27,9 +26,7 @@ export default function _layout() {
         name="createExercise"
         options={{
           title: "Create Exercise",
-          headerRight: () => {
-            return <Text>Done</Text>;
-          },
+          headerShown: false,
         }}
       />
     </Stack>

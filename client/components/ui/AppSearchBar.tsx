@@ -29,8 +29,9 @@ export const makeStyles = (theme: Theme, scale: number) =>
   StyleSheet.create({
     container: {
       borderWidth: 1 * scale,
-      borderColor: theme.background,
+      borderColor: theme.inputBorder,
       borderRadius: 20 * scale,
+      backgroundColor: theme.buttonSecondary,
       padding: 10 * scale,
       flexDirection: "row",
       alignItems: "center",

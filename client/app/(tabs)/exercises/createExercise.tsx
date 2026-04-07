@@ -1,4 +1,11 @@
-import { StyleSheet, TextInput, View } from "react-native";
+import {
+  Pressable,
+  StatusBar,
+  StyleSheet,
+  Text,
+  TextInput,
+  View,
+} from "react-native";
 import React, { useMemo, useState } from "react";
 import { Button } from "@react-navigation/elements";
 import { useExerciseContext } from "@/context/ExerciseContext";
@@ -12,6 +19,12 @@ import {
 import { Exercise } from "@/types/Global";
 import { Theme } from "@/types/Theme";
 import { useAppTheme } from "@/hooks/useAppTheme";
+import ExerciseForm from "@/components/exercises/ExerciseForm";
+import EvilIcons from "@expo/vector-icons/EvilIcons";
+import Feather from "@expo/vector-icons/Feather";
+import { router } from "expo-router";
+import { SafeAreaView } from "react-native-safe-area-context";
+import AppWrapper from "@/components/ui/AppWrapper";
 
 export default function CreateExerciseScreen() {
   const { theme, scale } = useAppTheme();
@@ -26,82 +39,52 @@ export default function CreateExerciseScreen() {
     userCreated: true,
   });
 
-  const isDisabled =
-    !exercise.name.trim() ||
-    exercise.primaryMuscles.length === 0 ||
-    exercise.bodyParts.length === 0 ||
-    exercise.equipment.length === 0;
-
-  const { setExercises } = useExerciseContext();
-
-  const handleSubmit = () => {
-    setExercises((prev) => [...prev, exercise]);
-  };
-
   return (
-    <View style={styles.container}>
-      <TextInput
-        placeholder="Name"
-        placeholderTextColor="black"
-        style={styles.input}
-        textAlignVertical="center"
-        value={exercise.name}
-        onChangeText={(text) =>
-          setExercise((prev) => ({ ...prev, name: text }))
-        }
-      />
-      <AppDropdown
-        selected={exercise.primaryMuscles[0] || ""}
-        data={primaryMuscles}
-        setSelected={(selected) =>
-          setExercise((prev) => ({
-            ...prev,
-            primaryMuscles: selected ? [selected] : [],
-          }))
-        }
-        placeholder="Select a muscle"
-      />
-      <AppDropdown
-        selected={exercise.bodyParts[0] || ""}
-        data={bodyParts}
-        setSelected={(selected) =>
-          setExercise((prev) => ({
-            ...prev,
-            bodyParts: selected ? [selected] : [],
-          }))
-        }
-        placeholder="Select a body part"
-      />
-      <AppDropdown
-        selected={exercise.equipment[0] || ""}
-        data={equipment}
-        setSelected={(selected) =>
-          setExercise((prev) => ({
-            ...prev,
-            equipment: selected ? [selected] : [],
-          }))
-        }
-        placeholder="Select equipment"
-      />
-      <Button
-        disabled={isDisabled}
-        onPressIn={handleSubmit}
-        style={{ backgroundColor: isDisabled ? "red" : "green" }}
-      >
-        Save Exercise
-      </Button>
-    </View>
+    <AppWrapper>
+      <View style={styles.container}>
+        <View style={styles.header}>
+          <Pressable
+            style={{ flexDirection: "row", paddingLeft: 16 }}
+            onPress={() => router.back()}
+            hitSlop={10}
+          >
+            <Feather name="arrow-left" size={24} color={"black"} />
+          </Pressable>
+        </View>
+        <View style={styles.titleContainer}>
+          <Text style={styles.title}>Create Exercise</Text>
+          <Text style={styles.description}>
+            Add the details for your new exercise below
+          </Text>
+        </View>
+        <ExerciseForm exercise={exercise} setExercise={setExercise} />
+      </View>
+    </AppWrapper>
   );
 }
 
-export const makeStyles = (theme: Theme, scale: number) =>
+const makeStyles = (theme: Theme, scale: number) =>
   StyleSheet.create({
-    container: { padding: 16 * scale },
-    input: {
-      borderWidth: 1 * scale,
-      borderColor: theme.border,
-      padding: 12 * scale,
-      marginBottom: 8 * scale,
-      borderRadius: 6 * scale,
+    container: { padding: 16 * scale, backgroundColor: theme.background },
+    header: {
+      flexDirection: "row",
+      alignItems: "center",
+      // marginTop: 40,
+      marginBottom: 30,
+    },
+
+    title: {
+      fontSize: 26 * scale,
+      fontWeight: "bold",
+      marginBottom: 5,
+      color: theme.text,
+    },
+    description: {
+      fontSize: 18 * scale,
+      fontWeight: "400",
+      color: theme.text,
+    },
+    titleContainer: {
+      padding: 16,
     },
   });

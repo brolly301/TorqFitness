@@ -32,8 +32,11 @@ export const makeStyles = (theme: Theme, scale: number) =>
   StyleSheet.create({
     timeContainer: {
       flexDirection: "row",
+      marginTop: 5,
     },
     time: {
-      fontSize: 22 * scale,
+      fontSize: 20 * scale,
+      fontWeight: "600",
+      color: theme.text,
     },
   });

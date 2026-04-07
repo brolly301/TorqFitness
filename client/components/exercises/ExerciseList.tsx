@@ -30,6 +30,7 @@ export default function ExerciseList({
       <FlatList
         data={exercises}
         keyExtractor={(item) => item.id}
+        contentContainerStyle={{ marginTop: 10 }}
         renderItem={({ item }) => {
           return (
             <Pressable

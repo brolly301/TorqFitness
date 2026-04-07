@@ -1,40 +1,32 @@
 export type Theme = {
-  // Base
   background: string;
   surface: string;
   card: string;
   border: string;
+  divider: string;
 
-  // Text
-  textPrimary: string;
+  text: string;
   textSecondary: string;
   textMuted: string;
 
-  // Actions
-  primary: string;
-  primaryText: string;
+  buttonPrimary: string;
+  buttonPrimaryText: string;
+  buttonSecondary: string;
+  buttonSecondaryText: string;
+  buttonDisabled: string;
+  buttonDisabledText: string;
 
-  secondary: string;
-  secondaryText: string;
-
-  // States
   success: string;
   error: string;
   warning: string;
-  disabled: string;
 
-  // Inputs
-  inputBackground: string;
+  inputBg: string;
   inputBorder: string;
   inputText: string;
   inputPlaceholder: string;
+  inputFocusBorder: string;
 
-  // UI Details
-  hover: string;
-  focus: string;
+  press: string;
   overlay: string;
   shadow: string;
-
-  // Navigation
-  navBorder: string;
 };
