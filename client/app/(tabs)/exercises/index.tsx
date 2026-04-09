@@ -32,7 +32,9 @@ export default function ExerciseScreen() {
             hitSlop={10}
             onPress={() => router.navigate("/(tabs)/exercises/createExercise")}
           >
-            <Feather name="plus" size={24} color={"black"} />
+            <View style={styles.iconContainer}>
+              <Feather name="plus" size={20} color={theme.buttonPrimary} />
+            </View>
           </Pressable>
         </View>
         <View style={styles.titleContainer}>
@@ -55,7 +57,6 @@ const makeStyles = (theme: Theme, scale: number) =>
       backgroundColor: theme.background,
     },
     header: {
-      paddingHorizontal: 16,
       // marginTop: 40,
     },
     title: {
@@ -69,5 +70,13 @@ const makeStyles = (theme: Theme, scale: number) =>
     },
     titleContainer: {
       padding: 16,
+    },
+    iconContainer: {
+      flexDirection: "row",
+      justifyContent: "center",
+      alignItems: "center",
+      padding: 8,
+      backgroundColor: theme.border,
+      borderRadius: 10,
     },
   });

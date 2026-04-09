@@ -1,23 +1,27 @@
-import { StyleSheet, Text, View } from "react-native";
-import React, { useCallback, useLayoutEffect, useState } from "react";
+import { Pressable, StyleSheet, Text, View } from "react-native";
+import React, { useCallback, useLayoutEffect, useMemo, useState } from "react";
 import { router, useLocalSearchParams, useNavigation } from "expo-router";
 import { useWorkoutContext } from "@/context/WorkoutContext";
 import { Workout } from "@/types/Global";
 import ExerciseModal from "@/components/modals/exercises/ExerciseModal";
 import WorkoutForm from "@/components/workout/WorkoutForm";
 import * as crypto from "expo-crypto";
-import EvilIcons from "@expo/vector-icons/EvilIcons";
 import DiscardModal from "@/components/modals/confirmation/DiscardModal";
 import FinishModal from "@/components/modals/confirmation/FinishModal";
+import { Theme } from "@/types/Theme";
+import AppWrapper from "@/components/ui/AppWrapper";
+import Feather from "@expo/vector-icons/Feather";
+import { useAppTheme } from "@/hooks/useAppTheme";
 
 export default function EditWorkoutScreen() {
+  const { theme, scale } = useAppTheme();
+  const styles = useMemo(() => makeStyles(theme, scale), [theme, scale]);
+
   const { workoutId } = useLocalSearchParams();
   const { workouts, setWorkouts } = useWorkoutContext();
   const [modalVisible, setModalVisible] = useState<boolean>(false);
 
   const workoutDetails = workouts.find((wk) => wk.id === workoutId);
-
-  const navigation = useNavigation();
 
   if (!workoutDetails) return;
 
@@ -33,31 +37,6 @@ export default function EditWorkoutScreen() {
     );
     router.back();
   }, [formData, setWorkouts]);
-
-  useLayoutEffect(() => {
-    navigation.setOptions({
-      headerRight: () => {
-        return (
-          <EvilIcons
-            name="check"
-            color={"black"}
-            size={22}
-            onPress={() => setFinishModalVisible(true)}
-          />
-        );
-      },
-      headerLeft: () => {
-        return (
-          <EvilIcons
-            name="chevron-left"
-            color={"black"}
-            size={32}
-            onPress={() => setDiscardModalVisible(true)}
-          />
-        );
-      },
-    });
-  }, [navigation, handleSubmit]);
 
   const handleAddExercise = (exerciseId: string) => {
     const newExercise = {
@@ -99,13 +78,56 @@ export default function EditWorkoutScreen() {
         setModalVisible={setModalVisible}
         handleAddExercise={handleAddExercise}
       />
-      <WorkoutForm
-        setDraft={setFormData}
-        draft={formData}
-        setModalVisible={setModalVisible}
-      />
+
+      <AppWrapper>
+        <View style={styles.container}>
+          <View style={styles.header}>
+            <Pressable
+              onPress={() => setDiscardModalVisible(true)}
+              hitSlop={10}
+              style={styles.headerIconContainer}
+            >
+              <Feather name="arrow-left" color={"black"} size={24} />
+            </Pressable>
+            <Pressable
+              style={styles.headerIconContainer}
+              onPress={() => setFinishModalVisible(true)}
+              hitSlop={10}
+            >
+              <Text style={[styles.headerText, { color: theme.buttonPrimary }]}>
+                Save
+              </Text>
+              <Feather name="check" color={theme.buttonPrimary} size={24} />
+            </Pressable>
+          </View>
+          <WorkoutForm
+            setDraft={setFormData}
+            mode="workout"
+            draft={formData}
+            setModalVisible={setModalVisible}
+          />
+        </View>
+      </AppWrapper>
     </>
   );
 }
-
-const styles = StyleSheet.create({});
+const makeStyles = (theme: Theme, scale: number) =>
+  StyleSheet.create({
+    container: { padding: 16 * scale, backgroundColor: theme.background },
+    header: {
+      flexDirection: "row",
+      justifyContent: "space-between",
+      alignItems: "center",
+      // marginTop: 40,
+      marginBottom: 30,
+    },
+    headerText: {
+      fontSize: 20,
+      fontWeight: "600",
+      marginRight: 4,
+    },
+    headerIconContainer: {
+      flexDirection: "row",
+      alignItems: "center",
+    },
+  });

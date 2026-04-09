@@ -46,7 +46,7 @@ export default function WorkoutScreen() {
             <FontAwesome name="history" size={16} color={theme.text} />
             <Text style={styles.subTitle}>Previous Workouts</Text>
           </View>
-          {workouts.length > 1 ? (
+          {workouts.length >= 1 ? (
             workouts.map((workout) => {
               return <WorkoutTile key={workout.id} workout={workout} />;
             })
@@ -65,7 +65,7 @@ export default function WorkoutScreen() {
 
             <Text style={styles.subTitle}>My Routines</Text>
           </View>
-          {routines.length > 1 ? (
+          {routines.length >= 1 ? (
             routines.map((routine) => {
               return <RoutineTile key={routine.id} routine={routine} />;
             })

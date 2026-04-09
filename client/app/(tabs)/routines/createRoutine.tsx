@@ -1,21 +1,27 @@
-import { StyleSheet } from "react-native";
-import React, { useCallback, useLayoutEffect, useState } from "react";
+import { Pressable, StyleSheet, Text, View } from "react-native";
+import React, { useCallback, useLayoutEffect, useMemo, useState } from "react";
 import { router, useNavigation } from "expo-router";
 import { useRoutineContext } from "@/context/RoutineContext";
 import WorkoutForm from "@/components/workout/WorkoutForm";
-import EvilIcons from "@expo/vector-icons/EvilIcons";
 import ExerciseModal from "@/components/modals/exercises/ExerciseModal";
 import * as crypto from "expo-crypto";
 import { Routine } from "@/types/Global";
 import FinishModal from "@/components/modals/confirmation/FinishModal";
 import DiscardModal from "@/components/modals/confirmation/DiscardModal";
+import { useAppTheme } from "@/hooks/useAppTheme";
+import AppWrapper from "@/components/ui/AppWrapper";
+import Feather from "@expo/vector-icons/Feather";
+import { Theme } from "@/types/Theme";
 
 export default function CreateRoutineScreen() {
-  const { setRoutines } = useRoutineContext();
+  const { theme, scale } = useAppTheme();
+  const styles = useMemo(() => makeStyles(theme, scale), [theme, scale]);
+
+  const { setRoutines, routines } = useRoutineContext();
 
   const [routine, setRoutine] = useState<Routine>({
     id: crypto.randomUUID(),
-    name: "",
+    name: `Routine #${routines.length + 1}`,
     exercises: [],
     notes: "",
   });
@@ -25,39 +31,12 @@ export default function CreateRoutineScreen() {
   const [discardModalVisible, setDiscardModalVisible] =
     useState<boolean>(false);
 
-  const navigation = useNavigation();
-
   const handleSubmit = useCallback(() => {
     if (!routine) return;
 
     setRoutines((prev) => [...prev, routine]);
     router.back();
   }, [routine, setRoutines]);
-
-  useLayoutEffect(() => {
-    navigation.setOptions({
-      headerRight: () => {
-        return (
-          <EvilIcons
-            name="check"
-            color={"black"}
-            size={22}
-            onPress={() => setFinishModalVisible(true)}
-          />
-        );
-      },
-      headerLeft: () => {
-        return (
-          <EvilIcons
-            name="chevron-left"
-            color={"black"}
-            size={32}
-            onPress={() => setDiscardModalVisible(true)}
-          />
-        );
-      },
-    });
-  }, [navigation, finishModalVisible]);
 
   const handleAddExercise = (exerciseId: string) => {
     const newExercise = {
@@ -85,7 +64,7 @@ export default function CreateRoutineScreen() {
       <DiscardModal
         modalVisible={discardModalVisible}
         setModalVisible={setDiscardModalVisible}
-        placeholder="discard your current workout?"
+        placeholder="discard your new routine?"
         onConfirm={() => router.back()}
       />
       <FinishModal
@@ -99,13 +78,55 @@ export default function CreateRoutineScreen() {
         setModalVisible={setModalVisible}
         handleAddExercise={handleAddExercise}
       />
-      <WorkoutForm
-        setDraft={setRoutine}
-        draft={routine}
-        setModalVisible={setModalVisible}
-      />
+      <AppWrapper>
+        <View style={styles.container}>
+          <View style={styles.header}>
+            <Pressable
+              onPress={() => setDiscardModalVisible(true)}
+              hitSlop={10}
+              style={styles.headerIconContainer}
+            >
+              <Feather name="arrow-left" color={"black"} size={24} />
+            </Pressable>
+            <Pressable
+              style={styles.headerIconContainer}
+              onPress={() => setFinishModalVisible(true)}
+              hitSlop={10}
+            >
+              <Text style={[styles.headerText, { color: theme.buttonPrimary }]}>
+                Save
+              </Text>
+              <Feather name="check" color={theme.buttonPrimary} size={24} />
+            </Pressable>
+          </View>
+          <WorkoutForm
+            mode="routine"
+            setDraft={setRoutine}
+            draft={routine}
+            setModalVisible={setModalVisible}
+          />
+        </View>
+      </AppWrapper>
     </>
   );
 }
-
-const styles = StyleSheet.create({});
+const makeStyles = (theme: Theme, scale: number) =>
+  StyleSheet.create({
+    container: { padding: 16 * scale, backgroundColor: theme.background },
+    header: {
+      flexDirection: "row",
+      justifyContent: "space-between",
+      alignItems: "center",
+      // marginTop: 40,
+      marginBottom: 30,
+    },
+    headerText: {
+      fontSize: 20,
+      fontWeight: "600",
+      marginRight: 4,
+    },
+    headerIconContainer: {
+      flexDirection: "row",
+      alignItems: "center",
+    },
+  });

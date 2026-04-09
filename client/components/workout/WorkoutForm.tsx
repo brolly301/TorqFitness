@@ -13,13 +13,13 @@ import { addSet, removeExercise, updateSet } from "@/utils/workoutUtil";
 type Props<T extends WorkoutDraft> = {
   draft: T;
   setDraft: React.Dispatch<React.SetStateAction<T>>;
-  showTimer?: boolean;
+  mode: "workout" | "routine";
 } & Pick<ModalProps, "setModalVisible">;
 
 export default function WorkoutForm<T extends WorkoutDraft>({
   draft,
   setDraft,
-  showTimer = false,
+  mode,
   setModalVisible,
 }: Props<T>) {
   const { theme, scale } = useAppTheme();
@@ -61,7 +61,6 @@ export default function WorkoutForm<T extends WorkoutDraft>({
       <View style={styles.headerRow}>
         <View style={styles.headerTextContainer}>
           <TextInput
-            placeholder="Workout #1"
             placeholderTextColor={theme.textSecondary}
             value={draft.name}
             onChangeText={(text) => updateForm("name", text)}
@@ -74,14 +73,13 @@ export default function WorkoutForm<T extends WorkoutDraft>({
             <Text style={styles.metaText}>{totalSets} sets</Text>
           </View>
         </View>
-
-        <Timer />
+        {mode === "workout" ? <Timer /> : null}
       </View>
 
       <View style={styles.hr} />
 
       <TextInput
-        placeholder="Enter workout notes"
+        placeholder={`Enter ${mode === "workout" ? "workout" : "routine"} notes`}
         placeholderTextColor={theme.textSecondary}
         value={draft.notes ?? ""}
         onChangeText={(text) => updateForm("notes", text)}

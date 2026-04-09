@@ -1,12 +1,5 @@
-import {
-  FlatList,
-  Pressable,
-  StyleSheet,
-  Text,
-  TextInput,
-  View,
-} from "react-native";
-import React, { useMemo, useRef, useState } from "react";
+import { FlatList, Pressable, StyleSheet, Text, View } from "react-native";
+import React, { useMemo, useState } from "react";
 import { capitalizeWords } from "@/utils/helpers";
 import { router } from "expo-router";
 import { Routine } from "@/types/Global";
@@ -15,6 +8,9 @@ import { useExerciseContext } from "@/context/ExerciseContext";
 import DeleteModal from "../confirmation/DeleteModal";
 import { useAppTheme } from "@/hooks/useAppTheme";
 import { Theme } from "@/types/Theme";
+import AntDesign from "@expo/vector-icons/AntDesign";
+import Entypo from "@expo/vector-icons/Entypo";
+import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 
 type Props = {
   routine: Routine;
@@ -28,7 +24,7 @@ export default function RoutineDetails({ routine, setModalVisible }: Props) {
   const { deleteRoutine } = useRoutineContext();
   const { exercises } = useExerciseContext();
 
-  const [deleteModalVisible, setDeleteModalVisible] = useState<boolean>(false);
+  const [deleteModalVisible, setDeleteModalVisible] = useState(false);
 
   const exerciseList = routine.exercises.map((rtEx) => {
     const details = exercises.find(
@@ -42,87 +38,122 @@ export default function RoutineDetails({ routine, setModalVisible }: Props) {
     0,
   );
 
+  const handleEditRoutine = () => {
+    router.navigate({
+      pathname: "/(tabs)/routines/editRoutine",
+      params: { routineId: routine.id },
+    });
+    setModalVisible(false);
+  };
+
+  const handleDeleteRoutine = () => {
+    deleteRoutine(routine.id);
+    setDeleteModalVisible(false);
+    setModalVisible(false);
+  };
+
   return (
     <>
       <DeleteModal
         modalVisible={deleteModalVisible}
         setModalVisible={setDeleteModalVisible}
         placeholder="routine"
-        onConfirm={() => deleteRoutine(routine.id)}
+        onConfirm={handleDeleteRoutine}
       />
+
       <View style={styles.container}>
-        <View style={styles.iconContainer}>
+        <View style={styles.header}>
           <Pressable
-            style={styles.buttonContainer}
-            onPress={() => {
-              setDeleteModalVisible(true);
-            }}
+            onPress={() => setModalVisible(false)}
+            style={styles.iconButton}
           >
-            <Text style={styles.buttonText}>Delete</Text>
+            <AntDesign name="close" size={20} color={theme.text} />
           </Pressable>
-          <Pressable
-            style={[
-              styles.buttonContainer,
-              {
-                borderColor: "rgba(6, 134, 12, 0.44)",
-                backgroundColor: "rgba(6, 134, 12, 0.2)",
-              },
-            ]}
-            onPress={() => {
-              router.navigate({
-                pathname: "/(tabs)/routines/editRoutine",
-                params: { routineId: routine.id },
-              });
-              setModalVisible(false);
-            }}
-          >
-            <Text
-              style={[styles.buttonText, { color: "rgba(6, 134, 12, 0.44)" }]}
+
+          <Text style={styles.name} numberOfLines={1}>
+            {routine.name}
+          </Text>
+
+          <View style={styles.headerActions}>
+            <Pressable
+              style={[styles.secondaryAction, { marginRight: 8 * scale }]}
+              // onPress={handleEditRoutine}
             >
-              Edit
-            </Text>
-          </Pressable>
+              <MaterialIcons name="more-horiz" size={18} color={theme.text} />
+            </Pressable>
+
+            <Pressable style={styles.primaryAction} onPress={handleEditRoutine}>
+              <Text style={styles.editText}>Edit</Text>
+            </Pressable>
+          </View>
         </View>
+
         <FlatList
           data={exerciseList}
           keyExtractor={(item) => item.id}
-          ListHeaderComponent={() => {
-            return (
-              <View style={styles.overviewContainer}>
-                <Text style={styles.name}>{routine.name}</Text>
-                <Text style={styles.notes}>{routine.notes}</Text>
-                <View style={styles.hr} />
-                <View style={{ flexDirection: "row", alignItems: "center" }}>
-                  <Text style={styles.exerciseLength}>
-                    {routine.exercises.length} Exercise
-                  </Text>
-                  <Text style={{ fontSize: 18 }}> • </Text>
-                  <Text style={styles.setLength}>{totalSets} Sets</Text>
-                </View>
-              </View>
-            );
-          }}
+          contentContainerStyle={styles.listContent}
+          showsVerticalScrollIndicator={false}
+          ListHeaderComponent={
+            <View style={styles.overviewContainer}>
+              {!!routine.notes && (
+                <Text style={styles.notes} numberOfLines={2}>
+                  {routine.notes}
+                </Text>
+              )}
+
+              <Text style={styles.metaText}>
+                {routine.exercises.length} exercises • {totalSets} sets
+              </Text>
+            </View>
+          }
           renderItem={({ item }) => {
+            const primary = capitalizeWords(
+              item.details?.primaryMuscles?.[0] ?? "",
+            );
+            const secondary = capitalizeWords(
+              item.details?.secondaryMuscles?.[0] ?? "",
+            );
+
+            const muscleText =
+              primary && secondary
+                ? `${primary} & ${secondary}`
+                : primary || secondary || "Exercise";
+
             return (
-              <View key={item.id} style={styles.routineContainer}>
-                <View style={styles.nameButtonContainer}>
-                  <Text style={styles.exerciseName}>
-                    {capitalizeWords(item.details?.name ?? "")}
-                  </Text>
-                  <Text style={styles.exerciseMuscle}>
-                    {capitalizeWords(item.details?.primaryMuscles[0] ?? "")} &{" "}
-                    {capitalizeWords(item.details?.secondaryMuscles[0] ?? "")}
-                  </Text>
+              <View style={styles.routineCard}>
+                <View style={styles.routineDetails}>
+                  <View style={styles.nameButtonContainer}>
+                    <View style={styles.exerciseTextContainer}>
+                      <Text style={styles.exerciseName} numberOfLines={1}>
+                        {capitalizeWords(item.details?.name ?? "")}
+                      </Text>
+
+                      <Text style={styles.exerciseMuscle} numberOfLines={1}>
+                        {muscleText}
+                      </Text>
+                    </View>
+
+                    <Entypo
+                      name="chevron-right"
+                      size={20}
+                      color={theme.textSecondary}
+                    />
+                  </View>
                 </View>
-                <View style={{ flexDirection: "row" }}>
-                  {Array.from({ length: item.sets.length }, (_, i) => (
-                    <Text>•</Text>
-                  ))}
+
+                <View style={styles.setCard}>
+                  <Text style={styles.setDetails}>{item.sets.length} sets</Text>
+                  <Text style={styles.setDetails}> • </Text>
+                  <Text style={styles.setDetails}>Last: 40 × 8</Text>
                 </View>
               </View>
             );
           }}
         />
+
+        <Pressable style={styles.startButton}>
+          <Text style={styles.startText}>Start Workout</Text>
+        </Pressable>
       </View>
     </>
   );
@@ -130,68 +161,148 @@ export default function RoutineDetails({ routine, setModalVisible }: Props) {
 
 export const makeStyles = (theme: Theme, scale: number) =>
   StyleSheet.create({
-    container: {},
-    iconContainer: {
+    container: {
+      flex: 1,
+    },
+
+    header: {
+      height: 44 * scale,
+      justifyContent: "center",
+      marginBottom: 8 * scale,
+      position: "relative",
+    },
+
+    iconButton: {
+      position: "absolute",
+      left: 0,
+      width: 36 * scale,
+      height: 36 * scale,
+      alignItems: "center",
+      justifyContent: "center",
+      borderRadius: 10,
+    },
+
+    headerActions: {
+      position: "absolute",
+      right: 0,
       flexDirection: "row",
-      justifyContent: "space-between",
       alignItems: "center",
     },
 
-    routineContainer: {
-      marginTop: 15 * scale,
-      borderRadius: 10,
+    name: {
+      position: "absolute",
+      left: 60 * scale,
+      right: 60 * scale,
+      fontSize: 22 * scale,
+      fontWeight: "700",
+      textAlign: "center",
+    },
+
+    listContent: {
+      paddingTop: 8 * scale,
+      paddingBottom: 12 * scale,
+    },
+
+    overviewContainer: {
+      marginBottom: 8 * scale,
+    },
+
+    notes: {
+      fontSize: 15 * scale,
+      color: theme.textSecondary,
+      marginBottom: 6 * scale,
+    },
+
+    metaText: {
+      fontSize: 15 * scale,
+      color: theme.textSecondary,
+    },
+
+    routineCard: {
+      marginTop: 10 * scale,
+      borderRadius: 12,
       borderWidth: 1,
-      padding: 10 * scale,
-      flexDirection: "row",
-      alignItems: "center",
-      justifyContent: "space-between",
+      borderColor: theme.border,
+      backgroundColor: theme.card,
+      overflow: "hidden",
+    },
+
+    routineDetails: {
+      padding: 12 * scale,
     },
 
     nameButtonContainer: {
-      // flexDirection: "row",
-      justifyContent: "center",
-    },
-    exerciseName: {
-      fontSize: 18 * scale,
-      fontWeight: "bold",
-      marginBottom: 2 * scale,
-    },
-    exerciseMuscle: {
-      fontSize: 15 * scale,
-      fontWeight: "400",
-    },
-    name: {
-      fontSize: 22,
-      fontWeight: "bold",
-      marginBottom: 5 * scale,
-    },
-    overviewContainer: {
-      marginTop: 20 * scale,
-    },
-    notes: {
-      fontSize: 16 * scale,
-    },
-    exerciseLength: { fontSize: 16 * scale },
-    setLength: { fontSize: 16 * scale },
-    hr: {
-      marginVertical: 10 * scale,
-      height: 1,
-      width: "100%",
-      backgroundColor: "black",
-    },
-    buttonContainer: {
-      padding: 7.5 * scale,
       flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "space-between",
+    },
+
+    exerciseTextContainer: {
+      flex: 1,
+      marginRight: 12 * scale,
+    },
+
+    exerciseName: {
+      fontSize: 17 * scale,
+      fontWeight: "700",
+      marginBottom: 2 * scale,
+      color: theme.text,
+    },
+
+    exerciseMuscle: {
+      fontSize: 14 * scale,
+      fontWeight: "400",
+      color: theme.textSecondary,
+    },
+
+    setCard: {
+      paddingHorizontal: 12 * scale,
+      paddingVertical: 10 * scale,
+      flexDirection: "row",
+      backgroundColor: theme.border,
+    },
+
+    setDetails: {
+      fontSize: 14 * scale,
+      color: theme.textSecondary,
+    },
+
+    secondaryAction: {
+      paddingVertical: 7.5 * scale,
+      paddingHorizontal: 10 * scale,
       justifyContent: "center",
       alignItems: "center",
-      borderWidth: 1,
-      borderColor: "rgba(255, 0, 0, 0.6)",
-      backgroundColor: "rgba(255, 0, 0, 0.2)",
+      backgroundColor: theme.border,
       borderRadius: 10,
     },
-    buttonText: {
-      fontSize: 14 * scale,
-      fontWeight: "bold",
-      color: "rgba(255, 0, 0, 0.6)",
+
+    primaryAction: {
+      paddingVertical: 7.5 * scale,
+      paddingHorizontal: 12 * scale,
+      justifyContent: "center",
+      alignItems: "center",
+      backgroundColor: theme.buttonPrimary,
+      borderRadius: 10,
+    },
+
+    editText: {
+      fontSize: 15 * scale,
+      fontWeight: "600",
+      color: theme.buttonPrimaryText,
+    },
+
+    startButton: {
+      justifyContent: "center",
+      alignItems: "center",
+      borderRadius: 12,
+      backgroundColor: theme.buttonPrimary,
+      paddingVertical: 12 * scale,
+      marginTop: 10 * scale,
+    },
+
+    startText: {
+      fontSize: 15 * scale,
+      color: theme.buttonPrimaryText,
+      fontWeight: "700",
     },
   });

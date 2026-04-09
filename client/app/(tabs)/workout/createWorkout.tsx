@@ -24,11 +24,11 @@ export default function StartWorkoutScreen() {
   const { theme, scale } = useAppTheme();
   const styles = useMemo(() => makeStyles(theme, scale), [theme, scale]);
 
-  const { setWorkouts } = useWorkoutContext();
+  const { setWorkouts, workouts } = useWorkoutContext();
 
   const [workout, setWorkout] = useState<Workout>({
     id: crypto.randomUUID(),
-    name: "",
+    name: `Workout #${workouts.length + 1}`,
     startedAt: null,
     completedAt: null,
     duration: 0,
@@ -41,7 +41,6 @@ export default function StartWorkoutScreen() {
   const [discardModalVisible, setDiscardModalVisible] =
     useState<boolean>(false);
 
-  const navigation = useNavigation();
   useEffect(() => {
     setWorkout((prev) => ({
       ...prev,
@@ -68,31 +67,6 @@ export default function StartWorkoutScreen() {
     setWorkouts((prev) => [...prev, finalWorkout]);
     router.back();
   }, [workout, setWorkouts]);
-
-  useLayoutEffect(() => {
-    navigation.setOptions({
-      headerRight: () => {
-        return (
-          <EvilIcons
-            name="check"
-            color={"black"}
-            size={22}
-            onPress={() => setFinishModalVisible(true)}
-          />
-        );
-      },
-      headerLeft: () => {
-        return (
-          <EvilIcons
-            name="chevron-left"
-            color={"black"}
-            size={32}
-            onPress={() => setDiscardModalVisible(true)}
-          />
-        );
-      },
-    });
-  }, [navigation, finishModalVisible]);
 
   const handleAddExercise = (exerciseId: string) => {
     const newExercise = {
@@ -156,6 +130,7 @@ export default function StartWorkoutScreen() {
             </Pressable>
           </View>
           <WorkoutForm
+            mode="workout"
             setDraft={setWorkout}
             draft={workout}
             setModalVisible={setModalVisible}
