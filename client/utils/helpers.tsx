@@ -1,8 +1,11 @@
 export function capitalizeWords(str: string): string {
   return str
-    .split(" ")
-    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-    .join(" ");
+    .split(/([ \-(])/g)
+    .map((part) => {
+      if (part === " " || part === "-" || part === "(") return part;
+      return part.charAt(0).toUpperCase() + part.slice(1);
+    })
+    .join("");
 }
 
 export const formatDate = (date: Date | string) =>

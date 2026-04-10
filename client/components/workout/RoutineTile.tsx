@@ -16,25 +16,26 @@ export default function RoutineTile({ routine }: Props) {
   const { theme, scale } = useAppTheme();
   const styles = useMemo(() => makeStyles(theme, scale), [theme, scale]);
 
-  const { setWorkout, workout } = useWorkoutContext();
-
   const loadRoutine = () => {
-    setWorkout((prev) => ({
-      ...prev,
-      ...routine,
-      id: crypto.randomUUID(),
-      exercises: routine.exercises.map((ex, i) => ({
-        ...ex,
-        id: crypto.randomUUID(),
-        order: i + 1,
-        sets: ex.sets.map((set, j) => ({
-          ...set,
-          id: crypto.randomUUID(),
-          order: j + 1,
-        })),
-      })),
-    }));
-    router.navigate("/workout/createWorkout");
+    // setWorkout((prev) => ({
+    //   ...prev,
+    //   ...routine,
+    //   id: crypto.randomUUID(),
+    //   exercises: routine.exercises.map((ex, i) => ({
+    //     ...ex,
+    //     id: crypto.randomUUID(),
+    //     order: i + 1,
+    //     sets: ex.sets.map((set, j) => ({
+    //       ...set,
+    //       id: crypto.randomUUID(),
+    //       order: j + 1,
+    //     })),
+    //   })),
+    // }));
+    router.navigate({
+      pathname: "/workout/createWorkout",
+      params: { routineId: routine.id },
+    });
   };
 
   return (

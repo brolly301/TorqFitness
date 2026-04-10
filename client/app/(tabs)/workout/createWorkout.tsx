@@ -8,7 +8,7 @@ import React, {
 } from "react";
 import WorkoutForm from "@/components/workout/WorkoutForm";
 import { useWorkoutContext } from "@/context/WorkoutContext";
-import { router, useNavigation } from "expo-router";
+import { router, useLocalSearchParams, useNavigation } from "expo-router";
 import EvilIcons from "@expo/vector-icons/EvilIcons";
 import ExerciseModal from "@/components/modals/exercises/ExerciseModal";
 import * as crypto from "expo-crypto";
@@ -19,12 +19,33 @@ import AppWrapper from "@/components/ui/AppWrapper";
 import { Theme } from "@/types/Theme";
 import { useAppTheme } from "@/hooks/useAppTheme";
 import Feather from "@expo/vector-icons/Feather";
+import { useRoutineContext } from "@/context/RoutineContext";
 
 export default function StartWorkoutScreen() {
   const { theme, scale } = useAppTheme();
   const styles = useMemo(() => makeStyles(theme, scale), [theme, scale]);
 
   const { setWorkouts, workouts } = useWorkoutContext();
+  const { routines } = useRoutineContext();
+  const { routineId } = useLocalSearchParams();
+
+  const routine = routines.find((routine) => routine.id === routineId);
+
+  useEffect(() => {
+    if (routine) {
+      setWorkout((prev) => ({
+        ...prev,
+        exercises: routine.exercises.map((exercise) => ({
+          ...exercise,
+          id: crypto.randomUUID(),
+          sets: exercise.sets.map((set) => ({
+            ...set,
+            id: crypto.randomUUID(),
+          })),
+        })),
+      }));
+    }
+  }, [routine]);
 
   const [workout, setWorkout] = useState<Workout>({
     id: crypto.randomUUID(),

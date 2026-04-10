@@ -9,7 +9,6 @@ import AppWrapper from "@/components/ui/AppWrapper";
 import { useAppTheme } from "@/hooks/useAppTheme";
 import { Theme } from "@/types/Theme";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
-import FontAwesome5 from "@expo/vector-icons/FontAwesome5";
 
 export default function WorkoutScreen() {
   const { theme, scale } = useAppTheme();

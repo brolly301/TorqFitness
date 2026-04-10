@@ -151,7 +151,16 @@ export default function RoutineDetails({ routine, setModalVisible }: Props) {
           }}
         />
 
-        <Pressable style={styles.startButton}>
+        <Pressable
+          style={styles.startButton}
+          onPress={() => {
+            setModalVisible(false);
+            router.navigate({
+              pathname: "/workout/createWorkout",
+              params: { routineId: routine.id },
+            });
+          }}
+        >
           <Text style={styles.startText}>Start Workout</Text>
         </Pressable>
       </View>
