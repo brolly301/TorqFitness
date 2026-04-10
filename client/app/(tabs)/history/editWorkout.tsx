@@ -18,7 +18,7 @@ export default function EditWorkoutScreen() {
   const styles = useMemo(() => makeStyles(theme, scale), [theme, scale]);
 
   const { workoutId } = useLocalSearchParams();
-  const { workouts, setWorkouts } = useWorkoutContext();
+  const { workouts, updateWorkout } = useWorkoutContext();
   const [modalVisible, setModalVisible] = useState<boolean>(false);
 
   const workoutDetails = workouts.find((wk) => wk.id === workoutId);
@@ -32,11 +32,9 @@ export default function EditWorkoutScreen() {
     useState<boolean>(false);
 
   const handleSubmit = useCallback(() => {
-    setWorkouts((prev) =>
-      prev.map((workout) => (workout.id === formData.id ? formData : workout)),
-    );
+    updateWorkout(formData);
     router.back();
-  }, [formData, setWorkouts]);
+  }, [formData, updateWorkout]);
 
   const handleAddExercise = (exerciseId: string) => {
     const newExercise = {

@@ -20,7 +20,7 @@ export default function EditRoutineScreen() {
   const styles = useMemo(() => makeStyles(theme, scale), [theme, scale]);
 
   const { routineId } = useLocalSearchParams();
-  const { routines, setRoutines } = useRoutineContext();
+  const { routines, updateRoutine } = useRoutineContext();
   const [modalVisible, setModalVisible] = useState<boolean>(false);
 
   const routineDetails = routines.find((wk) => wk.id === routineId);
@@ -34,11 +34,9 @@ export default function EditRoutineScreen() {
     useState<boolean>(false);
 
   const handleSubmit = useCallback(() => {
-    setRoutines((prev) =>
-      prev.map((routine) => (routine.id === formData.id ? formData : routine)),
-    );
+    updateRoutine(formData);
     router.back();
-  }, [formData, setRoutines]);
+  }, [formData, updateRoutine]);
 
   const handleAddExercise = (exerciseId: string) => {
     const newExercise = {

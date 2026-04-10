@@ -17,7 +17,7 @@ export default function CreateRoutineScreen() {
   const { theme, scale } = useAppTheme();
   const styles = useMemo(() => makeStyles(theme, scale), [theme, scale]);
 
-  const { setRoutines, routines } = useRoutineContext();
+  const { addRoutine, routines } = useRoutineContext();
 
   const [routine, setRoutine] = useState<Routine>({
     id: crypto.randomUUID(),
@@ -34,9 +34,9 @@ export default function CreateRoutineScreen() {
   const handleSubmit = useCallback(() => {
     if (!routine) return;
 
-    setRoutines((prev) => [...prev, routine]);
+    addRoutine(routine);
     router.back();
-  }, [routine, setRoutines]);
+  }, [routine, addRoutine]);
 
   const handleAddExercise = (exerciseId: string) => {
     const newExercise = {

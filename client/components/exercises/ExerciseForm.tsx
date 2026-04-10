@@ -28,10 +28,10 @@ export default function ExerciseForm({ exercise, setExercise }: Props) {
     exercise.bodyParts.length === 0 ||
     exercise.equipment.length === 0;
 
-  const { setExercises } = useExerciseContext();
+  const { addExercise } = useExerciseContext();
 
   const handleSubmit = () => {
-    setExercises((prev) => [...prev, exercise]);
+    addExercise(exercise);
     router.back();
   };
 

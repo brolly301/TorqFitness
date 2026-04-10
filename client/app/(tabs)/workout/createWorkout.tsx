@@ -25,7 +25,7 @@ export default function StartWorkoutScreen() {
   const { theme, scale } = useAppTheme();
   const styles = useMemo(() => makeStyles(theme, scale), [theme, scale]);
 
-  const { setWorkouts, workouts } = useWorkoutContext();
+  const { addWorkout, workouts } = useWorkoutContext();
   const { routines } = useRoutineContext();
   const { routineId } = useLocalSearchParams();
 
@@ -85,9 +85,9 @@ export default function StartWorkoutScreen() {
       duration,
     };
 
-    setWorkouts((prev) => [...prev, finalWorkout]);
+    addWorkout(finalWorkout);
     router.back();
-  }, [workout, setWorkouts]);
+  }, [workout, addWorkout]);
 
   const handleAddExercise = (exerciseId: string) => {
     const newExercise = {
