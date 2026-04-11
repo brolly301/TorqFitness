@@ -2,7 +2,6 @@ import { Modal, Pressable, StyleSheet, Text, View } from "react-native";
 import React, { useState } from "react";
 import { ModalProps, Workout } from "@/types/Global";
 import WorkoutDetails from "./WorkoutDetails";
-import DeleteModal from "../confirmation/DeleteModal";
 
 type Props = ModalProps & { workout: Workout };
 

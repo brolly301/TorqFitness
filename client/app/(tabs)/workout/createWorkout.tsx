@@ -1,15 +1,8 @@
 import { Pressable, StyleSheet, Text, View } from "react-native";
-import React, {
-  useCallback,
-  useEffect,
-  useLayoutEffect,
-  useMemo,
-  useState,
-} from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import WorkoutForm from "@/components/workout/WorkoutForm";
 import { useWorkoutContext } from "@/context/WorkoutContext";
-import { router, useLocalSearchParams, useNavigation } from "expo-router";
-import EvilIcons from "@expo/vector-icons/EvilIcons";
+import { router, useLocalSearchParams } from "expo-router";
 import ExerciseModal from "@/components/modals/exercises/ExerciseModal";
 import * as crypto from "expo-crypto";
 import { Workout } from "@/types/Global";
@@ -29,24 +22,6 @@ export default function StartWorkoutScreen() {
   const { routines } = useRoutineContext();
   const { routineId } = useLocalSearchParams();
 
-  const routine = routines.find((routine) => routine.id === routineId);
-
-  useEffect(() => {
-    if (routine) {
-      setWorkout((prev) => ({
-        ...prev,
-        exercises: routine.exercises.map((exercise) => ({
-          ...exercise,
-          id: crypto.randomUUID(),
-          sets: exercise.sets.map((set) => ({
-            ...set,
-            id: crypto.randomUUID(),
-          })),
-        })),
-      }));
-    }
-  }, [routine]);
-
   const [workout, setWorkout] = useState<Workout>({
     id: crypto.randomUUID(),
     name: `Workout #${workouts.length + 1}`,
@@ -57,17 +32,40 @@ export default function StartWorkoutScreen() {
     notes: "",
   });
 
-  const [modalVisible, setModalVisible] = useState<boolean>(false);
-  const [finishModalVisible, setFinishModalVisible] = useState<boolean>(false);
-  const [discardModalVisible, setDiscardModalVisible] =
-    useState<boolean>(false);
+  const [modalVisible, setModalVisible] = useState(false);
+  const [finishModalVisible, setFinishModalVisible] = useState(false);
+  const [discardModalVisible, setDiscardModalVisible] = useState(false);
+
+  const routine = useMemo(() => {
+    return routines.find((item) => item.id === routineId);
+  }, [routines, routineId]);
 
   useEffect(() => {
     setWorkout((prev) => ({
       ...prev,
-      startedAt: new Date().toISOString(),
+      startedAt: prev.startedAt ?? new Date().toISOString(),
     }));
   }, []);
+
+  useEffect(() => {
+    if (!routine) return;
+
+    setWorkout((prev) => {
+      if (prev.exercises.length > 0) return prev;
+
+      return {
+        ...prev,
+        exercises: routine.exercises.map((exercise) => ({
+          ...exercise,
+          id: crypto.randomUUID(),
+          sets: exercise.sets.map((set) => ({
+            ...set,
+            id: crypto.randomUUID(),
+          })),
+        })),
+      };
+    });
+  }, [routine]);
 
   const handleSubmit = useCallback(() => {
     if (!workout.startedAt) return;
@@ -93,20 +91,14 @@ export default function StartWorkoutScreen() {
     const newExercise = {
       id: crypto.randomUUID(),
       exerciseId,
-      order: 1,
+      order: workout.exercises.length + 1,
       sets: [{ id: crypto.randomUUID(), order: 1, reps: 0, weight: null }],
       notes: "",
     };
 
     setWorkout((prev) => ({
       ...prev,
-      exercises: [
-        ...prev.exercises,
-        {
-          ...newExercise,
-          order: prev.exercises.length + 1,
-        },
-      ],
+      exercises: [...prev.exercises, newExercise],
     }));
   };
 
@@ -118,44 +110,54 @@ export default function StartWorkoutScreen() {
         placeholder="discard your current workout?"
         onConfirm={() => router.back()}
       />
+
       <FinishModal
         modalVisible={finishModalVisible}
         setModalVisible={setFinishModalVisible}
         onConfirm={handleSubmit}
-        placeholder={"with this workout?"}
+        placeholder="with this workout?"
       />
+
       <ExerciseModal
         modalVisible={modalVisible}
         setModalVisible={setModalVisible}
         handleAddExercise={handleAddExercise}
       />
+
       <AppWrapper>
         <View style={styles.container}>
           <View style={styles.header}>
             <Pressable
               onPress={() => setDiscardModalVisible(true)}
               hitSlop={10}
-              style={styles.headerIconContainer}
+              style={styles.headerIconButton}
             >
-              <Feather name="arrow-left" color={"black"} size={24} />
+              <Feather name="arrow-left" color={theme.text} size={22 * scale} />
             </Pressable>
+
             <Pressable
-              style={styles.headerIconContainer}
+              style={styles.finishButton}
               onPress={() => setFinishModalVisible(true)}
               hitSlop={10}
             >
-              <Text style={[styles.headerText, { color: theme.buttonPrimary }]}>
-                Finish
-              </Text>
-              <Feather name="check" color={theme.buttonPrimary} size={24} />
+              <Text style={styles.finishText}>Finish</Text>
+              <Feather
+                name="check"
+                color={theme.buttonPrimary}
+                size={20 * scale}
+              />
             </Pressable>
           </View>
-          <WorkoutForm
-            mode="workout"
-            setDraft={setWorkout}
-            draft={workout}
-            setModalVisible={setModalVisible}
-          />
+
+          <View style={styles.formContainer}>
+            <WorkoutForm
+              mode="workout"
+              setDraft={setWorkout}
+              draft={workout}
+              setModalVisible={setModalVisible}
+              showTimer
+            />
+          </View>
         </View>
       </AppWrapper>
     </>
@@ -164,21 +166,51 @@ export default function StartWorkoutScreen() {
 
 const makeStyles = (theme: Theme, scale: number) =>
   StyleSheet.create({
-    container: { padding: 16 * scale, backgroundColor: theme.background },
+    container: {
+      flex: 1,
+      paddingHorizontal: 16 * scale,
+      paddingTop: 12 * scale,
+      backgroundColor: theme.background,
+    },
+
     header: {
       flexDirection: "row",
       justifyContent: "space-between",
       alignItems: "center",
-      // marginTop: 40,
-      marginBottom: 30,
+      marginBottom: 16 * scale,
     },
-    headerText: {
-      fontSize: 20,
-      fontWeight: "600",
-      marginRight: 4,
+
+    headerIconButton: {
+      width: 40 * scale,
+      height: 40 * scale,
+      borderRadius: 12 * scale,
+      alignItems: "center",
+      justifyContent: "center",
+      backgroundColor: theme.card,
+      borderWidth: 1,
+      borderColor: theme.border,
     },
-    headerIconContainer: {
+
+    finishButton: {
       flexDirection: "row",
       alignItems: "center",
+      justifyContent: "center",
+      paddingVertical: 10 * scale,
+      paddingHorizontal: 14 * scale,
+      borderRadius: 12 * scale,
+      backgroundColor: theme.buttonPrimary + "15",
+      borderWidth: 1,
+      borderColor: theme.buttonPrimary + "30",
+    },
+
+    finishText: {
+      fontSize: 16 * scale,
+      fontWeight: "600",
+      marginRight: 6 * scale,
+      color: theme.buttonPrimary,
+    },
+
+    formContainer: {
+      flex: 1,
     },
   });

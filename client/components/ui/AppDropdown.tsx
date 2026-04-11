@@ -1,5 +1,5 @@
 import { Pressable, StyleSheet, Text, View } from "react-native";
-import React, { act, useMemo, useState } from "react";
+import React, { useMemo, useState } from "react";
 import { useAppTheme } from "@/hooks/useAppTheme";
 import { Theme } from "@/types/Theme";
 import EvilIcons from "@expo/vector-icons/EvilIcons";
@@ -20,7 +20,7 @@ export default function AppDropdown({
   const { theme, scale } = useAppTheme();
   const styles = useMemo(() => makeStyles(theme, scale), [theme, scale]);
 
-  const [active, setActive] = useState<boolean>(false);
+  const [active, setActive] = useState(false);
 
   const handleSelected = (item: string) => {
     setSelected(item);
@@ -32,31 +32,51 @@ export default function AppDropdown({
       <Pressable
         style={[
           styles.container,
-          { borderColor: active ? theme.inputFocusBorder : theme.inputBorder },
+          {
+            borderColor: active ? theme.inputFocusBorder : theme.inputBorder,
+          },
         ]}
         onPress={() => setActive((prev) => !prev)}
       >
         <View style={styles.nameIcon}>
-          <Text>{selected || placeholder}</Text>
-          {!active ? (
-            <EvilIcons name="chevron-right" size={20} color={theme.text} />
-          ) : (
-            <EvilIcons name="chevron-down" size={20} color={theme.text} />
-          )}
+          <Text
+            style={[styles.valueText, !selected && styles.placeholderText]}
+            numberOfLines={1}
+          >
+            {selected || placeholder}
+          </Text>
+
+          <EvilIcons
+            name={active ? "chevron-down" : "chevron-right"}
+            size={24 * scale}
+            color={theme.textSecondary}
+          />
         </View>
       </Pressable>
 
       {active && (
-        <View style={[styles.dropdown]}>
-          {data.map((item) => (
-            <Pressable
-              key={item}
-              style={styles.item}
-              onPress={() => handleSelected(item)}
-            >
-              <Text>{item}</Text>
-            </Pressable>
-          ))}
+        <View style={styles.dropdown}>
+          {data.map((item, index) => {
+            const isSelected = item === selected;
+            const isLast = index === data.length - 1;
+
+            return (
+              <Pressable
+                key={item}
+                style={[styles.item, !isLast && styles.itemBorder]}
+                onPress={() => handleSelected(item)}
+              >
+                <Text
+                  style={[
+                    styles.itemText,
+                    isSelected && styles.selectedItemText,
+                  ]}
+                >
+                  {item}
+                </Text>
+              </Pressable>
+            );
+          })}
         </View>
       )}
     </View>
@@ -66,37 +86,72 @@ export default function AppDropdown({
 export const makeStyles = (theme: Theme, scale: number) =>
   StyleSheet.create({
     wrapper: {
-      gap: 6 * scale,
-      marginBottom: 15 * scale,
+      marginBottom: 16 * scale,
+      position: "relative",
+      zIndex: 100,
     },
+
     container: {
-      borderRadius: 10 * scale,
-      borderWidth: 1 * scale,
-      borderColor: theme.border,
-      padding: 10 * scale,
-      backgroundColor: theme.buttonSecondary,
-    },
-    dropdown: {
-      borderWidth: 1 * scale,
+      minHeight: 46 * scale,
+      borderRadius: 12 * scale,
+      borderWidth: 1,
       borderColor: theme.inputBorder,
-      borderRadius: 10 * scale,
-      marginTop: 4 * scale,
-      overflow: "hidden",
-      backgroundColor: theme.card,
-      position: "absolute",
-      top: 40,
-      left: 0,
-      right: 0,
-      zIndex: 1000,
+      paddingHorizontal: 12 * scale,
+      paddingVertical: 12 * scale,
+      backgroundColor: theme.buttonSecondary,
+      justifyContent: "center",
     },
-    item: {
-      padding: 10 * scale,
-      borderBottomWidth: 1 * scale,
-      borderBottomColor: theme.inputBorder,
-    },
+
     nameIcon: {
       flexDirection: "row",
       alignItems: "center",
       justifyContent: "space-between",
+      gap: 12 * scale,
+    },
+
+    valueText: {
+      flex: 1,
+      fontSize: 15 * scale,
+      color: theme.text,
+    },
+
+    placeholderText: {
+      color: theme.textSecondary,
+    },
+
+    dropdown: {
+      marginTop: 6 * scale,
+      borderWidth: 1,
+      borderColor: theme.inputBorder,
+      borderRadius: 12 * scale,
+      overflow: "hidden",
+      backgroundColor: theme.card,
+      zIndex: 1000,
+      elevation: 8,
+      shadowColor: theme.shadow,
+      shadowOffset: { width: 0, height: 4 },
+      shadowOpacity: 0.08,
+      shadowRadius: 8,
+    },
+
+    item: {
+      paddingHorizontal: 12 * scale,
+      paddingVertical: 12 * scale,
+      backgroundColor: theme.card,
+    },
+
+    itemBorder: {
+      borderBottomWidth: 1,
+      borderBottomColor: theme.border,
+    },
+
+    itemText: {
+      fontSize: 15 * scale,
+      color: theme.text,
+    },
+
+    selectedItemText: {
+      color: theme.buttonPrimary,
+      fontWeight: "600",
     },
   });

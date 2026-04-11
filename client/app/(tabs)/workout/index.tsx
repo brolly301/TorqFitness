@@ -1,4 +1,4 @@
-import { Pressable, StyleSheet, Text, View } from "react-native";
+import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import React, { useMemo } from "react";
 import WorkoutTile from "@/components/workout/WorkoutTile";
 import RoutineTile from "@/components/workout/RoutineTile";
@@ -17,135 +17,213 @@ export default function WorkoutScreen() {
   const { workouts } = useWorkoutContext();
   const { routines } = useRoutineContext();
 
+  const recentWorkouts = workouts.slice(0, 3);
+  const recentRoutines = routines.slice(0, 3);
+
   return (
     <AppWrapper>
-      <View style={styles.container}>
+      <ScrollView
+        style={styles.container}
+        contentContainerStyle={styles.contentContainer}
+        showsVerticalScrollIndicator={false}
+      >
         <View style={styles.titleContainer}>
           <Text style={styles.title}>Workouts</Text>
           <Text style={styles.description}>
             Start a workout or jump back into a routine
           </Text>
         </View>
+
         <Pressable
-          style={({ pressed }) => [styles.button, pressed && { opacity: 0.9 }]}
+          style={({ pressed }) => [
+            styles.button,
+            pressed && styles.buttonPressed,
+          ]}
           onPress={() => router.navigate("/(tabs)/workout/createWorkout")}
         >
           <View style={styles.buttonContent}>
             <Text style={styles.buttonText}>Start New Workout</Text>
             <FontAwesome
-              style={{ opacity: 0.9 }}
               name="play-circle"
-              size={16}
+              size={16 * scale}
               color={theme.buttonPrimaryText}
+              style={styles.buttonIcon}
             />
           </View>
         </Pressable>
+
         <View style={styles.sectionContainer}>
-          <View style={styles.titleIcon}>
-            <FontAwesome name="history" size={16} color={theme.text} />
-            <Text style={styles.subTitle}>Previous Workouts</Text>
+          <View style={styles.sectionHeader}>
+            <View style={styles.titleIcon}>
+              <FontAwesome
+                name="history"
+                size={16 * scale}
+                color={theme.text}
+              />
+              <Text style={styles.subTitle}>Previous Workouts</Text>
+            </View>
+
+            {workouts.length > 0 && (
+              <Pressable onPress={() => router.navigate("/history")}>
+                <Text style={styles.sectionLink}>View all</Text>
+              </Pressable>
+            )}
           </View>
-          {workouts.length >= 1 ? (
-            workouts.map((workout) => {
-              return <WorkoutTile key={workout.id} workout={workout} />;
-            })
+
+          {recentWorkouts.length > 0 ? (
+            recentWorkouts.map((workout) => (
+              <WorkoutTile key={workout.id} workout={workout} />
+            ))
           ) : (
-            <View>
-              <Text style={styles.placeholderText}>No workouts yet</Text>
+            <View style={styles.placeholderContainer}>
+              <Text style={styles.placeholderTitle}>No workouts yet</Text>
               <Text style={styles.placeholderText}>
                 Start your first workout to see it here
               </Text>
             </View>
           )}
         </View>
-        <View style={styles.sectionContainer}>
-          <View style={styles.titleIcon}>
-            <FontAwesome name="folder" size={16} color={theme.text} />
 
-            <Text style={styles.subTitle}>My Routines</Text>
+        <View style={styles.sectionContainer}>
+          <View style={styles.sectionHeader}>
+            <View style={styles.titleIcon}>
+              <FontAwesome name="folder" size={16 * scale} color={theme.text} />
+              <Text style={styles.subTitle}>My Routines</Text>
+            </View>
+
+            {routines.length > 0 && (
+              <Pressable onPress={() => router.navigate("/routines")}>
+                <Text style={styles.sectionLink}>View all</Text>
+              </Pressable>
+            )}
           </View>
-          {routines.length >= 1 ? (
-            routines.map((routine) => {
-              return <RoutineTile key={routine.id} routine={routine} />;
-            })
+
+          {recentRoutines.length > 0 ? (
+            recentRoutines.map((routine) => (
+              <RoutineTile key={routine.id} routine={routine} />
+            ))
           ) : (
-            <View>
-              <Text style={styles.placeholderText}>No routine yet</Text>
+            <View style={styles.placeholderContainer}>
+              <Text style={styles.placeholderTitle}>No routines yet</Text>
               <Text style={styles.placeholderText}>
                 Add a new routine to see it here
               </Text>
             </View>
           )}
         </View>
-      </View>
+      </ScrollView>
     </AppWrapper>
   );
 }
 
 const makeStyles = (theme: Theme, scale: number) =>
   StyleSheet.create({
-    container: { padding: 16 * scale, backgroundColor: theme.background },
-    subTitle: {
-      fontSize: 20,
-      fontWeight: "500",
-      color: theme.text,
-      // marginBottom: 12,
-    },
-    header: {
-      flexDirection: "row",
-      alignItems: "center",
-      // marginTop: 40,
-      marginBottom: 30,
+    container: {
+      backgroundColor: theme.background,
+      flex: 1,
+      marginTop: 20,
     },
 
-    title: {
-      fontSize: 36 * scale,
-      fontWeight: "bold",
-      marginBottom: 5,
-      color: theme.text,
+    contentContainer: {
+      padding: 16 * scale,
+      flexGrow: 1,
     },
 
     titleContainer: {
-      padding: 16,
+      marginBottom: 16 * scale,
     },
+
+    title: {
+      fontSize: 34 * scale,
+      fontWeight: "700",
+      marginBottom: 4 * scale,
+      color: theme.text,
+    },
+
+    description: {
+      fontSize: 16 * scale,
+      fontWeight: "400",
+      color: theme.textSecondary,
+      lineHeight: 22 * scale,
+    },
+
     button: {
       backgroundColor: theme.buttonPrimary,
-      paddingVertical: 16,
-      borderRadius: 16,
-      marginBottom: 25,
+      paddingVertical: 15 * scale,
+      borderRadius: 16 * scale,
+      marginBottom: 24 * scale,
       alignItems: "center",
+    },
+
+    buttonPressed: {
+      opacity: 0.92,
     },
 
     buttonContent: {
       flexDirection: "row",
       alignItems: "center",
-      gap: 8,
+      gap: 8 * scale,
+    },
+
+    buttonIcon: {
+      opacity: 0.95,
     },
 
     buttonText: {
       color: theme.buttonPrimaryText,
-      fontSize: 17,
+      fontSize: 17 * scale,
       fontWeight: "600",
     },
+
     sectionContainer: {
-      marginBottom: 24,
+      marginBottom: 20 * scale,
       backgroundColor: theme.card,
-      padding: 16,
-      borderRadius: 10,
+      padding: 14 * scale,
+      borderRadius: 16 * scale,
+      borderWidth: 1,
+      borderColor: theme.border,
     },
-    placeholderText: {
-      fontSize: 15,
-      fontWeight: "400",
+
+    sectionHeader: {
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "space-between",
+      marginBottom: 12 * scale,
     },
-    description: {
-      fontSize: 18 * scale,
-      fontWeight: "400",
-      color: theme.text,
-    },
+
     titleIcon: {
       flexDirection: "row",
       alignItems: "center",
-      gap: 8,
-      marginBottom: 12,
+      gap: 8 * scale,
+    },
+
+    subTitle: {
+      fontSize: 19 * scale,
+      fontWeight: "600",
+      color: theme.text,
+    },
+
+    sectionLink: {
+      fontSize: 14 * scale,
+      fontWeight: "600",
+      color: theme.buttonPrimary,
+    },
+
+    placeholderContainer: {
+      paddingVertical: 8 * scale,
+    },
+
+    placeholderTitle: {
+      fontSize: 15 * scale,
+      fontWeight: "600",
+      color: theme.text,
+      marginBottom: 4 * scale,
+    },
+
+    placeholderText: {
+      fontSize: 14 * scale,
+      fontWeight: "400",
+      color: theme.textSecondary,
+      lineHeight: 20 * scale,
     },
   });

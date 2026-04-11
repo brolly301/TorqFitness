@@ -1,8 +1,6 @@
-import { StyleSheet, Text, View } from "react-native";
 import React from "react";
 import { ModalProps } from "@/types/Global";
-import AppModal from "@/components/ui/AppModal";
-import { Button } from "@react-navigation/elements";
+import ConfirmationModal from "./ConfirmationModal";
 
 type Props = ModalProps & {
   placeholder: string;
@@ -16,14 +14,14 @@ export default function DiscardModal({
   onConfirm,
 }: Props) {
   return (
-    <AppModal modalVisible={modalVisible} setModalVisible={setModalVisible}>
-      <View>
-        <Text>Are you sure you want to {placeholder}</Text>
-        <Button onPressIn={onConfirm}>Yes, discard changes</Button>
-        <Button onPressIn={() => setModalVisible(false)}>Cancel</Button>
-      </View>
-    </AppModal>
+    <ConfirmationModal
+      modalVisible={modalVisible}
+      setModalVisible={setModalVisible}
+      title="Discard changes?"
+      description={`Are you sure you want to ${placeholder} Your unsaved changes will be lost.`}
+      confirmText="Discard"
+      confirmVariant="danger"
+      onConfirm={onConfirm}
+    />
   );
 }
-
-const styles = StyleSheet.create({});

@@ -1,7 +1,5 @@
 import { Pressable, StyleSheet, Text, View } from "react-native";
 import React, { useMemo, useState } from "react";
-import { Workout } from "@/types/Global";
-import { Button } from "@react-navigation/elements";
 import ActivityList from "@/components/history/ActivityList";
 import RecordsList from "@/components/history/RecordsList";
 import { useWorkoutContext } from "@/context/WorkoutContext";
@@ -10,8 +8,10 @@ import { useAppTheme } from "@/hooks/useAppTheme";
 import { Theme } from "@/types/Theme";
 import Feather from "@expo/vector-icons/Feather";
 
+type HistoryTab = "activity" | "records";
+
 export default function HistoryScreen() {
-  const [activeTab, setActiveTab] = useState<string>("activity");
+  const [activeTab, setActiveTab] = useState<HistoryTab>("activity");
   const { workouts } = useWorkoutContext();
 
   const { theme, scale } = useAppTheme();
@@ -21,37 +21,73 @@ export default function HistoryScreen() {
     <AppWrapper>
       <View style={styles.container}>
         <View style={styles.header}>
-          <Pressable style={{ alignItems: "flex-end" }} hitSlop={10}>
-            <View style={styles.iconContainer}>
-              <Feather name="calendar" size={20} color={theme.buttonPrimary} />
-            </View>
+          <Pressable style={styles.calendarButton} hitSlop={10}>
+            <Feather
+              name="calendar"
+              size={20 * scale}
+              color={theme.buttonPrimary}
+            />
           </Pressable>
         </View>
+
         <View style={styles.titleContainer}>
           <Text style={styles.title}>History</Text>
           <Text style={styles.description}>
             Track your sessions. See your progress.
           </Text>
         </View>
-        <View style={styles.buttonContainer}>
+
+        <View style={styles.tabContainer}>
           <Pressable
             onPress={() => setActiveTab("activity")}
-            style={styles.button}
+            style={[
+              styles.tabButton,
+              activeTab === "activity"
+                ? styles.tabButtonActive
+                : styles.tabButtonInactive,
+            ]}
           >
-            <Text style={styles.buttonText}>Activity</Text>
+            <Text
+              style={[
+                styles.tabButtonText,
+                activeTab === "activity"
+                  ? styles.tabButtonTextActive
+                  : styles.tabButtonTextInactive,
+              ]}
+            >
+              Activity
+            </Text>
           </Pressable>
+
           <Pressable
             onPress={() => setActiveTab("records")}
-            style={styles.button}
+            style={[
+              styles.tabButton,
+              activeTab === "records"
+                ? styles.tabButtonActive
+                : styles.tabButtonInactive,
+            ]}
           >
-            <Text style={styles.buttonText}>Records</Text>
+            <Text
+              style={[
+                styles.tabButtonText,
+                activeTab === "records"
+                  ? styles.tabButtonTextActive
+                  : styles.tabButtonTextInactive,
+              ]}
+            >
+              Records
+            </Text>
           </Pressable>
         </View>
-        {activeTab === "activity" ? (
-          <ActivityList workouts={workouts} />
-        ) : (
-          <RecordsList />
-        )}
+
+        <View style={styles.contentContainer}>
+          {activeTab === "activity" ? (
+            <ActivityList workouts={workouts} />
+          ) : (
+            <RecordsList />
+          )}
+        </View>
       </View>
     </AppWrapper>
   );
@@ -60,51 +96,86 @@ export default function HistoryScreen() {
 const makeStyles = (theme: Theme, scale: number) =>
   StyleSheet.create({
     container: {
-      padding: 16 * scale,
+      flex: 1,
       backgroundColor: theme.background,
-    },
-    header: {
-      // marginTop: 40,
-    },
-    title: {
-      fontSize: 26 * scale,
-      fontWeight: "bold",
-      marginBottom: 5,
-    },
-    description: {
-      fontSize: 18 * scale,
-      fontWeight: "400",
-    },
-    titleContainer: {
-      padding: 16,
-    },
-    iconContainer: {
-      flexDirection: "row",
-      justifyContent: "center",
-      alignItems: "center",
-      padding: 8,
-      backgroundColor: theme.border,
-      borderRadius: 10,
+      paddingHorizontal: 16 * scale,
+      paddingTop: 12 * scale,
     },
 
-    buttonContainer: {
+    header: {
       flexDirection: "row",
-      justifyContent: "space-between",
-      alignItems: "center",
-      marginBottom: 20,
+      justifyContent: "flex-end",
+      marginBottom: 12 * scale,
     },
-    button: {
-      flexDirection: "row",
+
+    calendarButton: {
+      width: 40 * scale,
+      height: 40 * scale,
       justifyContent: "center",
       alignItems: "center",
-      borderRadius: 10,
-      backgroundColor: theme.buttonPrimary,
-      paddingVertical: 10 * scale,
-      width: "49%",
+      backgroundColor: theme.card,
+      borderRadius: 12 * scale,
+      borderWidth: 1,
+      borderColor: theme.border,
     },
-    buttonText: {
-      fontSize: 14 * scale,
-      fontWeight: "bold",
+
+    titleContainer: {
+      marginBottom: 18 * scale,
+    },
+
+    title: {
+      fontSize: 32 * scale,
+      fontWeight: "700",
+      marginBottom: 4 * scale,
+      color: theme.text,
+    },
+
+    description: {
+      fontSize: 16 * scale,
+      fontWeight: "400",
+      color: theme.textSecondary,
+      lineHeight: 22 * scale,
+    },
+
+    tabContainer: {
+      flexDirection: "row",
+      gap: 10 * scale,
+      marginBottom: 16 * scale,
+    },
+
+    tabButton: {
+      flex: 1,
+      borderRadius: 14 * scale,
+      paddingVertical: 12 * scale,
+      alignItems: "center",
+      justifyContent: "center",
+      borderWidth: 1,
+    },
+
+    tabButtonActive: {
+      backgroundColor: theme.buttonPrimary,
+      borderColor: theme.buttonPrimary,
+    },
+
+    tabButtonInactive: {
+      backgroundColor: theme.card,
+      borderColor: theme.border,
+    },
+
+    tabButtonText: {
+      fontSize: 15 * scale,
+      fontWeight: "600",
+    },
+
+    tabButtonTextActive: {
       color: theme.buttonPrimaryText,
+    },
+
+    tabButtonTextInactive: {
+      color: theme.text,
+    },
+
+    contentContainer: {
+      flex: 1,
     },
   });

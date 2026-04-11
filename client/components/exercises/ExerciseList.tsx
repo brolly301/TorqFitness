@@ -1,5 +1,5 @@
-import { FlatList, Pressable, StyleSheet, Text, View } from "react-native";
-import React, { useEffect, useState } from "react";
+import { FlatList, Pressable, StyleSheet, View } from "react-native";
+import React, { useMemo, useState } from "react";
 import { Exercise } from "@/types/Global";
 import ExerciseItem from "./ExerciseItem";
 import ExerciseDetailsModal from "../modals/exercises/ExerciseDetailsModal";
@@ -15,24 +15,26 @@ export default function ExerciseList({
   exercises,
   handleAddExercise,
 }: Props) {
-  const [modalVisible, setModalVisible] = useState<boolean>(false);
+  const [modalVisible, setModalVisible] = useState(false);
   const [exercise, setExercise] = useState<Exercise | null>(null);
+
+  const selectedExercise = useMemo(() => exercise, [exercise]);
 
   return (
     <>
       <ExerciseDetailsModal
         modalVisible={modalVisible}
         setModalVisible={setModalVisible}
-        exercise={exercise}
+        exercise={selectedExercise}
         handleAddExercise={handleAddExercise}
         showAddButton={showAddButton}
       />
-      <FlatList
-        data={exercises}
-        keyExtractor={(item) => item.id}
-        contentContainerStyle={{ marginTop: 10 }}
-        renderItem={({ item }) => {
-          return (
+
+      <View style={styles.container}>
+        <FlatList
+          data={exercises}
+          keyExtractor={(item) => item.id}
+          renderItem={({ item }) => (
             <Pressable
               onPress={() => {
                 setExercise(item);
@@ -41,11 +43,26 @@ export default function ExerciseList({
             >
               <ExerciseItem exercise={item} />
             </Pressable>
-          );
-        }}
-      />
+          )}
+          style={styles.list}
+          contentContainerStyle={styles.contentContainer}
+          showsVerticalScrollIndicator={false}
+          keyboardShouldPersistTaps="handled"
+        />
+      </View>
     </>
   );
 }
 
-const styles = StyleSheet.create({});
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+  },
+  list: {
+    flex: 1,
+  },
+  contentContainer: {
+    paddingTop: 4,
+    paddingBottom: 24,
+  },
+});

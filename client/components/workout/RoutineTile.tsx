@@ -3,8 +3,6 @@ import React, { useMemo } from "react";
 import Feather from "@expo/vector-icons/Feather";
 import { Routine } from "@/types/Global";
 import { router } from "expo-router";
-import { useWorkoutContext } from "@/context/WorkoutContext";
-import * as crypto from "expo-crypto";
 import { useAppTheme } from "@/hooks/useAppTheme";
 import { Theme } from "@/types/Theme";
 
@@ -17,40 +15,44 @@ export default function RoutineTile({ routine }: Props) {
   const styles = useMemo(() => makeStyles(theme, scale), [theme, scale]);
 
   const loadRoutine = () => {
-    // setWorkout((prev) => ({
-    //   ...prev,
-    //   ...routine,
-    //   id: crypto.randomUUID(),
-    //   exercises: routine.exercises.map((ex, i) => ({
-    //     ...ex,
-    //     id: crypto.randomUUID(),
-    //     order: i + 1,
-    //     sets: ex.sets.map((set, j) => ({
-    //       ...set,
-    //       id: crypto.randomUUID(),
-    //       order: j + 1,
-    //     })),
-    //   })),
-    // }));
     router.navigate({
       pathname: "/workout/createWorkout",
       params: { routineId: routine.id },
     });
   };
 
+  const exerciseCount = routine.exercises.length;
+  const exerciseLabel = exerciseCount === 1 ? "exercise" : "exercises";
+
   return (
     <Pressable style={styles.container} onPress={loadRoutine}>
-      <View>
-        <Text style={styles.name}>{routine.name}</Text>
-        <Text style={styles.date}>Last used - Monday, 10:39</Text>
-      </View>
-      <View>
-        <Text style={styles.exercises}>
-          {routine.exercises.length} exercises
+      <View style={styles.leftContent}>
+        <Text style={styles.name} numberOfLines={1}>
+          {routine.name}
         </Text>
-        <Text style={styles.volume}>Chest, Triceps</Text>
+
+        <Text style={styles.subText} numberOfLines={1}>
+          Last used • Monday, 10:39
+        </Text>
       </View>
-      <Feather name="arrow-right" />
+
+      <View style={styles.rightContent}>
+        <Text style={styles.meta} numberOfLines={1}>
+          {exerciseCount} {exerciseLabel}
+        </Text>
+
+        <View style={styles.tagPill}>
+          <Text style={styles.tagText}>Chest • Triceps</Text>
+        </View>
+      </View>
+
+      <View style={styles.iconContainer}>
+        <Feather
+          name="arrow-right"
+          size={18 * scale}
+          color={theme.textSecondary}
+        />
+      </View>
     </Pressable>
   );
 }
@@ -59,29 +61,66 @@ export const makeStyles = (theme: Theme, scale: number) =>
   StyleSheet.create({
     container: {
       flexDirection: "row",
-      justifyContent: "space-between",
       alignItems: "center",
-      backgroundColor: theme.background,
-      padding: 10 * scale,
-      borderRadius: 10,
-      marginBottom: 10 * scale,
+      backgroundColor: theme.card,
+      borderRadius: 14 * scale,
+      paddingVertical: 14 * scale,
+      paddingHorizontal: 14 * scale,
+      marginBottom: 12 * scale,
+      borderWidth: 1,
+      borderColor: theme.border,
+      shadowColor: "#000",
+      shadowOpacity: 0.05,
+      shadowRadius: 8,
+      shadowOffset: { width: 0, height: 2 },
+      elevation: 2,
     },
+
+    leftContent: {
+      flex: 1,
+      marginRight: 12 * scale,
+    },
+
+    rightContent: {
+      alignItems: "flex-end",
+      marginRight: 10 * scale,
+      maxWidth: "35%",
+    },
+
+    iconContainer: {
+      width: 26 * scale,
+      alignItems: "flex-end",
+      justifyContent: "center",
+    },
+
     name: {
       fontSize: 18 * scale,
-      fontWeight: "600",
-      marginBottom: 10 * scale,
+      fontWeight: "700",
+      color: theme.text,
+      marginBottom: 4 * scale,
     },
-    date: {
+
+    subText: {
       fontSize: 14 * scale,
-      fontWeight: "400",
+      color: theme.textSecondary,
     },
-    exercises: {
-      fontSize: 16 * scale,
-      fontWeight: "400",
-      marginBottom: 10 * scale,
+
+    meta: {
+      fontSize: 15 * scale,
+      fontWeight: "600",
+      color: theme.text,
+      marginBottom: 4 * scale,
     },
-    volume: {
-      fontSize: 16 * scale,
-      fontWeight: "400",
+
+    tagPill: {
+      paddingHorizontal: 8 * scale,
+      paddingVertical: 4 * scale,
+      borderRadius: 999,
+      backgroundColor: theme.buttonPrimary + "15",
+    },
+
+    tagText: {
+      fontSize: 13 * scale,
+      color: theme.buttonPrimary,
     },
   });

@@ -14,37 +14,48 @@ export default function ExerciseScreen() {
   const { theme, scale } = useAppTheme();
   const styles = useMemo(() => makeStyles(theme, scale), [theme, scale]);
 
-  const [search, setSearch] = useState<string>("");
+  const [search, setSearch] = useState("");
   const { exercises } = useExerciseContext();
 
-  const filteredExercises = exercises.filter(
-    (exercise) =>
-      normalize(exercise.name).includes(normalize(search)) &&
-      !exercise.archived,
-  );
+  const filteredExercises = useMemo(() => {
+    return exercises.filter(
+      (exercise) =>
+        normalize(exercise.name).includes(normalize(search)) &&
+        !exercise.archived,
+    );
+  }, [exercises, search]);
 
   return (
     <AppWrapper>
       <View style={styles.container}>
         <View style={styles.header}>
           <Pressable
-            style={{ alignItems: "flex-end" }}
+            style={styles.addButton}
             hitSlop={10}
             onPress={() => router.navigate("/(tabs)/exercises/createExercise")}
           >
-            <View style={styles.iconContainer}>
-              <Feather name="plus" size={20} color={theme.buttonPrimary} />
-            </View>
+            <Feather
+              name="plus"
+              size={20 * scale}
+              color={theme.buttonPrimary}
+            />
           </Pressable>
         </View>
+
         <View style={styles.titleContainer}>
           <Text style={styles.title}>Exercises</Text>
           <Text style={styles.description}>
             Browse and manage your exercise library
           </Text>
         </View>
-        <AppSearchBar setSearch={setSearch} />
-        <ExerciseList showAddButton={false} exercises={filteredExercises} />
+
+        <View style={styles.searchContainer}>
+          <AppSearchBar setSearch={setSearch} />
+        </View>
+
+        <View style={styles.listContainer}>
+          <ExerciseList showAddButton={false} exercises={filteredExercises} />
+        </View>
       </View>
     </AppWrapper>
   );
@@ -53,30 +64,52 @@ export default function ExerciseScreen() {
 const makeStyles = (theme: Theme, scale: number) =>
   StyleSheet.create({
     container: {
-      padding: 16 * scale,
+      flex: 1,
       backgroundColor: theme.background,
+      paddingHorizontal: 16 * scale,
+      paddingTop: 12 * scale,
     },
+
     header: {
-      // marginTop: 40,
-    },
-    title: {
-      fontSize: 26 * scale,
-      fontWeight: "bold",
-      marginBottom: 5,
-    },
-    description: {
-      fontSize: 18 * scale,
-      fontWeight: "400",
-    },
-    titleContainer: {
-      padding: 16,
-    },
-    iconContainer: {
       flexDirection: "row",
+      justifyContent: "flex-end",
+      marginBottom: 12 * scale,
+    },
+
+    addButton: {
+      width: 40 * scale,
+      height: 40 * scale,
       justifyContent: "center",
       alignItems: "center",
-      padding: 8,
-      backgroundColor: theme.border,
-      borderRadius: 10,
+      backgroundColor: theme.card,
+      borderRadius: 12 * scale,
+      borderWidth: 1,
+      borderColor: theme.border,
+    },
+
+    titleContainer: {
+      marginBottom: 18 * scale,
+    },
+
+    title: {
+      fontSize: 32 * scale,
+      fontWeight: "700",
+      marginBottom: 4 * scale,
+      color: theme.text,
+    },
+
+    description: {
+      fontSize: 16 * scale,
+      fontWeight: "400",
+      color: theme.textSecondary,
+      lineHeight: 22 * scale,
+    },
+
+    searchContainer: {
+      marginBottom: 14 * scale,
+    },
+
+    listContainer: {
+      flex: 1,
     },
   });

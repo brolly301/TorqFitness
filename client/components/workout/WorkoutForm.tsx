@@ -1,5 +1,12 @@
 import React, { useMemo } from "react";
-import { Pressable, StyleSheet, Text, TextInput, View } from "react-native";
+import {
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TextInput,
+  View,
+} from "react-native";
 import EvilIcons from "@expo/vector-icons/EvilIcons";
 
 import Timer from "./Timer";
@@ -14,12 +21,14 @@ type Props<T extends WorkoutDraft> = {
   draft: T;
   setDraft: React.Dispatch<React.SetStateAction<T>>;
   mode: "workout" | "routine";
+  showTimer?: boolean;
 } & Pick<ModalProps, "setModalVisible">;
 
 export default function WorkoutForm<T extends WorkoutDraft>({
   draft,
   setDraft,
   mode,
+  showTimer = false,
   setModalVisible,
 }: Props<T>) {
   const { theme, scale } = useAppTheme();
@@ -57,7 +66,12 @@ export default function WorkoutForm<T extends WorkoutDraft>({
   }, 0);
 
   return (
-    <View>
+    <ScrollView
+      style={styles.container}
+      contentContainerStyle={styles.contentContainer}
+      showsVerticalScrollIndicator={false}
+      keyboardShouldPersistTaps="handled"
+    >
       <View style={styles.headerRow}>
         <View style={styles.headerTextContainer}>
           <TextInput
@@ -73,7 +87,7 @@ export default function WorkoutForm<T extends WorkoutDraft>({
             <Text style={styles.metaText}>{totalSets} sets</Text>
           </View>
         </View>
-        {mode === "workout" ? <Timer /> : null}
+        {showTimer ? <Timer /> : null}
       </View>
 
       <View style={styles.hr} />
@@ -127,12 +141,7 @@ export default function WorkoutForm<T extends WorkoutDraft>({
 
               return (
                 <View key={set.id} style={styles.exerciseContainer}>
-                  <View
-                    style={{
-                      flexDirection: "row",
-                      justifyContent: "space-between",
-                    }}
-                  >
+                  <View style={styles.setTopRow}>
                     <View style={styles.setHeader}>
                       <Text style={styles.setLabel}>Set {index + 1}</Text>
                       <Text style={styles.setDivider}>|</Text>
@@ -202,16 +211,26 @@ export default function WorkoutForm<T extends WorkoutDraft>({
       <Pressable style={styles.button} onPress={() => setModalVisible(true)}>
         <Text style={styles.buttonText}>Add Exercise</Text>
       </Pressable>
-    </View>
+    </ScrollView>
   );
 }
 
 export const makeStyles = (theme: Theme, scale: number) =>
   StyleSheet.create({
+    container: {
+      flex: 1,
+    },
+    contentContainer: {
+      paddingBottom: 32 * scale,
+    },
     headerRow: {
       flexDirection: "row",
       justifyContent: "space-between",
       alignItems: "flex-start",
+    },
+    setTopRow: {
+      flexDirection: "row",
+      justifyContent: "space-between",
     },
     headerTextContainer: {
       flex: 1,

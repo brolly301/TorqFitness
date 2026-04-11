@@ -1,12 +1,10 @@
 import { Pressable, StyleSheet, Text, View } from "react-native";
-import React, { useCallback, useLayoutEffect, useMemo, useState } from "react";
-import { router, useLocalSearchParams, useNavigation } from "expo-router";
-import { useWorkoutContext } from "@/context/WorkoutContext";
-import { Routine, Workout } from "@/types/Global";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
+import { router, useLocalSearchParams } from "expo-router";
+import { Routine } from "@/types/Global";
 import ExerciseModal from "@/components/modals/exercises/ExerciseModal";
 import WorkoutForm from "@/components/workout/WorkoutForm";
 import * as crypto from "expo-crypto";
-import EvilIcons from "@expo/vector-icons/EvilIcons";
 import { useRoutineContext } from "@/context/RoutineContext";
 import DiscardModal from "@/components/modals/confirmation/DiscardModal";
 import FinishModal from "@/components/modals/confirmation/FinishModal";
@@ -20,44 +18,74 @@ export default function EditRoutineScreen() {
   const styles = useMemo(() => makeStyles(theme, scale), [theme, scale]);
 
   const { routineId } = useLocalSearchParams();
+  const resolvedRoutineId = Array.isArray(routineId) ? routineId[0] : routineId;
+
   const { routines, updateRoutine } = useRoutineContext();
-  const [modalVisible, setModalVisible] = useState<boolean>(false);
 
-  const routineDetails = routines.find((wk) => wk.id === routineId);
+  const [modalVisible, setModalVisible] = useState(false);
+  const [finishModalVisible, setFinishModalVisible] = useState(false);
+  const [discardModalVisible, setDiscardModalVisible] = useState(false);
 
-  if (!routineDetails) return;
+  const routineDetails = useMemo(() => {
+    return routines.find((routine) => routine.id === resolvedRoutineId);
+  }, [routines, resolvedRoutineId]);
 
-  const [formData, setFormData] = useState<Routine>(routineDetails);
+  const [formData, setFormData] = useState<Routine>({
+    id: "",
+    name: "",
+    exercises: [],
+    notes: "",
+  });
 
-  const [finishModalVisible, setFinishModalVisible] = useState<boolean>(false);
-  const [discardModalVisible, setDiscardModalVisible] =
-    useState<boolean>(false);
+  useEffect(() => {
+    if (!routineDetails) return;
+
+    setFormData({
+      ...routineDetails,
+      exercises: routineDetails.exercises.map((exercise) => ({
+        ...exercise,
+        sets: exercise.sets.map((set) => ({ ...set })),
+      })),
+    });
+  }, [routineDetails]);
 
   const handleSubmit = useCallback(() => {
+    if (!formData) return;
+
     updateRoutine(formData);
     router.back();
   }, [formData, updateRoutine]);
 
   const handleAddExercise = (exerciseId: string) => {
+    if (!formData) return;
+
     const newExercise = {
       id: crypto.randomUUID(),
       exerciseId,
-      order: 1,
+      order: formData.exercises.length + 1,
       sets: [{ id: crypto.randomUUID(), order: 1, reps: 0, weight: null }],
       notes: "",
     };
 
-    setFormData((prev) => ({
-      ...prev,
-      exercises: [
-        ...prev.exercises,
-        {
-          ...newExercise,
-          order: prev.exercises.length + 1,
-        },
-      ],
-    }));
+    setFormData((prev) => {
+      if (!prev) return prev;
+
+      return {
+        ...prev,
+        exercises: [...prev.exercises, newExercise],
+      };
+    });
   };
+
+  if (!formData) {
+    return (
+      <AppWrapper>
+        <View style={styles.container}>
+          <Text style={styles.loadingText}>Loading routine...</Text>
+        </View>
+      </AppWrapper>
+    );
+  }
 
   return (
     <>
@@ -67,12 +95,14 @@ export default function EditRoutineScreen() {
         placeholder="discard your changes?"
         onConfirm={() => router.back()}
       />
+
       <FinishModal
         modalVisible={finishModalVisible}
         setModalVisible={setFinishModalVisible}
         onConfirm={handleSubmit}
-        placeholder={"editing this routine?"}
+        placeholder="editing this routine?"
       />
+
       <ExerciseModal
         modalVisible={modalVisible}
         setModalVisible={setModalVisible}
@@ -85,27 +115,33 @@ export default function EditRoutineScreen() {
             <Pressable
               onPress={() => setDiscardModalVisible(true)}
               hitSlop={10}
-              style={styles.headerIconContainer}
+              style={styles.headerIconButton}
             >
-              <Feather name="arrow-left" color={"black"} size={24} />
+              <Feather name="arrow-left" color={theme.text} size={22 * scale} />
             </Pressable>
+
             <Pressable
-              style={styles.headerIconContainer}
+              style={styles.saveButton}
               onPress={() => setFinishModalVisible(true)}
               hitSlop={10}
             >
-              <Text style={[styles.headerText, { color: theme.buttonPrimary }]}>
-                Save
-              </Text>
-              <Feather name="check" color={theme.buttonPrimary} size={24} />
+              <Text style={styles.saveText}>Save</Text>
+              <Feather
+                name="check"
+                color={theme.buttonPrimary}
+                size={20 * scale}
+              />
             </Pressable>
           </View>
-          <WorkoutForm
-            setDraft={setFormData}
-            mode="routine"
-            draft={formData}
-            setModalVisible={setModalVisible}
-          />
+
+          <View style={styles.formContainer}>
+            <WorkoutForm
+              setDraft={setFormData}
+              mode="routine"
+              draft={formData}
+              setModalVisible={setModalVisible}
+            />
+          </View>
         </View>
       </AppWrapper>
     </>
@@ -114,21 +150,56 @@ export default function EditRoutineScreen() {
 
 const makeStyles = (theme: Theme, scale: number) =>
   StyleSheet.create({
-    container: { padding: 16 * scale, backgroundColor: theme.background },
+    container: {
+      flex: 1,
+      paddingHorizontal: 16 * scale,
+      paddingTop: 12 * scale,
+      backgroundColor: theme.background,
+    },
+
     header: {
       flexDirection: "row",
       justifyContent: "space-between",
       alignItems: "center",
-      // marginTop: 40,
-      marginBottom: 30,
+      marginBottom: 16 * scale,
     },
-    headerText: {
-      fontSize: 20,
-      fontWeight: "600",
-      marginRight: 4,
+
+    headerIconButton: {
+      width: 40 * scale,
+      height: 40 * scale,
+      borderRadius: 12 * scale,
+      alignItems: "center",
+      justifyContent: "center",
+      backgroundColor: theme.card,
+      borderWidth: 1,
+      borderColor: theme.border,
     },
-    headerIconContainer: {
+
+    saveButton: {
       flexDirection: "row",
       alignItems: "center",
+      justifyContent: "center",
+      paddingVertical: 10 * scale,
+      paddingHorizontal: 14 * scale,
+      borderRadius: 12 * scale,
+      backgroundColor: theme.buttonPrimary + "15",
+      borderWidth: 1,
+      borderColor: theme.buttonPrimary + "30",
+    },
+
+    saveText: {
+      fontSize: 16 * scale,
+      fontWeight: "600",
+      marginRight: 6 * scale,
+      color: theme.buttonPrimary,
+    },
+
+    formContainer: {
+      flex: 1,
+    },
+
+    loadingText: {
+      fontSize: 16 * scale,
+      color: theme.textSecondary,
     },
   });

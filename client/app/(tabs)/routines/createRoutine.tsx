@@ -1,6 +1,6 @@
 import { Pressable, StyleSheet, Text, View } from "react-native";
-import React, { useCallback, useLayoutEffect, useMemo, useState } from "react";
-import { router, useNavigation } from "expo-router";
+import React, { useCallback, useMemo, useState } from "react";
+import { router } from "expo-router";
 import { useRoutineContext } from "@/context/RoutineContext";
 import WorkoutForm from "@/components/workout/WorkoutForm";
 import ExerciseModal from "@/components/modals/exercises/ExerciseModal";
@@ -26,14 +26,11 @@ export default function CreateRoutineScreen() {
     notes: "",
   });
 
-  const [modalVisible, setModalVisible] = useState<boolean>(false);
-  const [finishModalVisible, setFinishModalVisible] = useState<boolean>(false);
-  const [discardModalVisible, setDiscardModalVisible] =
-    useState<boolean>(false);
+  const [modalVisible, setModalVisible] = useState(false);
+  const [finishModalVisible, setFinishModalVisible] = useState(false);
+  const [discardModalVisible, setDiscardModalVisible] = useState(false);
 
   const handleSubmit = useCallback(() => {
-    if (!routine) return;
-
     addRoutine(routine);
     router.back();
   }, [routine, addRoutine]);
@@ -42,20 +39,14 @@ export default function CreateRoutineScreen() {
     const newExercise = {
       id: crypto.randomUUID(),
       exerciseId,
-      order: 1,
+      order: routine.exercises.length + 1,
       sets: [{ id: crypto.randomUUID(), order: 1, reps: 0, weight: null }],
       notes: "",
     };
 
     setRoutine((prev) => ({
       ...prev,
-      exercises: [
-        ...prev.exercises,
-        {
-          ...newExercise,
-          order: prev.exercises.length + 1,
-        },
-      ],
+      exercises: [...prev.exercises, newExercise],
     }));
   };
 
@@ -67,66 +58,106 @@ export default function CreateRoutineScreen() {
         placeholder="discard your new routine?"
         onConfirm={() => router.back()}
       />
+
       <FinishModal
         modalVisible={finishModalVisible}
         setModalVisible={setFinishModalVisible}
         onConfirm={handleSubmit}
         placeholder="with this routine?"
       />
+
       <ExerciseModal
         modalVisible={modalVisible}
         setModalVisible={setModalVisible}
         handleAddExercise={handleAddExercise}
       />
+
       <AppWrapper>
         <View style={styles.container}>
           <View style={styles.header}>
             <Pressable
               onPress={() => setDiscardModalVisible(true)}
               hitSlop={10}
-              style={styles.headerIconContainer}
+              style={styles.headerIconButton}
             >
-              <Feather name="arrow-left" color={"black"} size={24} />
+              <Feather name="arrow-left" color={theme.text} size={22 * scale} />
             </Pressable>
+
             <Pressable
-              style={styles.headerIconContainer}
+              style={styles.saveButton}
               onPress={() => setFinishModalVisible(true)}
               hitSlop={10}
             >
-              <Text style={[styles.headerText, { color: theme.buttonPrimary }]}>
-                Save
-              </Text>
-              <Feather name="check" color={theme.buttonPrimary} size={24} />
+              <Text style={styles.saveText}>Save</Text>
+              <Feather
+                name="check"
+                color={theme.buttonPrimary}
+                size={20 * scale}
+              />
             </Pressable>
           </View>
-          <WorkoutForm
-            mode="routine"
-            setDraft={setRoutine}
-            draft={routine}
-            setModalVisible={setModalVisible}
-          />
+
+          <View style={styles.formContainer}>
+            <WorkoutForm
+              mode="routine"
+              setDraft={setRoutine}
+              draft={routine}
+              setModalVisible={setModalVisible}
+            />
+          </View>
         </View>
       </AppWrapper>
     </>
   );
 }
+
 const makeStyles = (theme: Theme, scale: number) =>
   StyleSheet.create({
-    container: { padding: 16 * scale, backgroundColor: theme.background },
+    container: {
+      flex: 1,
+      paddingHorizontal: 16 * scale,
+      paddingTop: 12 * scale,
+      backgroundColor: theme.background,
+    },
+
     header: {
       flexDirection: "row",
       justifyContent: "space-between",
       alignItems: "center",
-      // marginTop: 40,
-      marginBottom: 30,
+      marginBottom: 16 * scale,
     },
-    headerText: {
-      fontSize: 20,
-      fontWeight: "600",
-      marginRight: 4,
+
+    headerIconButton: {
+      width: 40 * scale,
+      height: 40 * scale,
+      borderRadius: 12 * scale,
+      alignItems: "center",
+      justifyContent: "center",
+      backgroundColor: theme.card,
+      borderWidth: 1,
+      borderColor: theme.border,
     },
-    headerIconContainer: {
+
+    saveButton: {
       flexDirection: "row",
       alignItems: "center",
+      justifyContent: "center",
+      paddingVertical: 10 * scale,
+      paddingHorizontal: 14 * scale,
+      borderRadius: 12 * scale,
+      backgroundColor: theme.buttonPrimary + "15",
+      borderWidth: 1,
+      borderColor: theme.buttonPrimary + "30",
+    },
+
+    saveText: {
+      fontSize: 16 * scale,
+      fontWeight: "600",
+      marginRight: 6 * scale,
+      color: theme.buttonPrimary,
+    },
+
+    formContainer: {
+      flex: 1,
     },
   });

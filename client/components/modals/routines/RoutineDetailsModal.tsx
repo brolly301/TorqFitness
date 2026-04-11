@@ -41,8 +41,4 @@ const styles = StyleSheet.create({
     paddingHorizontal: 15,
     paddingBottom: 26,
   },
-  iconContainer: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-  },
 });

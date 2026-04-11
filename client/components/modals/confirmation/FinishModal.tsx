@@ -1,8 +1,6 @@
-import { StyleSheet, Text, View } from "react-native";
 import React from "react";
 import { ModalProps } from "@/types/Global";
-import AppModal from "@/components/ui/AppModal";
-import { Button } from "@react-navigation/elements";
+import ConfirmationModal from "./ConfirmationModal";
 
 type Props = ModalProps & {
   onConfirm: () => void;
@@ -16,14 +14,14 @@ export default function FinishModal({
   placeholder,
 }: Props) {
   return (
-    <AppModal modalVisible={modalVisible} setModalVisible={setModalVisible}>
-      <View>
-        <Text>Are you sure you are finished {placeholder}</Text>
-        <Button onPressIn={onConfirm}>Yes, finish & save workout</Button>
-        <Button onPressIn={() => setModalVisible(false)}>Cancel</Button>
-      </View>
-    </AppModal>
+    <ConfirmationModal
+      modalVisible={modalVisible}
+      setModalVisible={setModalVisible}
+      title="Finish and save?"
+      description={`Are you sure you are finished ${placeholder}`}
+      confirmText="Finish & Save"
+      confirmVariant="primary"
+      onConfirm={onConfirm}
+    />
   );
 }
-
-const styles = StyleSheet.create({});

@@ -1,4 +1,4 @@
-import { StyleSheet, TextInput, View } from "react-native";
+import { Pressable, StyleSheet, Text, TextInput, View } from "react-native";
 import React, { useMemo, useState } from "react";
 import { useExerciseContext } from "@/context/ExerciseContext";
 import AppDropdown from "../ui/AppDropdown";
@@ -27,9 +27,10 @@ export default function ExerciseEditForm({ exercise, setModalVisible }: Props) {
 
   const [deleteModalVisible, setDeleteModalVisible] = useState<boolean>(false);
 
-  const isDisabled =
-    !exercise.name.trim() ||
-    exercise.primaryMuscles.length === 0 ||
+  console.log(exerciseData.name);
+
+  const isDisabled = !exercise.name.trim() || !exerciseData.name.trim();
+  exercise.primaryMuscles.length === 0 ||
     exercise.bodyParts.length === 0 ||
     exercise.equipment.length === 0;
 
@@ -54,6 +55,9 @@ export default function ExerciseEditForm({ exercise, setModalVisible }: Props) {
         onConfirm={onConfirm}
       />
       <View style={styles.container}>
+        <Text style={styles.title}>Edit Exercise</Text>
+        <Text style={styles.label}>Name</Text>
+
         <TextInput
           placeholder="Name"
           placeholderTextColor="black"
@@ -64,6 +68,7 @@ export default function ExerciseEditForm({ exercise, setModalVisible }: Props) {
             setExerciseData((prev) => ({ ...prev, name: text }))
           }
         />
+        <Text style={styles.label}>Primary Muscle</Text>
 
         <AppDropdown
           selected={exerciseData.primaryMuscles[0] || ""}
@@ -76,6 +81,7 @@ export default function ExerciseEditForm({ exercise, setModalVisible }: Props) {
           }
           placeholder="Select a muscle"
         />
+        <Text style={styles.label}>Body Part</Text>
 
         <AppDropdown
           selected={exerciseData.bodyParts[0] || ""}
@@ -88,6 +94,7 @@ export default function ExerciseEditForm({ exercise, setModalVisible }: Props) {
           }
           placeholder="Select a body part"
         />
+        <Text style={styles.label}>Equipment</Text>
 
         <AppDropdown
           selected={exerciseData.equipment[0] || ""}
@@ -101,22 +108,55 @@ export default function ExerciseEditForm({ exercise, setModalVisible }: Props) {
           placeholder="Select equipment"
         />
 
-        <Button
+        <Pressable
           disabled={isDisabled}
           onPress={handleSubmit}
-          style={{
-            backgroundColor: isDisabled ? "red" : "green",
-          }}
+          style={[
+            styles.button,
+            {
+              backgroundColor: isDisabled
+                ? theme.buttonDisabled
+                : theme.buttonPrimary,
+              marginBottom: 10,
+            },
+          ]}
         >
-          Save Exercise
-        </Button>
-        <Button
+          <Text
+            style={[
+              styles.buttonText,
+              {
+                color: isDisabled
+                  ? theme.buttonDisabledText
+                  : theme.buttonPrimaryText,
+              },
+            ]}
+          >
+            Save Exercise
+          </Text>
+        </Pressable>
+        <Pressable
+          disabled={isDisabled}
           onPress={() => {
             setDeleteModalVisible(true);
           }}
+          style={[
+            styles.button,
+            {
+              backgroundColor: theme.error,
+            },
+          ]}
         >
-          Archive Exercise
-        </Button>
+          <Text
+            style={[
+              styles.buttonText,
+              {
+                color: theme.buttonPrimaryText,
+              },
+            ]}
+          >
+            Archive Exercise
+          </Text>
+        </Pressable>
       </View>
     </>
   );
@@ -125,11 +165,33 @@ export default function ExerciseEditForm({ exercise, setModalVisible }: Props) {
 export const makeStyles = (theme: Theme, scale: number) =>
   StyleSheet.create({
     container: { padding: 16 * scale },
+    title: {
+      fontSize: 18,
+      fontWeight: "bold",
+      textAlign: "center",
+      marginBottom: 20,
+    },
+    label: {
+      fontSize: 13 * scale,
+      color: theme.textSecondary,
+      marginBottom: 5,
+    },
     input: {
       borderWidth: 1 * scale,
       borderColor: theme.border,
       padding: 12 * scale,
       marginBottom: 8 * scale,
       borderRadius: 6 * scale,
+    },
+    button: {
+      flexDirection: "row",
+      justifyContent: "center",
+      alignItems: "center",
+      borderRadius: 10,
+      paddingVertical: 10 * scale,
+    },
+    buttonText: {
+      fontSize: 14 * scale,
+      fontWeight: "bold",
     },
   });

@@ -38,9 +38,7 @@ export const makeStyles = (theme: Theme, scale: number) =>
     },
     modalView: {
       width: "89%",
-      height: "60%",
       borderRadius: 12 * scale,
-      backgroundColor: theme.background,
       paddingTop: 15 * scale,
       paddingHorizontal: 15 * scale,
       paddingBottom: 26 * scale,

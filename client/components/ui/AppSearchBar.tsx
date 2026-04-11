@@ -1,4 +1,4 @@
-import { StyleSheet, Text, TextInput, View } from "react-native";
+import { StyleSheet, TextInput, View } from "react-native";
 import React, { useMemo } from "react";
 import FontAwesome6 from "@expo/vector-icons/FontAwesome6";
 import { useAppTheme } from "@/hooks/useAppTheme";
@@ -14,12 +14,17 @@ export default function AppSearchBar({ setSearch }: Props) {
 
   return (
     <View style={styles.container}>
-      <FontAwesome6 name="magnifying-glass" size={14} color="black" />
+      <FontAwesome6
+        name="magnifying-glass"
+        size={16 * scale}
+        color={theme.textSecondary}
+      />
+
       <TextInput
         style={styles.input}
         placeholder="Search exercises..."
-        placeholderTextColor={"black"}
-        onChangeText={(text) => setSearch(text)}
+        placeholderTextColor={theme.textSecondary}
+        onChangeText={setSearch}
       />
     </View>
   );
@@ -28,16 +33,23 @@ export default function AppSearchBar({ setSearch }: Props) {
 export const makeStyles = (theme: Theme, scale: number) =>
   StyleSheet.create({
     container: {
-      borderWidth: 1 * scale,
-      borderColor: theme.inputBorder,
-      borderRadius: 20 * scale,
-      backgroundColor: theme.buttonSecondary,
-      padding: 10 * scale,
       flexDirection: "row",
       alignItems: "center",
+
+      height: 46 * scale,
+      borderRadius: 14 * scale,
+      borderWidth: 1,
+      borderColor: theme.inputBorder,
+      backgroundColor: theme.buttonSecondary,
+
+      paddingHorizontal: 12 * scale,
     },
+
     input: {
-      width: "100%",
+      flex: 1,
       marginLeft: 10 * scale,
+      fontSize: 15 * scale,
+      color: theme.text,
+      padding: 0,
     },
   });

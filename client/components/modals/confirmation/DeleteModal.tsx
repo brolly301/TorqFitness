@@ -1,8 +1,6 @@
-import { StyleSheet, Text, View } from "react-native";
 import React from "react";
-import AppModal from "@/components/ui/AppModal";
 import { ModalProps } from "@/types/Global";
-import { Button } from "@react-navigation/elements";
+import ConfirmationModal from "./ConfirmationModal";
 
 type Props = ModalProps & {
   onConfirm: () => void;
@@ -16,14 +14,14 @@ export default function DeleteModal({
   onConfirm,
 }: Props) {
   return (
-    <AppModal modalVisible={modalVisible} setModalVisible={setModalVisible}>
-      <View>
-        <Text>Are you sure you want to delete this {placeholder}?</Text>
-        <Button onPressIn={onConfirm}>Yes, delete.</Button>
-        <Button onPressIn={() => setModalVisible(false)}>Cancel</Button>
-      </View>
-    </AppModal>
+    <ConfirmationModal
+      modalVisible={modalVisible}
+      setModalVisible={setModalVisible}
+      title={`Delete ${placeholder}?`}
+      description={`This will permanently remove this ${placeholder}. This action cannot be undone.`}
+      confirmText="Delete"
+      confirmVariant="danger"
+      onConfirm={onConfirm}
+    />
   );
 }
-
-const styles = StyleSheet.create({});

@@ -1,6 +1,6 @@
 import { Pressable, StyleSheet, Text, View } from "react-native";
-import React, { useCallback, useLayoutEffect, useMemo, useState } from "react";
-import { router, useLocalSearchParams, useNavigation } from "expo-router";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
+import { router, useLocalSearchParams } from "expo-router";
 import { useWorkoutContext } from "@/context/WorkoutContext";
 import { Workout } from "@/types/Global";
 import ExerciseModal from "@/components/modals/exercises/ExerciseModal";
@@ -18,18 +18,39 @@ export default function EditWorkoutScreen() {
   const styles = useMemo(() => makeStyles(theme, scale), [theme, scale]);
 
   const { workoutId } = useLocalSearchParams();
+  const resolvedWorkoutId = Array.isArray(workoutId) ? workoutId[0] : workoutId;
+
   const { workouts, updateWorkout } = useWorkoutContext();
-  const [modalVisible, setModalVisible] = useState<boolean>(false);
 
-  const workoutDetails = workouts.find((wk) => wk.id === workoutId);
+  const [modalVisible, setModalVisible] = useState(false);
+  const [finishModalVisible, setFinishModalVisible] = useState(false);
+  const [discardModalVisible, setDiscardModalVisible] = useState(false);
 
-  if (!workoutDetails) return;
+  const workoutDetails = useMemo(() => {
+    return workouts.find((workout) => workout.id === resolvedWorkoutId);
+  }, [workouts, resolvedWorkoutId]);
 
-  const [formData, setFormData] = useState<Workout>(workoutDetails);
+  const [formData, setFormData] = useState<Workout>({
+    id: "",
+    name: "",
+    startedAt: null,
+    completedAt: null,
+    duration: 0,
+    exercises: [],
+    notes: "",
+  });
 
-  const [finishModalVisible, setFinishModalVisible] = useState<boolean>(false);
-  const [discardModalVisible, setDiscardModalVisible] =
-    useState<boolean>(false);
+  useEffect(() => {
+    if (!workoutDetails) return;
+
+    setFormData({
+      ...workoutDetails,
+      exercises: workoutDetails.exercises.map((exercise) => ({
+        ...exercise,
+        sets: exercise.sets.map((set) => ({ ...set })),
+      })),
+    });
+  }, [workoutDetails]);
 
   const handleSubmit = useCallback(() => {
     updateWorkout(formData);
@@ -40,22 +61,26 @@ export default function EditWorkoutScreen() {
     const newExercise = {
       id: crypto.randomUUID(),
       exerciseId,
-      order: 1,
+      order: formData.exercises.length + 1,
       sets: [{ id: crypto.randomUUID(), order: 1, reps: 0, weight: null }],
       notes: "",
     };
 
     setFormData((prev) => ({
       ...prev,
-      exercises: [
-        ...prev.exercises,
-        {
-          ...newExercise,
-          order: prev.exercises.length + 1,
-        },
-      ],
+      exercises: [...prev.exercises, newExercise],
     }));
   };
+
+  if (!workoutDetails) {
+    return (
+      <AppWrapper>
+        <View style={styles.container}>
+          <Text style={styles.loadingText}>Loading workout...</Text>
+        </View>
+      </AppWrapper>
+    );
+  }
 
   return (
     <>
@@ -65,12 +90,14 @@ export default function EditWorkoutScreen() {
         placeholder="discard your changes?"
         onConfirm={() => router.back()}
       />
+
       <FinishModal
         modalVisible={finishModalVisible}
         setModalVisible={setFinishModalVisible}
         onConfirm={handleSubmit}
-        placeholder={"editing this workout?"}
+        placeholder="editing this workout?"
       />
+
       <ExerciseModal
         modalVisible={modalVisible}
         setModalVisible={setModalVisible}
@@ -83,49 +110,91 @@ export default function EditWorkoutScreen() {
             <Pressable
               onPress={() => setDiscardModalVisible(true)}
               hitSlop={10}
-              style={styles.headerIconContainer}
+              style={styles.headerIconButton}
             >
-              <Feather name="arrow-left" color={"black"} size={24} />
+              <Feather name="arrow-left" color={theme.text} size={22 * scale} />
             </Pressable>
+
             <Pressable
-              style={styles.headerIconContainer}
+              style={styles.saveButton}
               onPress={() => setFinishModalVisible(true)}
               hitSlop={10}
             >
-              <Text style={[styles.headerText, { color: theme.buttonPrimary }]}>
-                Save
-              </Text>
-              <Feather name="check" color={theme.buttonPrimary} size={24} />
+              <Text style={styles.saveText}>Save</Text>
+              <Feather
+                name="check"
+                color={theme.buttonPrimary}
+                size={20 * scale}
+              />
             </Pressable>
           </View>
-          <WorkoutForm
-            setDraft={setFormData}
-            mode="workout"
-            draft={formData}
-            setModalVisible={setModalVisible}
-          />
+
+          <View style={styles.formContainer}>
+            <WorkoutForm
+              setDraft={setFormData}
+              mode="workout"
+              draft={formData}
+              setModalVisible={setModalVisible}
+            />
+          </View>
         </View>
       </AppWrapper>
     </>
   );
 }
+
 const makeStyles = (theme: Theme, scale: number) =>
   StyleSheet.create({
-    container: { padding: 16 * scale, backgroundColor: theme.background },
+    container: {
+      flex: 1,
+      paddingHorizontal: 16 * scale,
+      paddingTop: 12 * scale,
+      backgroundColor: theme.background,
+    },
+
     header: {
       flexDirection: "row",
       justifyContent: "space-between",
       alignItems: "center",
-      // marginTop: 40,
-      marginBottom: 30,
+      marginBottom: 16 * scale,
     },
-    headerText: {
-      fontSize: 20,
-      fontWeight: "600",
-      marginRight: 4,
+
+    headerIconButton: {
+      width: 40 * scale,
+      height: 40 * scale,
+      borderRadius: 12 * scale,
+      alignItems: "center",
+      justifyContent: "center",
+      backgroundColor: theme.card,
+      borderWidth: 1,
+      borderColor: theme.border,
     },
-    headerIconContainer: {
+
+    saveButton: {
       flexDirection: "row",
       alignItems: "center",
+      justifyContent: "center",
+      paddingVertical: 10 * scale,
+      paddingHorizontal: 14 * scale,
+      borderRadius: 12 * scale,
+      backgroundColor: theme.buttonPrimary + "15",
+      borderWidth: 1,
+      borderColor: theme.buttonPrimary + "30",
+    },
+
+    saveText: {
+      fontSize: 16 * scale,
+      fontWeight: "600",
+      marginRight: 6 * scale,
+      color: theme.buttonPrimary,
+    },
+
+    formContainer: {
+      flex: 1,
+    },
+
+    loadingText: {
+      fontSize: 16 * scale,
+      color: theme.textSecondary,
     },
   });

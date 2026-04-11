@@ -1,18 +1,28 @@
-import { StatusBar, StyleSheet, Text, View } from "react-native";
+import { StatusBar, StyleSheet } from "react-native";
 import React, { ReactNode } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { useAppTheme } from "@/hooks/useAppTheme";
 
 type Props = {
   children: ReactNode;
 };
 
 export default function AppWrapper({ children }: Props) {
+  const { theme } = useAppTheme();
+
   return (
-    <SafeAreaView>
-      <StatusBar barStyle={"dark-content"} />
+    <SafeAreaView
+      style={[styles.container, { backgroundColor: theme.background }]}
+      edges={["top", "left", "right"]}
+    >
+      <StatusBar barStyle={"dark-content"} backgroundColor={theme.background} />
       {children}
     </SafeAreaView>
   );
 }
 
-const styles = StyleSheet.create({});
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+  },
+});

@@ -15,25 +15,39 @@ export default function ExerciseItem({ exercise }: Props) {
   const styles = useMemo(() => makeStyles(theme, scale), [theme, scale]);
   const expoImageRef = useRef<Image>(null);
 
+  const bodyPart = capitalizeWords(exercise.bodyParts?.[0] ?? "Exercise");
+  const primaryMuscle = capitalizeWords(
+    exercise.primaryMuscles?.[0] ?? "Unknown muscle",
+  );
+  const secondaryMuscle = exercise.secondaryMuscles?.[0]
+    ? capitalizeWords(exercise.secondaryMuscles[0])
+    : "";
+
   return (
     <View style={styles.container}>
       <Image
         style={styles.gif}
         ref={expoImageRef}
         source={exercise.gifUrl}
+        contentFit="contain"
         onLoad={() => {
           expoImageRef.current?.stopAnimating();
         }}
       />
+
       <View style={styles.textContainer}>
-        <Text style={styles.name}>{capitalizeWords(exercise.name)}</Text>
-        <Text style={styles.primaryMuscle}>
-          {capitalizeWords(exercise.bodyParts[0])}
+        <Text style={styles.name} numberOfLines={1}>
+          {capitalizeWords(exercise.name)}
         </Text>
-        <Text style={styles.primaryMuscle}>
-          {capitalizeWords(exercise.primaryMuscles[0])}
-          {exercise.secondaryMuscles?.[0] && (
-            <Text> & {capitalizeWords(exercise.secondaryMuscles[0])}</Text>
+
+        <Text style={styles.bodyPart} numberOfLines={1}>
+          {bodyPart}
+        </Text>
+
+        <Text style={styles.muscles} numberOfLines={1}>
+          {primaryMuscle}
+          {!!secondaryMuscle && (
+            <Text style={styles.muscles}> & {secondaryMuscle}</Text>
           )}
         </Text>
       </View>
@@ -44,29 +58,49 @@ export default function ExerciseItem({ exercise }: Props) {
 export const makeStyles = (theme: Theme, scale: number) =>
   StyleSheet.create({
     container: {
-      padding: 10 * scale,
-      backgroundColor: theme.card,
-      borderRadius: 10 * scale,
-      marginVertical: 5 * scale,
       flexDirection: "row",
+      alignItems: "center",
+      padding: 12 * scale,
+      backgroundColor: theme.card,
+      borderRadius: 14 * scale,
+      marginBottom: 10 * scale,
+      borderWidth: 1,
+      borderColor: theme.border,
       shadowColor: theme.shadow,
-      shadowOffset: { width: 0, height: 6 },
-      shadowOpacity: 0.08,
-      shadowRadius: 12,
-      elevation: 6,
+      shadowOffset: { width: 0, height: 4 },
+      shadowOpacity: 0.06,
+      shadowRadius: 10,
+      elevation: 4,
     },
-    name: {
-      fontSize: 20 * scale,
-      fontWeight: "600",
-      marginBottom: 5 * scale,
-    },
-    primaryMuscle: {
-      fontSize: 14 * scale,
-    },
+
     gif: {
-      width: 65,
-      height: 65,
-      marginRight: 10,
+      width: 64 * scale,
+      height: 64 * scale,
+      marginRight: 12 * scale,
+      borderRadius: 10 * scale,
+      backgroundColor: theme.buttonSecondary,
     },
-    textContainer: {},
+
+    textContainer: {
+      flex: 1,
+      justifyContent: "center",
+    },
+
+    name: {
+      fontSize: 17 * scale,
+      fontWeight: "700",
+      color: theme.text,
+      marginBottom: 4 * scale,
+    },
+
+    bodyPart: {
+      fontSize: 14 * scale,
+      color: theme.textSecondary,
+      marginBottom: 2 * scale,
+    },
+
+    muscles: {
+      fontSize: 14 * scale,
+      color: theme.text,
+    },
   });

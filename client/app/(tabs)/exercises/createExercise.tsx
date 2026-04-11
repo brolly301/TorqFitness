@@ -27,20 +27,24 @@ export default function CreateExerciseScreen() {
       <View style={styles.container}>
         <View style={styles.header}>
           <Pressable
-            style={{ flexDirection: "row", paddingLeft: 16 }}
+            style={styles.backButton}
             onPress={() => router.back()}
             hitSlop={10}
           >
-            <Feather name="arrow-left" size={24} color={"black"} />
+            <Feather name="arrow-left" size={22 * scale} color={theme.text} />
           </Pressable>
         </View>
+
         <View style={styles.titleContainer}>
           <Text style={styles.title}>Create Exercise</Text>
           <Text style={styles.description}>
             Add the details for your new exercise below
           </Text>
         </View>
-        <ExerciseForm exercise={exercise} setExercise={setExercise} />
+
+        <View style={styles.formContainer}>
+          <ExerciseForm exercise={exercise} setExercise={setExercise} />
+        </View>
       </View>
     </AppWrapper>
   );
@@ -48,26 +52,50 @@ export default function CreateExerciseScreen() {
 
 const makeStyles = (theme: Theme, scale: number) =>
   StyleSheet.create({
-    container: { padding: 16 * scale, backgroundColor: theme.background },
+    container: {
+      flex: 1,
+      paddingHorizontal: 16 * scale,
+      paddingTop: 12 * scale,
+      backgroundColor: theme.background,
+    },
+
     header: {
       flexDirection: "row",
+      justifyContent: "flex-start",
       alignItems: "center",
-      // marginTop: 40,
-      marginBottom: 30,
+      marginBottom: 12 * scale,
+    },
+
+    backButton: {
+      width: 40 * scale,
+      height: 40 * scale,
+      borderRadius: 12 * scale,
+      alignItems: "center",
+      justifyContent: "center",
+      backgroundColor: theme.card,
+      borderWidth: 1,
+      borderColor: theme.border,
+    },
+
+    titleContainer: {
+      marginBottom: 18 * scale,
     },
 
     title: {
-      fontSize: 26 * scale,
-      fontWeight: "bold",
-      marginBottom: 5,
+      fontSize: 32 * scale,
+      fontWeight: "700",
+      marginBottom: 4 * scale,
       color: theme.text,
     },
+
     description: {
-      fontSize: 18 * scale,
+      fontSize: 16 * scale,
       fontWeight: "400",
-      color: theme.text,
+      color: theme.textSecondary,
+      lineHeight: 22 * scale,
     },
-    titleContainer: {
-      padding: 16,
+
+    formContainer: {
+      flex: 1,
     },
   });

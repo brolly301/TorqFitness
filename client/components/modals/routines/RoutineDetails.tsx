@@ -26,17 +26,18 @@ export default function RoutineDetails({ routine, setModalVisible }: Props) {
 
   const [deleteModalVisible, setDeleteModalVisible] = useState(false);
 
-  const exerciseList = routine.exercises.map((rtEx) => {
-    const details = exercises.find(
-      (exercise) => exercise.id === rtEx.exerciseId,
-    );
-    return { ...rtEx, details };
-  });
+  const exerciseList = useMemo(() => {
+    return routine.exercises.map((rtEx) => {
+      const details = exercises.find(
+        (exercise) => exercise.id === rtEx.exerciseId,
+      );
+      return { ...rtEx, details };
+    });
+  }, [routine.exercises, exercises]);
 
-  const totalSets = routine.exercises.reduce(
-    (total, ex) => total + ex.sets.length,
-    0,
-  );
+  const totalSets = useMemo(() => {
+    return routine.exercises.reduce((total, ex) => total + ex.sets.length, 0);
+  }, [routine.exercises]);
 
   const handleEditRoutine = () => {
     router.navigate({
@@ -67,7 +68,7 @@ export default function RoutineDetails({ routine, setModalVisible }: Props) {
             onPress={() => setModalVisible(false)}
             style={styles.iconButton}
           >
-            <AntDesign name="close" size={20} color={theme.text} />
+            <AntDesign name="close" size={20 * scale} color={theme.text} />
           </Pressable>
 
           <Text style={styles.name} numberOfLines={1}>
@@ -77,9 +78,13 @@ export default function RoutineDetails({ routine, setModalVisible }: Props) {
           <View style={styles.headerActions}>
             <Pressable
               style={[styles.secondaryAction, { marginRight: 8 * scale }]}
-              // onPress={handleEditRoutine}
+              onPress={() => setDeleteModalVisible(true)}
             >
-              <MaterialIcons name="more-horiz" size={18} color={theme.text} />
+              <MaterialIcons
+                name="delete-outline"
+                size={18 * scale}
+                color={theme.text}
+              />
             </Pressable>
 
             <Pressable style={styles.primaryAction} onPress={handleEditRoutine}>
@@ -119,13 +124,16 @@ export default function RoutineDetails({ routine, setModalVisible }: Props) {
                 ? `${primary} & ${secondary}`
                 : primary || secondary || "Exercise";
 
+            const setCount = item.sets.length;
+            const setLabel = setCount === 1 ? "set" : "sets";
+
             return (
               <View style={styles.routineCard}>
                 <View style={styles.routineDetails}>
                   <View style={styles.nameButtonContainer}>
                     <View style={styles.exerciseTextContainer}>
                       <Text style={styles.exerciseName} numberOfLines={1}>
-                        {capitalizeWords(item.details?.name ?? "")}
+                        {capitalizeWords(item.details?.name ?? "Exercise")}
                       </Text>
 
                       <Text style={styles.exerciseMuscle} numberOfLines={1}>
@@ -135,20 +143,23 @@ export default function RoutineDetails({ routine, setModalVisible }: Props) {
 
                     <Entypo
                       name="chevron-right"
-                      size={20}
+                      size={20 * scale}
                       color={theme.textSecondary}
                     />
                   </View>
                 </View>
 
                 <View style={styles.setCard}>
-                  <Text style={styles.setDetails}>{item.sets.length} sets</Text>
-                  <Text style={styles.setDetails}> • </Text>
-                  <Text style={styles.setDetails}>Last: 40 × 8</Text>
+                  <Text style={styles.setDetails}>
+                    {setCount} {setLabel}
+                  </Text>
+                  <Text style={styles.setDivider}>•</Text>
+                  <Text style={styles.setDetails}>Last 40 × 8</Text>
                 </View>
               </View>
             );
           }}
+          ListFooterComponent={<View style={styles.footerSpacer} />}
         />
 
         <Pressable
@@ -177,7 +188,7 @@ export const makeStyles = (theme: Theme, scale: number) =>
     header: {
       height: 44 * scale,
       justifyContent: "center",
-      marginBottom: 8 * scale,
+      marginBottom: 10 * scale,
       position: "relative",
     },
 
@@ -188,7 +199,7 @@ export const makeStyles = (theme: Theme, scale: number) =>
       height: 36 * scale,
       alignItems: "center",
       justifyContent: "center",
-      borderRadius: 10,
+      borderRadius: 10 * scale,
     },
 
     headerActions: {
@@ -205,11 +216,11 @@ export const makeStyles = (theme: Theme, scale: number) =>
       fontSize: 22 * scale,
       fontWeight: "700",
       textAlign: "center",
+      color: theme.text,
     },
 
     listContent: {
       paddingTop: 8 * scale,
-      paddingBottom: 12 * scale,
     },
 
     overviewContainer: {
@@ -229,7 +240,7 @@ export const makeStyles = (theme: Theme, scale: number) =>
 
     routineCard: {
       marginTop: 10 * scale,
-      borderRadius: 12,
+      borderRadius: 14 * scale,
       borderWidth: 1,
       borderColor: theme.border,
       backgroundColor: theme.card,
@@ -237,7 +248,8 @@ export const makeStyles = (theme: Theme, scale: number) =>
     },
 
     routineDetails: {
-      padding: 12 * scale,
+      paddingHorizontal: 14 * scale,
+      paddingVertical: 12 * scale,
     },
 
     nameButtonContainer: {
@@ -260,20 +272,26 @@ export const makeStyles = (theme: Theme, scale: number) =>
 
     exerciseMuscle: {
       fontSize: 14 * scale,
-      fontWeight: "400",
       color: theme.textSecondary,
     },
 
     setCard: {
-      paddingHorizontal: 12 * scale,
-      paddingVertical: 10 * scale,
       flexDirection: "row",
-      backgroundColor: theme.border,
+      alignItems: "center",
+      paddingHorizontal: 14 * scale,
+      paddingVertical: 10 * scale,
+      backgroundColor: theme.buttonSecondary,
     },
 
     setDetails: {
       fontSize: 14 * scale,
       color: theme.textSecondary,
+    },
+
+    setDivider: {
+      fontSize: 14 * scale,
+      color: theme.textSecondary,
+      marginHorizontal: 6 * scale,
     },
 
     secondaryAction: {
@@ -282,7 +300,7 @@ export const makeStyles = (theme: Theme, scale: number) =>
       justifyContent: "center",
       alignItems: "center",
       backgroundColor: theme.border,
-      borderRadius: 10,
+      borderRadius: 10 * scale,
     },
 
     primaryAction: {
@@ -291,7 +309,7 @@ export const makeStyles = (theme: Theme, scale: number) =>
       justifyContent: "center",
       alignItems: "center",
       backgroundColor: theme.buttonPrimary,
-      borderRadius: 10,
+      borderRadius: 10 * scale,
     },
 
     editText: {
@@ -300,13 +318,17 @@ export const makeStyles = (theme: Theme, scale: number) =>
       color: theme.buttonPrimaryText,
     },
 
+    footerSpacer: {
+      height: 8 * scale,
+    },
+
     startButton: {
       justifyContent: "center",
       alignItems: "center",
-      borderRadius: 12,
+      borderRadius: 12 * scale,
       backgroundColor: theme.buttonPrimary,
       paddingVertical: 12 * scale,
-      marginTop: 10 * scale,
+      marginTop: 12 * scale,
     },
 
     startText: {
