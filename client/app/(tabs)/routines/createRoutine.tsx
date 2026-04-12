@@ -1,4 +1,11 @@
-import { Pressable, StyleSheet, Text, View } from "react-native";
+import {
+  KeyboardAvoidingView,
+  Platform,
+  Pressable,
+  StyleSheet,
+  Text,
+  View,
+} from "react-native";
 import React, { useCallback, useMemo, useState } from "react";
 import { router } from "expo-router";
 import { useRoutineContext } from "@/context/RoutineContext";
@@ -73,7 +80,11 @@ export default function CreateRoutineScreen() {
       />
 
       <AppWrapper>
-        <View style={styles.container}>
+        <KeyboardAvoidingView
+          style={styles.container}
+          behavior={Platform.OS === "ios" ? "padding" : undefined}
+          keyboardVerticalOffset={0}
+        >
           <View style={styles.header}>
             <Pressable
               onPress={() => setDiscardModalVisible(true)}
@@ -105,7 +116,7 @@ export default function CreateRoutineScreen() {
               setModalVisible={setModalVisible}
             />
           </View>
-        </View>
+        </KeyboardAvoidingView>
       </AppWrapper>
     </>
   );

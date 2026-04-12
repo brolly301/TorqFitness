@@ -60,6 +60,7 @@ export default function ExerciseEditForm({ exercise, setModalVisible }: Props) {
 
         <TextInput
           placeholder="Name"
+          returnKeyType="done"
           placeholderTextColor="black"
           style={styles.input}
           textAlignVertical="center"

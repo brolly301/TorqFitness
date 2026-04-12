@@ -1,4 +1,4 @@
-import { Pressable, StyleSheet, Text, View } from "react-native";
+import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import React, { useMemo, useState } from "react";
 import * as crypto from "expo-crypto";
 import { Exercise } from "@/types/Global";
@@ -24,7 +24,7 @@ export default function CreateExerciseScreen() {
 
   return (
     <AppWrapper>
-      <View style={styles.container}>
+      <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
         <View style={styles.header}>
           <Pressable
             style={styles.backButton}
@@ -45,7 +45,7 @@ export default function CreateExerciseScreen() {
         <View style={styles.formContainer}>
           <ExerciseForm exercise={exercise} setExercise={setExercise} />
         </View>
-      </View>
+      </ScrollView>
     </AppWrapper>
   );
 }

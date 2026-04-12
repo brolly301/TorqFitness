@@ -1,4 +1,11 @@
-import { Pressable, StyleSheet, Text, View } from "react-native";
+import {
+  KeyboardAvoidingView,
+  Platform,
+  Pressable,
+  StyleSheet,
+  Text,
+  View,
+} from "react-native";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import WorkoutForm from "@/components/workout/WorkoutForm";
 import { useWorkoutContext } from "@/context/WorkoutContext";
@@ -125,7 +132,11 @@ export default function StartWorkoutScreen() {
       />
 
       <AppWrapper>
-        <View style={styles.container}>
+        <KeyboardAvoidingView
+          style={styles.container}
+          behavior={Platform.OS === "ios" ? "padding" : undefined}
+          keyboardVerticalOffset={0}
+        >
           <View style={styles.header}>
             <Pressable
               onPress={() => setDiscardModalVisible(true)}
@@ -158,7 +169,7 @@ export default function StartWorkoutScreen() {
               showTimer
             />
           </View>
-        </View>
+        </KeyboardAvoidingView>
       </AppWrapper>
     </>
   );

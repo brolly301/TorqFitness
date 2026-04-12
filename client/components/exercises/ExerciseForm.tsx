@@ -42,6 +42,7 @@ export default function ExerciseForm({ exercise, setExercise }: Props) {
       <Text style={styles.label}>Exercise Name</Text>
       <TextInput
         placeholder="Name"
+        returnKeyType="done"
         placeholderTextColor={theme.textSecondary}
         onFocus={() => setIsNameFocused(true)}
         onBlur={() => setIsNameFocused(false)}

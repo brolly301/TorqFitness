@@ -1,4 +1,4 @@
-import React, { useMemo } from "react";
+import React, { useMemo, useRef } from "react";
 import {
   Pressable,
   ScrollView,
@@ -65,153 +65,175 @@ export default function WorkoutForm<T extends WorkoutDraft>({
     return total + exercise.sets.length;
   }, 0);
 
+  const weightRefs = useRef<Record<string, TextInput | null>>({});
+  const repRefs = useRef<Record<string, TextInput | null>>({});
+
   return (
-    <ScrollView
-      style={styles.container}
-      contentContainerStyle={styles.contentContainer}
-      showsVerticalScrollIndicator={false}
-      keyboardShouldPersistTaps="handled"
-    >
-      <View style={styles.headerRow}>
-        <View style={styles.headerTextContainer}>
-          <TextInput
-            placeholderTextColor={theme.textSecondary}
-            value={draft.name}
-            onChangeText={(text) => updateForm("name", text)}
-            style={styles.nameInput}
-          />
+    <>
+      <ScrollView
+        style={styles.container}
+        contentContainerStyle={styles.contentContainer}
+        showsVerticalScrollIndicator={false}
+        keyboardShouldPersistTaps="handled"
+      >
+        <View style={styles.headerRow}>
+          <View style={styles.headerTextContainer}>
+            <TextInput
+              placeholderTextColor={theme.textSecondary}
+              returnKeyType="done"
+              value={draft.name}
+              onChangeText={(text) => updateForm("name", text)}
+              style={styles.nameInput}
+            />
 
-          <View style={styles.metaContainer}>
-            <Text style={styles.metaText}>Volume {totalVolume} kg</Text>
-            <Text style={styles.metaText}> • </Text>
-            <Text style={styles.metaText}>{totalSets} sets</Text>
+            <View style={styles.metaContainer}>
+              <Text style={styles.metaText}>Volume {totalVolume} kg</Text>
+              <Text style={styles.metaText}> • </Text>
+              <Text style={styles.metaText}>{totalSets} sets</Text>
+            </View>
           </View>
+          {showTimer ? <Timer /> : null}
         </View>
-        {showTimer ? <Timer /> : null}
-      </View>
 
-      <View style={styles.hr} />
+        <View style={styles.hr} />
 
-      <TextInput
-        placeholder={`Enter ${mode === "workout" ? "workout" : "routine"} notes`}
-        placeholderTextColor={theme.textSecondary}
-        value={draft.notes ?? ""}
-        onChangeText={(text) => updateForm("notes", text)}
-        style={styles.notesInput}
-      />
+        <TextInput
+          placeholder={`Enter ${mode === "workout" ? "workout" : "routine"} notes`}
+          returnKeyType="done"
+          placeholderTextColor={theme.textSecondary}
+          value={draft.notes ?? ""}
+          onChangeText={(text) => updateForm("notes", text)}
+          style={styles.notesInput}
+        />
 
-      {exerciseList.map((exercise) => {
-        const primaryMuscle = capitalizeWords(
-          exercise.details?.primaryMuscles?.[0] ?? "",
-        );
-        const secondaryMuscle = capitalizeWords(
-          exercise.details?.secondaryMuscles?.[0] ?? "",
-        );
-        const muscleLabel = secondaryMuscle
-          ? `${primaryMuscle} & ${secondaryMuscle}`
-          : primaryMuscle;
+        {exerciseList.map((exercise) => {
+          const primaryMuscle = capitalizeWords(
+            exercise.details?.primaryMuscles?.[0] ?? "",
+          );
+          const secondaryMuscle = capitalizeWords(
+            exercise.details?.secondaryMuscles?.[0] ?? "",
+          );
+          const muscleLabel = secondaryMuscle
+            ? `${primaryMuscle} & ${secondaryMuscle}`
+            : primaryMuscle;
 
-        return (
-          <View key={exercise.id} style={styles.workoutContainer}>
-            <View style={styles.nameButtonContainer}>
-              <View style={styles.exerciseHeading}>
-                <Text style={styles.exerciseName}>
-                  {capitalizeWords(exercise.details?.name ?? "")}
-                </Text>
+          return (
+            <View key={exercise.id} style={styles.workoutContainer}>
+              <View style={styles.nameButtonContainer}>
+                <View style={styles.exerciseHeading}>
+                  <Text style={styles.exerciseName}>
+                    {capitalizeWords(exercise.details?.name ?? "")}
+                  </Text>
 
-                {!!muscleLabel && (
-                  <Text style={styles.muscleName}>{muscleLabel}</Text>
-                )}
+                  {!!muscleLabel && (
+                    <Text style={styles.muscleName}>{muscleLabel}</Text>
+                  )}
+                </View>
+
+                <Pressable
+                  onPress={() => removeExercise(setDraft, exercise.id)}
+                  hitSlop={8}
+                >
+                  <EvilIcons
+                    name="trash"
+                    size={30 * scale}
+                    color={theme.error ?? "red"}
+                  />
+                </Pressable>
               </View>
 
+              {exercise.sets.map((set, index) => {
+                const previousText = "40 × 8";
+                const totalSetVol = set.weight ? set.reps * set.weight : 0;
+
+                return (
+                  <View key={set.id} style={styles.exerciseContainer}>
+                    <View style={styles.setTopRow}>
+                      <View style={styles.setHeader}>
+                        <Text style={styles.setLabel}>Set {index + 1}</Text>
+                        <Text style={styles.setDivider}>|</Text>
+                        <Text style={styles.previousText}>{previousText}</Text>
+                        <Text style={styles.previousLabel}> (last)</Text>
+                      </View>
+                      <Text style={styles.previousLabel}>{totalSetVol} kg</Text>
+                    </View>
+
+                    <View style={styles.inputsRow}>
+                      <Pressable
+                        style={styles.valueLabelContainer}
+                        onPress={() => weightRefs.current[set.id]?.focus()}
+                      >
+                        <TextInput
+                          ref={(ref) => {
+                            weightRefs.current[set.id] = ref;
+                          }}
+                          value={set.weight ? String(set.weight) : ""}
+                          placeholder="0"
+                          returnKeyType="done"
+                          placeholderTextColor={theme.textSecondary}
+                          keyboardType="numeric"
+                          onChangeText={(text) =>
+                            updateSet(
+                              setDraft,
+                              exercise.id,
+                              set.id,
+                              "weight",
+                              text === "" ? 0 : parseInt(text, 10) || 0,
+                            )
+                          }
+                          style={styles.valueInput}
+                        />
+                        <Text style={styles.labelText}>kg</Text>
+                      </Pressable>
+
+                      <Text style={styles.x}>×</Text>
+
+                      <Pressable
+                        style={styles.valueLabelContainer}
+                        onPress={() => repRefs.current[set.id]?.focus()}
+                      >
+                        <TextInput
+                          ref={(ref) => {
+                            repRefs.current[set.id] = ref;
+                          }}
+                          value={set.reps ? String(set.reps) : ""}
+                          returnKeyType="done"
+                          placeholder="0"
+                          placeholderTextColor={theme.textSecondary}
+                          keyboardType="numeric"
+                          onChangeText={(text) =>
+                            updateSet(
+                              setDraft,
+                              exercise.id,
+                              set.id,
+                              "reps",
+                              text === "" ? 0 : parseInt(text, 10) || 0,
+                            )
+                          }
+                          style={styles.valueInput}
+                        />
+                        <Text style={styles.labelText}>reps</Text>
+                      </Pressable>
+                    </View>
+                  </View>
+                );
+              })}
+
               <Pressable
-                onPress={() => removeExercise(setDraft, exercise.id)}
-                hitSlop={8}
+                style={styles.secondaryButton}
+                onPress={() => addSet(setDraft, exercise.id)}
               >
-                <EvilIcons
-                  name="trash"
-                  size={30 * scale}
-                  color={theme.error ?? "red"}
-                />
+                <Text style={styles.secondaryButtonText}>+ Add Set</Text>
               </Pressable>
             </View>
+          );
+        })}
 
-            {exercise.sets.map((set, index) => {
-              const previousText = "40 × 8";
-
-              return (
-                <View key={set.id} style={styles.exerciseContainer}>
-                  <View style={styles.setTopRow}>
-                    <View style={styles.setHeader}>
-                      <Text style={styles.setLabel}>Set {index + 1}</Text>
-                      <Text style={styles.setDivider}>|</Text>
-                      <Text style={styles.previousText}>{previousText}</Text>
-                      <Text style={styles.previousLabel}> (last)</Text>
-                    </View>
-                    <Text style={styles.previousLabel}>{totalVolume} kg</Text>
-                  </View>
-
-                  <View style={styles.inputsRow}>
-                    <View style={styles.valueLabelContainer}>
-                      <TextInput
-                        value={set.weight ? String(set.weight) : ""}
-                        placeholder="0"
-                        placeholderTextColor={theme.textSecondary}
-                        keyboardType="numeric"
-                        onChangeText={(text) =>
-                          updateSet(
-                            setDraft,
-                            exercise.id,
-                            set.id,
-                            "weight",
-                            text === "" ? 0 : parseInt(text, 10) || 0,
-                          )
-                        }
-                        style={styles.valueInput}
-                      />
-                      <Text style={styles.labelText}>kg</Text>
-                    </View>
-
-                    <Text style={styles.x}>×</Text>
-
-                    <View style={styles.valueLabelContainer}>
-                      <TextInput
-                        value={set.reps ? String(set.reps) : ""}
-                        placeholder="0"
-                        placeholderTextColor={theme.textSecondary}
-                        keyboardType="numeric"
-                        onChangeText={(text) =>
-                          updateSet(
-                            setDraft,
-                            exercise.id,
-                            set.id,
-                            "reps",
-                            text === "" ? 0 : parseInt(text, 10) || 0,
-                          )
-                        }
-                        style={styles.valueInput}
-                      />
-                      <Text style={styles.labelText}>reps</Text>
-                    </View>
-                  </View>
-                </View>
-              );
-            })}
-
-            <Pressable
-              style={styles.secondaryButton}
-              onPress={() => addSet(setDraft, exercise.id)}
-            >
-              <Text style={styles.secondaryButtonText}>+ Add Set</Text>
-            </Pressable>
-          </View>
-        );
-      })}
-
-      <Pressable style={styles.button} onPress={() => setModalVisible(true)}>
-        <Text style={styles.buttonText}>Add Exercise</Text>
-      </Pressable>
-    </ScrollView>
+        <Pressable style={styles.button} onPress={() => setModalVisible(true)}>
+          <Text style={styles.buttonText}>Add Exercise</Text>
+        </Pressable>
+      </ScrollView>
+    </>
   );
 }
 
