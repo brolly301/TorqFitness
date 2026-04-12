@@ -37,7 +37,16 @@ export default function RoutineScreen() {
         </View>
 
         <View style={styles.listContainer}>
-          <RoutineList routines={routines} />
+          {routines.length > 0 ? (
+            <RoutineList routines={routines} />
+          ) : (
+            <View style={styles.placeholderContainer}>
+              <Text style={styles.placeholderTitle}>No routines yet</Text>
+              <Text style={styles.placeholderText}>
+                Add a new routine to see it here
+              </Text>
+            </View>
+          )}
         </View>
       </View>
     </AppWrapper>
@@ -90,5 +99,30 @@ const makeStyles = (theme: Theme, scale: number) =>
 
     listContainer: {
       flex: 1,
+    },
+
+    placeholderContainer: {
+      marginTop: 8 * scale,
+      backgroundColor: theme.card,
+      borderRadius: 16 * scale,
+      borderWidth: 1,
+      borderColor: theme.border,
+      paddingVertical: 24 * scale,
+      paddingHorizontal: 18 * scale,
+      alignItems: "center",
+    },
+
+    placeholderTitle: {
+      fontSize: 16 * scale,
+      fontWeight: "700",
+      color: theme.text,
+      marginBottom: 6 * scale,
+    },
+
+    placeholderText: {
+      fontSize: 14 * scale,
+      color: theme.textSecondary,
+      lineHeight: 20 * scale,
+      textAlign: "center",
     },
   });

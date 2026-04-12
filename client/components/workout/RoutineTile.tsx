@@ -1,10 +1,11 @@
 import { Pressable, StyleSheet, Text, View } from "react-native";
-import React, { useMemo } from "react";
+import React, { useMemo, useState } from "react";
 import Feather from "@expo/vector-icons/Feather";
 import { Routine } from "@/types/Global";
 import { router } from "expo-router";
 import { useAppTheme } from "@/hooks/useAppTheme";
 import { Theme } from "@/types/Theme";
+import RoutineDetailsModal from "../modals/routines/RoutineDetailsModal";
 
 type Props = {
   routine: Routine;
@@ -14,46 +15,49 @@ export default function RoutineTile({ routine }: Props) {
   const { theme, scale } = useAppTheme();
   const styles = useMemo(() => makeStyles(theme, scale), [theme, scale]);
 
-  const loadRoutine = () => {
-    router.navigate({
-      pathname: "/workout/createWorkout",
-      params: { routineId: routine.id },
-    });
-  };
+  const [modalVisible, setModalVisible] = useState<boolean>(false);
 
   const exerciseCount = routine.exercises.length;
   const exerciseLabel = exerciseCount === 1 ? "exercise" : "exercises";
 
   return (
-    <Pressable style={styles.container} onPress={loadRoutine}>
-      <View style={styles.leftContent}>
-        <Text style={styles.name} numberOfLines={1}>
-          {routine.name}
-        </Text>
+    <>
+      <RoutineDetailsModal
+        modalVisible={modalVisible}
+        setModalVisible={setModalVisible}
+        routine={routine}
+      />
 
-        <Text style={styles.subText} numberOfLines={1}>
-          Last used • Monday, 10:39
-        </Text>
-      </View>
+      <Pressable style={styles.container} onPress={() => setModalVisible(true)}>
+        <View style={styles.leftContent}>
+          <Text style={styles.name} numberOfLines={1}>
+            {routine.name}
+          </Text>
 
-      <View style={styles.rightContent}>
-        <Text style={styles.meta} numberOfLines={1}>
-          {exerciseCount} {exerciseLabel}
-        </Text>
-
-        <View style={styles.tagPill}>
-          <Text style={styles.tagText}>Chest • Triceps</Text>
+          <Text style={styles.subText} numberOfLines={1}>
+            Last used • Monday, 10:39
+          </Text>
         </View>
-      </View>
 
-      <View style={styles.iconContainer}>
-        <Feather
-          name="arrow-right"
-          size={18 * scale}
-          color={theme.textSecondary}
-        />
-      </View>
-    </Pressable>
+        <View style={styles.rightContent}>
+          <Text style={styles.meta} numberOfLines={1}>
+            {exerciseCount} {exerciseLabel}
+          </Text>
+
+          <View style={styles.tagPill}>
+            <Text style={styles.tagText}>Chest • Triceps</Text>
+          </View>
+        </View>
+
+        <View style={styles.iconContainer}>
+          <Feather
+            name="arrow-right"
+            size={18 * scale}
+            color={theme.textSecondary}
+          />
+        </View>
+      </Pressable>
+    </>
   );
 }
 

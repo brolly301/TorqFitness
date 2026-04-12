@@ -82,11 +82,18 @@ export default function HistoryScreen() {
         </View>
 
         <View style={styles.contentContainer}>
-          {activeTab === "activity" ? (
-            <ActivityList workouts={workouts} />
-          ) : (
-            <RecordsList />
+          {activeTab === "activity" && workouts.length === 0 && (
+            <View style={styles.placeholderContainer}>
+              <Text style={styles.placeholderTitle}>No workouts yet</Text>
+              <Text style={styles.placeholderText}>
+                Start your first workout to see it here
+              </Text>
+            </View>
           )}
+          {activeTab === "activity" && workouts.length > 0 && (
+            <ActivityList workouts={workouts} />
+          )}
+          {activeTab === "records" && <RecordsList />}
         </View>
       </View>
     </AppWrapper>
@@ -177,5 +184,30 @@ const makeStyles = (theme: Theme, scale: number) =>
 
     contentContainer: {
       flex: 1,
+    },
+
+    placeholderContainer: {
+      marginTop: 8 * scale,
+      backgroundColor: theme.card,
+      borderRadius: 16 * scale,
+      borderWidth: 1,
+      borderColor: theme.border,
+      paddingVertical: 24 * scale,
+      paddingHorizontal: 18 * scale,
+      alignItems: "center",
+    },
+
+    placeholderTitle: {
+      fontSize: 16 * scale,
+      fontWeight: "700",
+      color: theme.text,
+      marginBottom: 6 * scale,
+    },
+
+    placeholderText: {
+      fontSize: 14 * scale,
+      color: theme.textSecondary,
+      lineHeight: 20 * scale,
+      textAlign: "center",
     },
   });
