@@ -1,5 +1,5 @@
 import { StyleSheet, Text, View } from "react-native";
-import React, { useMemo, useRef } from "react";
+import React, { useMemo } from "react";
 import { Exercise } from "@/types/Global";
 import { Image } from "expo-image";
 import { capitalizeWords } from "@/utils/helpers";
@@ -13,7 +13,6 @@ type Props = {
 export default function ExerciseItem({ exercise }: Props) {
   const { theme, scale } = useAppTheme();
   const styles = useMemo(() => makeStyles(theme, scale), [theme, scale]);
-  const expoImageRef = useRef<Image>(null);
 
   const bodyPart = capitalizeWords(exercise.bodyParts?.[0] ?? "Exercise");
   const primaryMuscle = capitalizeWords(
@@ -23,17 +22,25 @@ export default function ExerciseItem({ exercise }: Props) {
     ? capitalizeWords(exercise.secondaryMuscles[0])
     : "";
 
+  const muscleText = secondaryMuscle
+    ? `${primaryMuscle} & ${secondaryMuscle}`
+    : primaryMuscle;
+
+  const exerciseInitial = exercise.name?.charAt(0).toUpperCase() ?? "?";
+
   return (
     <View style={styles.container}>
-      <Image
-        style={styles.gif}
-        ref={expoImageRef}
-        source={exercise.gifUrl}
-        contentFit="contain"
-        onLoad={() => {
-          expoImageRef.current?.stopAnimating();
-        }}
-      />
+      {exercise.gifUrl ? (
+        <Image
+          style={styles.gif}
+          source={exercise.gifUrl}
+          contentFit="contain"
+        />
+      ) : (
+        <View style={styles.placeholder}>
+          <Text style={styles.placeholderText}>{exerciseInitial}</Text>
+        </View>
+      )}
 
       <View style={styles.textContainer}>
         <Text style={styles.name} numberOfLines={1}>
@@ -45,10 +52,7 @@ export default function ExerciseItem({ exercise }: Props) {
         </Text>
 
         <Text style={styles.muscles} numberOfLines={1}>
-          {primaryMuscle}
-          {!!secondaryMuscle && (
-            <Text style={styles.muscles}> & {secondaryMuscle}</Text>
-          )}
+          {muscleText}
         </Text>
       </View>
     </View>
@@ -67,10 +71,10 @@ export const makeStyles = (theme: Theme, scale: number) =>
       borderWidth: 1,
       borderColor: theme.border,
       shadowColor: theme.shadow,
-      shadowOffset: { width: 0, height: 4 },
-      shadowOpacity: 0.06,
-      shadowRadius: 10,
-      elevation: 4,
+      shadowOffset: { width: 0, height: 3 },
+      shadowOpacity: 0.05,
+      shadowRadius: 8,
+      elevation: 3,
     },
 
     gif: {
@@ -79,6 +83,22 @@ export const makeStyles = (theme: Theme, scale: number) =>
       marginRight: 12 * scale,
       borderRadius: 10 * scale,
       backgroundColor: theme.buttonSecondary,
+    },
+
+    placeholder: {
+      width: 64 * scale,
+      height: 64 * scale,
+      borderRadius: 12 * scale,
+      backgroundColor: theme.buttonPrimary + "15",
+      justifyContent: "center",
+      alignItems: "center",
+      marginRight: 12 * scale,
+    },
+
+    placeholderText: {
+      fontSize: 28 * scale,
+      fontWeight: "700",
+      color: theme.buttonPrimary,
     },
 
     textContainer: {

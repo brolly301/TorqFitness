@@ -1,6 +1,6 @@
 import { Modal, Pressable, StyleSheet, Text, View } from "react-native";
-import React, { useMemo, useState } from "react";
-import EvilIcons from "@expo/vector-icons/EvilIcons";
+import React, { useEffect, useMemo, useState } from "react";
+import AntDesign from "@expo/vector-icons/AntDesign";
 import { Exercise, ModalProps } from "@/types/Global";
 import DetailsTab from "./DetailsTab";
 import ChartsTab from "./ChartsTab";
@@ -17,7 +17,7 @@ type Props = ModalProps & {
   showAddButton: boolean;
 };
 
-type TabName = "Details" | "Records" | "History" | "Charts";
+type TabName = "Details" | "History" | "Records" | "Charts";
 
 export default function ExerciseDetailsModal({
   modalVisible,
@@ -28,10 +28,17 @@ export default function ExerciseDetailsModal({
 }: Props) {
   const { theme, scale } = useAppTheme();
   const styles = useMemo(() => makeStyles(theme, scale), [theme, scale]);
-  const [tab, setTab] = useState<TabName>("Details");
-  const tabName: TabName[] = ["Details", "History", "Records", "Charts"];
 
-  const [editModalVisible, setEditModalVisible] = useState<boolean>(false);
+  const [tab, setTab] = useState<TabName>("Details");
+  const [editModalVisible, setEditModalVisible] = useState(false);
+
+  const tabNames: TabName[] = ["Details", "History", "Records", "Charts"];
+
+  useEffect(() => {
+    if (modalVisible) {
+      setTab("Details");
+    }
+  }, [modalVisible, exercise?.id]);
 
   const renderTab = () => {
     switch (tab) {
@@ -49,12 +56,19 @@ export default function ExerciseDetailsModal({
   };
 
   const handleSubmit = () => {
-    if (!exercise) return;
+    if (!exercise || !handleAddExercise) return;
 
-    if (handleAddExercise) {
-      handleAddExercise(exercise.id);
-    }
+    handleAddExercise(exercise.id);
     setModalVisible(false);
+  };
+
+  const handleClose = () => {
+    setModalVisible(false);
+  };
+
+  const handleEdit = () => {
+    setModalVisible(false);
+    setEditModalVisible(true);
   };
 
   return (
@@ -64,54 +78,83 @@ export default function ExerciseDetailsModal({
         setModalVisible={setEditModalVisible}
         exercise={exercise}
       />
-      <Modal visible={modalVisible} transparent animationType="fade">
-        <View style={styles.centeredView}>
-          <Pressable
-            onPress={() => setModalVisible(!modalVisible)}
-            style={StyleSheet.absoluteFill}
-          />
+
+      <Modal
+        visible={modalVisible}
+        transparent
+        animationType="fade"
+        onRequestClose={handleClose}
+      >
+        <View style={styles.overlay}>
+          <Pressable onPress={handleClose} style={StyleSheet.absoluteFill} />
+
           <View style={styles.modalView}>
-            <View style={styles.iconContainer}>
-              <EvilIcons
-                name="close"
-                size={22}
-                color={"black"}
-                onPress={() => setModalVisible(!modalVisible)}
-              />
-              {showAddButton && (
-                <Pressable style={styles.addButton} onPress={handleSubmit}>
-                  <Text style={styles.addButtonText}>Add</Text>
-                </Pressable>
-              )}
-              {exercise?.userCreated && (
-                <Pressable
-                  style={styles.addButton}
-                  onPress={() => {
-                    setModalVisible(false);
-                    setEditModalVisible(true);
-                  }}
-                >
-                  <Text style={styles.addButtonText}>Edit</Text>
-                </Pressable>
-              )}
+            <View style={styles.header}>
+              <Pressable
+                style={styles.iconButton}
+                onPress={handleClose}
+                hitSlop={8}
+              >
+                <AntDesign name="close" size={18 * scale} color={theme.text} />
+              </Pressable>
+
+              <View style={styles.headerActions}>
+                {showAddButton && (
+                  <Pressable
+                    style={styles.primaryButton}
+                    onPress={handleSubmit}
+                  >
+                    <Text style={styles.primaryButtonText}>Add</Text>
+                  </Pressable>
+                )}
+
+                {exercise?.userCreated && (
+                  <Pressable
+                    style={[
+                      styles.secondaryButton,
+                      showAddButton && styles.secondaryButtonWithGap,
+                    ]}
+                    onPress={handleEdit}
+                  >
+                    <Text style={styles.secondaryButtonText}>Edit</Text>
+                  </Pressable>
+                )}
+              </View>
             </View>
-            <Text style={styles.exercise}>
-              {exercise?.name ? capitalizeWords(exercise?.name) : ""}
+
+            <Text style={styles.exerciseTitle} numberOfLines={2}>
+              {exercise?.name ? capitalizeWords(exercise.name) : ""}
             </Text>
+
             <View style={styles.tabRowContainer}>
-              {tabName.map((tab) => {
+              {tabNames.map((tabName) => {
+                const isActive = tab === tabName;
+
                 return (
                   <Pressable
-                    key={tab}
-                    style={styles.tab}
-                    onPress={() => setTab(tab)}
+                    key={tabName}
+                    style={[
+                      styles.tab,
+                      isActive ? styles.activeTab : styles.inactiveTab,
+                    ]}
+                    onPress={() => setTab(tabName)}
                   >
-                    <Text style={styles.tabLabel}>{tab}</Text>
+                    <Text
+                      style={[
+                        styles.tabLabel,
+                        isActive
+                          ? styles.activeTabLabel
+                          : styles.inactiveTabLabel,
+                      ]}
+                    >
+                      {tabName}
+                    </Text>
                   </Pressable>
                 );
               })}
             </View>
-            <>{renderTab()}</>
+
+            <View style={styles.contentContainer}>{renderTab()}</View>
           </View>
         </View>
       </Modal>
@@ -121,61 +164,130 @@ export default function ExerciseDetailsModal({
 
 export const makeStyles = (theme: Theme, scale: number) =>
   StyleSheet.create({
-    centeredView: {
+    overlay: {
+      flex: 1,
       justifyContent: "center",
       alignItems: "center",
-      flex: 1,
-      backgroundColor: "rgba(0,0,0,0.6)",
+      backgroundColor: "rgba(0,0,0,0.55)",
+      paddingHorizontal: 16 * scale,
     },
+
     modalView: {
-      width: "89%",
-      height: "60%",
-      borderRadius: 12,
-      backgroundColor: "white",
-      paddingTop: 15,
-      paddingHorizontal: 15,
-      paddingBottom: 26,
+      width: "100%",
+      maxWidth: 420,
+      height: "72%",
+      borderRadius: 20 * scale,
+      backgroundColor: theme.background,
+      paddingTop: 16 * scale,
+      paddingHorizontal: 16 * scale,
+      paddingBottom: 16 * scale,
+      borderWidth: 1,
+      borderColor: theme.border,
     },
-    closeButton: {
-      alignSelf: "flex-end",
-    },
-    exercise: {
-      fontSize: 20 * scale,
-      fontWeight: "600",
-      textAlign: "center",
-      marginBottom: 15 * scale,
-    },
-    tabRowContainer: {
+
+    header: {
       flexDirection: "row",
       justifyContent: "space-between",
       alignItems: "center",
+      marginBottom: 14 * scale,
     },
-    tab: {
-      paddingVertical: 8 * scale,
-      paddingHorizontal: 16 * scale,
-      borderRadius: 6,
-      backgroundColor: theme.focus,
-      marginHorizontal: 4 * scale,
-    },
-    tabLabel: {
-      color: theme.textPrimary,
 
+    iconButton: {
+      width: 36 * scale,
+      height: 36 * scale,
+      borderRadius: 10 * scale,
+      alignItems: "center",
+      justifyContent: "center",
+      backgroundColor: theme.card,
+      borderWidth: 1,
+      borderColor: theme.border,
+    },
+
+    headerActions: {
+      flexDirection: "row",
+      alignItems: "center",
+    },
+
+    primaryButton: {
+      paddingVertical: 9 * scale,
+      paddingHorizontal: 14 * scale,
+      borderRadius: 10 * scale,
+      backgroundColor: theme.buttonPrimary,
+    },
+
+    primaryButtonText: {
+      color: theme.buttonPrimaryText,
+      fontSize: 14 * scale,
       fontWeight: "700",
     },
-    iconContainer: {
+
+    secondaryButton: {
+      paddingVertical: 9 * scale,
+      paddingHorizontal: 14 * scale,
+      borderRadius: 10 * scale,
+      backgroundColor: theme.buttonPrimary + "15",
+      borderWidth: 1,
+      borderColor: theme.buttonPrimary + "30",
+    },
+
+    secondaryButtonWithGap: {
+      marginLeft: 8 * scale,
+    },
+
+    secondaryButtonText: {
+      color: theme.buttonPrimary,
+      fontSize: 14 * scale,
+      fontWeight: "700",
+    },
+
+    exerciseTitle: {
+      fontSize: 22 * scale,
+      fontWeight: "700",
+      textAlign: "center",
+      color: theme.text,
+      marginBottom: 14 * scale,
+    },
+
+    tabRowContainer: {
       flexDirection: "row",
-      justifyContent: "space-between",
       alignItems: "center",
-      marginBottom: 15 * scale,
+      marginBottom: 14 * scale,
+      gap: 8 * scale,
     },
-    addButton: {
-      paddingVertical: 8 * scale,
-      paddingHorizontal: 16 * scale,
-      borderRadius: 6,
-      backgroundColor: theme.focus,
-      marginHorizontal: 4 * scale,
+
+    tab: {
+      flex: 1,
+      paddingVertical: 10 * scale,
+      borderRadius: 12 * scale,
+      alignItems: "center",
+      justifyContent: "center",
+      borderWidth: 1,
     },
-    addButtonText: {
-      color: theme.textPrimary,
+
+    activeTab: {
+      backgroundColor: theme.buttonPrimary,
+      borderColor: theme.buttonPrimary,
+    },
+
+    inactiveTab: {
+      backgroundColor: theme.card,
+      borderColor: theme.border,
+    },
+
+    tabLabel: {
+      fontSize: 14 * scale,
+      fontWeight: "600",
+    },
+
+    activeTabLabel: {
+      color: theme.buttonPrimaryText,
+    },
+
+    inactiveTabLabel: {
+      color: theme.text,
+    },
+
+    contentContainer: {
+      flex: 1,
     },
   });

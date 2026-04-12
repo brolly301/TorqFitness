@@ -336,6 +336,9 @@ export const makeStyles = (theme: Theme, scale: number) => {
       alignItems: "center",
       justifyContent: "center",
       borderRadius: 10 * scale,
+      backgroundColor: theme.card,
+      borderWidth: 1,
+      borderColor: theme.border,
     },
 
     headerActions: {
