@@ -14,12 +14,12 @@ export type FormField<T> = {
 export type Exercise = {
   id: string;
   name: string;
-  gifUrl?: string;
+  gifUrl: string | null;
   bodyParts: string[];
   primaryMuscles: string[];
-  secondaryMuscles?: string[];
+  secondaryMuscles: string[];
   equipment: string[];
-  instructions?: string[];
+  instructions: string[];
   archived?: boolean;
   userCreated?: boolean;
 };
@@ -43,7 +43,7 @@ export type WorkoutDraft = {
   id: string;
   name: string;
   exercises: WorkoutExercise[];
-  notes?: string;
+  notes?: string | null;
 };
 
 export type Workout = WorkoutDraft & {

@@ -1,0 +1,156 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+
+model User {
+  id            String     @id @default(uuid())
+  firstName     String
+  surname       String
+  email         String     @unique
+  password      String
+  resetToken    String?
+  resetTokenExp DateTime?
+
+  exercises     Exercise[]
+  workouts      Workout[]
+  routines      Routine[]
+  settings      Settings?
+
+  createdAt     DateTime   @default(now())
+  updatedAt     DateTime   @updatedAt
+}
+
+
+model Settings {
+  id        String   @id @default(uuid())
+  theme     String   @default("light")
+  font      String   @default("medium")
+
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId    String   @unique
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Workout {
+  id           String            @id @default(uuid())
+  name         String
+  notes        String?
+  startedAt    DateTime
+  completedAt  DateTime
+  duration     Int
+
+  user         User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId       String
+
+  exercises    WorkoutExercise[]
+
+  createdAt    DateTime          @default(now())
+  updatedAt    DateTime          @updatedAt
+}
+
+
+model Routine {
+  id           String            @id @default(uuid())
+  name         String
+  notes        String?
+
+  user         User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId       String
+
+  exercises    RoutineExercise[]
+
+  createdAt    DateTime          @default(now())
+  updatedAt    DateTime          @updatedAt
+}
+
+model WorkoutExercise {
+  id           String         @id @default(uuid())
+  order        Int
+  notes        String?
+
+  workout      Workout        @relation(fields: [workoutId], references: [id], onDelete: Cascade)
+  workoutId    String
+
+  exercise     Exercise       @relation(fields: [exerciseId], references: [id], onDelete: Cascade)
+  exerciseId   String
+
+  sets         WorkoutSet[]
+
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @updatedAt
+}
+
+model WorkoutSet {
+  id                String           @id @default(uuid())
+  order             Int
+  reps              Int
+  weight            Int?
+
+  workoutExercise   WorkoutExercise  @relation(fields: [workoutExerciseId], references: [id], onDelete: Cascade)
+  workoutExerciseId String
+
+  createdAt         DateTime         @default(now())
+  updatedAt         DateTime         @updatedAt
+}
+
+model RoutineExercise {
+  id           String         @id @default(uuid())
+  order        Int
+  notes        String?
+
+  routine      Routine        @relation(fields: [routineId], references: [id], onDelete: Cascade)
+  routineId    String
+
+  exercise     Exercise       @relation(fields: [exerciseId], references: [id], onDelete: Cascade)
+  exerciseId   String
+
+  sets         RoutineSet[]
+
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @updatedAt
+}
+
+model RoutineSet {
+  id                String           @id @default(uuid())
+  order             Int
+  reps              Int
+  weight            Int?
+
+  routineExercise   RoutineExercise  @relation(fields: [routineExerciseId], references: [id], onDelete: Cascade)
+  routineExerciseId String
+
+  createdAt         DateTime         @default(now())
+  updatedAt         DateTime         @updatedAt
+}
+
+
+model Exercise {
+  id                String     @id @default(uuid())
+  name              String
+  gifUrl            String?
+  bodyParts         String[]
+  primaryMuscles    String[]
+  secondaryMuscles  String[]
+  equipment         String[]
+  instructions      String[]
+
+  archived          Boolean    @default(false)
+  userCreated       Boolean    @default(false)
+
+  user              User?      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId            String?
+
+  workoutEntries    WorkoutExercise[]
+  routineEntries    RoutineExercise[]
+
+  createdAt         DateTime   @default(now())
+  updatedAt         DateTime   @updatedAt
+}

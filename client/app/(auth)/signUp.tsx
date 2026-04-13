@@ -10,6 +10,7 @@ import { FormField } from "@/types/Global";
 import AppError from "@/components/ui/AppError";
 import { Button } from "@react-navigation/elements";
 import { useUserContext } from "@/context/UserContext";
+import { signUpUser } from "@/api/auth";
 
 export default function SignUpScreen() {
   const {
@@ -55,7 +56,13 @@ export default function SignUpScreen() {
   ];
 
   const onSubmit = (data: SignUpFormValues) => {
-    signUp(data);
+    const { confirmPassword, ...body } = data;
+
+    if (confirmPassword !== body.password) {
+      return console.log("NOPE");
+    }
+
+    signUp(body);
   };
 
   return (
@@ -75,6 +82,9 @@ export default function SignUpScreen() {
                   textAlignVertical={"center"}
                   secureTextEntry={field.secureTextEntry}
                   value={value}
+                  autoComplete="off"
+                  textContentType="oneTimeCode"
+                  importantForAutofill="no"
                   style={styles.input}
                 />
                 {errors[field.name] && (

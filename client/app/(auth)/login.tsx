@@ -8,6 +8,7 @@ import type { FormField } from "@/types/Global";
 import AppError from "@/components/ui/AppError";
 import { Button } from "@react-navigation/elements";
 import { useUserContext } from "@/context/UserContext";
+import { loginUser } from "@/api/auth";
 
 export default function LoginScreen() {
   const {

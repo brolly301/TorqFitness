@@ -1,11 +1,30 @@
 export type User = {
-  id: string;
+  userId: string;
   email: string;
   firstName: string;
   surname: string;
 };
 
 export type AuthResponse = {
-  user: User;
+  userData: User;
   token: string;
+};
+
+export type Settings = {
+  id: string;
+  theme: string;
+  font: string;
+  userId: string;
+};
+
+export type Login = {
+  email: string;
+  password: string;
+};
+
+export type SignUp = {
+  email: string;
+  password: string;
+  firstName: string;
+  surname: string;
 };

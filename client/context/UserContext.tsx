@@ -1,55 +1,50 @@
-import { User } from "@/types/User";
-import { LoginFormValues } from "@/utils/validation/loginSchema";
-import { SignUpFormValues } from "@/utils/validation/signUpSchema";
-import { router } from "expo-router";
+import { loginUser, signUpUser } from "@/api/auth";
+import { Login, SignUp, User } from "@/types/User";
 import { createContext, ReactNode, useContext, useState } from "react";
+
+type AuthToken = {
+  token: string;
+  valid: boolean;
+};
 
 type UserContextType = {
   user: User | null;
   setUser: (user: User | null) => void;
-  login: (data: LoginFormValues) => void;
-  signUp: (data: SignUpFormValues) => void;
+  login: (data: Login) => void;
+  signUp: (data: SignUp) => void;
+  authToken: AuthToken;
   logout: () => void;
 };
 
 const UserContext = createContext<UserContextType | null>(null);
 
 export const UserProvider = ({ children }: { children: ReactNode }) => {
-  const [user, setUser] = useState<User | null>({
-    id: "1",
-    email: "marcrobertjohn@gmail.com",
-    firstName: "Marc",
-    surname: "Brolly",
+  const [user, setUser] = useState<User | null>(null);
+  const [authToken, setAuthToken] = useState<AuthToken>({
+    token: "",
+    valid: false,
   });
 
-  const login = (data: LoginFormValues) => {
-    const fakeUser = {
-      id: "1",
-      email: "marcrobertjohn@gmail.com",
-      firstName: "Marc",
-      surname: "Brolly",
-    };
-
-    if (
-      data.email === "marcrobertjohn@gmail.com" &&
-      data.password === "Testing123!!"
-    ) {
-      setUser(fakeUser);
-      router.navigate("/(tabs)/profile");
+  const login = async (data: Login) => {
+    try {
+      const res = await loginUser(data);
+      setUser(res.userData);
+      setAuthToken({ token: res.token, valid: true });
+    } catch (e) {
+      const message = e instanceof Error ? e.message : "Something went wrong";
+      console.log(message);
     }
   };
 
-  const signUp = (data: SignUpFormValues) => {
-    const newUser = {
-      id: "1",
-      email: data.email,
-      firstName: data.firstName,
-      surname: data.surname,
-    };
-
-    setUser(newUser);
-    console.log("Sign up successful");
-    router.navigate("/(tabs)/profile");
+  const signUp = async (data: SignUp) => {
+    try {
+      const res = await signUpUser(data);
+      setUser(res.userData);
+      setAuthToken({ token: res.token, valid: true });
+    } catch (e) {
+      const message = e instanceof Error ? e.message : "Something went wrong";
+      console.log(message);
+    }
   };
 
   const logout = () => {
@@ -57,7 +52,9 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
   };
 
   return (
-    <UserContext.Provider value={{ login, logout, signUp, setUser, user }}>
+    <UserContext.Provider
+      value={{ authToken, login, logout, signUp, setUser, user }}
+    >
       {children}
     </UserContext.Provider>
   );
