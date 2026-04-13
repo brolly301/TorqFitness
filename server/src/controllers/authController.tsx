@@ -3,6 +3,7 @@ import { prisma } from "../lib/prisma";
 import nodemailer from "nodemailer";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
+import { AuthRequest } from "../../middleware/requireAuth";
 
 const JWT_SECRET = process.env.JWT_SECRET as string;
 
@@ -116,11 +117,29 @@ export const getUser = async (req: Request, res: Response) => {
       settings: user.settings,
     };
 
-    res
-      .status(200)
-      .json({ message: "Successfully retrieved user", user: userData });
+    res.status(200).json({ message: "Successfully retrieved user", userData });
   } catch (err) {
     console.error("Get user error:", err);
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+export const deleteUser = async (req: AuthRequest, res: Response) => {
+  try {
+    const userId = req.user?.userId;
+
+    if (!userId) {
+      res.status(401).json({ message: "Unauthorized" });
+      return;
+    }
+
+    await prisma.user.delete({
+      where: { id: userId },
+    });
+
+    res.status(204).end();
+  } catch (err) {
+    console.error("Delete user error:", err);
     res.status(500).json({ message: "Internal server error" });
   }
 };

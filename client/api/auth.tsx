@@ -34,3 +34,25 @@ export const loginUser = async (userDetails: Login): Promise<AuthResponse> => {
 
   return data;
 };
+
+export const getUser = async (token: string): Promise<AuthResponse> => {
+  const res = await fetch(`${baseURL}/auth/user`, {
+    method: "GET",
+    headers: { Authorization: `Bearer ${token}` },
+  });
+
+  const data = await res.json();
+
+  if (!res.ok) {
+    throw new Error(data.message || "Failed fetch user");
+  }
+
+  return data;
+};
+
+export const deleteUser = async (token: string) => {
+  return fetch(`${baseURL}/auth/user`, {
+    method: "DELETE",
+    headers: { Authorization: `Bearer ${token}` },
+  });
+};

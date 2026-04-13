@@ -3,11 +3,12 @@ import React, { useMemo } from "react";
 import { useUserContext } from "@/context/UserContext";
 import { useAppTheme } from "@/hooks/useAppTheme";
 import { Theme } from "@/types/Theme";
+import { Button } from "@react-navigation/elements";
 
 export default function UserBioTile() {
   const { theme, scale } = useAppTheme();
   const styles = useMemo(() => makeStyles(theme, scale), [theme, scale]);
-  const { user } = useUserContext();
+  const { user, deleteAccount, logout } = useUserContext();
 
   return (
     <View style={styles.container}>
@@ -21,6 +22,8 @@ export default function UserBioTile() {
         </Text>
         <Text style={styles.workouts}>207 Workouts</Text>
         <Text style={styles.member}>Member since March 2024</Text>
+        <Button onPressIn={deleteAccount}>Delete Account</Button>
+        <Button onPressIn={logout}>Log out</Button>
       </View>
     </View>
   );

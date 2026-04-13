@@ -1,6 +1,11 @@
 import express from "express";
-import { getUser, login, signUp } from "../controllers/authController";
-// import { requireAuth } from "../../middleware/requireAuth";
+import {
+  deleteUser,
+  getUser,
+  login,
+  signUp,
+} from "../controllers/authController";
+import { requireAuth } from "../../middleware/requireAuth";
 
 const router = express.Router();
 
@@ -10,9 +15,9 @@ router.post("/signUp", signUp);
 
 // router.patch("/user/:id");
 
-// router.delete("/user/:id");
+router.delete("/user", requireAuth, deleteUser);
 
-// router.get("/user", requireAuth, getUser);
+router.get("/user", requireAuth, getUser);
 
 // router.post("/requestResetCode");
 
