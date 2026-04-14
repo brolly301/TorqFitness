@@ -2,7 +2,7 @@ import { Response } from "express";
 import { prisma } from "../lib/prisma";
 import { AuthRequest } from "../../middleware/requireAuth";
 
-export const addRoutine = async (req: AuthRequest, res: Response) => {
+export const addExercise = async (req: AuthRequest, res: Response) => {
   try {
     const userId = req.user?.userId;
     if (!userId) {
@@ -12,21 +12,34 @@ export const addRoutine = async (req: AuthRequest, res: Response) => {
       return;
     }
 
-    const { name, notes } = req.body;
+    const {
+      name,
+      gifUrl,
+      bodyParts,
+      primaryMuscles,
+      secondaryMuscles,
+      equipment,
+      instructions,
+      userCreated,
+    } = req.body;
 
-    console.log(req.body);
-
-    const routine = await prisma.routine.create({
+    const exercise = await prisma.exercise.create({
       data: {
         name,
-        notes,
+        gifUrl,
+        bodyParts,
+        primaryMuscles,
+        secondaryMuscles,
+        equipment,
+        instructions,
+        userCreated,
         userId,
       },
     });
 
     res.status(201).json({
-      message: "Routine created",
-      routine,
+      message: "Exercise created",
+      exercise,
     });
   } catch (e) {
     res.status(400).json({ message: "Internal server error" });

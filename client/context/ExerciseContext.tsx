@@ -8,6 +8,7 @@ import {
 } from "react";
 import exercisesJSON from "../constants/exercises.json";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { addUserExercise } from "@/api/exercise";
 
 type ExerciseContextType = {
   exercises: Exercise[];
@@ -42,7 +43,7 @@ export const ExerciseProvider = ({ children }: { children: ReactNode }) => {
     }
   };
 
-  const addExercise = (exercise: Exercise) => {
+  const addExercise = async (exercise: Exercise) => {
     setExercises((prev) => {
       const updatedExercises = [...prev, exercise];
       AsyncStorage.setItem("exercises", JSON.stringify(updatedExercises)).catch(
@@ -50,6 +51,12 @@ export const ExerciseProvider = ({ children }: { children: ReactNode }) => {
       );
       return updatedExercises;
     });
+
+    const token = await AsyncStorage.getItem("token");
+
+    if (!token) return;
+
+    await addUserExercise(exercise, token);
   };
 
   const updateExercise = (updatedExercise: Exercise) => {
