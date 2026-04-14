@@ -134,6 +134,7 @@ model RoutineSet {
 
 model Exercise {
   id                String     @id @default(uuid())
+  jsonId            String?    @unique
   name              String
   gifUrl            String?
   bodyParts         String[]

@@ -6,7 +6,6 @@ import {
   useEffect,
   useState,
 } from "react";
-import exercisesJSON from "../constants/exercises.json";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import {
   addUserExercise,
@@ -25,7 +24,7 @@ type ExerciseContextType = {
 const ExerciseContext = createContext<ExerciseContextType | null>(null);
 
 export const ExerciseProvider = ({ children }: { children: ReactNode }) => {
-  const [exercises, setExercises] = useState<Exercise[]>(exercisesJSON);
+  const [exercises, setExercises] = useState<Exercise[]>([]);
 
   const { authToken } = useUserContext();
 

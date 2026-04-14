@@ -50,14 +50,18 @@ export const getExercises = async (req: AuthRequest, res: Response) => {
   try {
     const userId = req.user?.userId;
     if (!userId) {
-      res
-        .status(400)
-        .json({ message: "Cannot get user exercises. Unauthorized." });
+      res.status(400).json({ message: "Cannot get exercises. Unauthorized." });
       return;
     }
 
     const exercises = await prisma.exercise.findMany({
-      where: { userId },
+      where: {
+        archived: false,
+        OR: [{ userId: null }, { userId }],
+      },
+      orderBy: {
+        name: "asc",
+      },
     });
 
     res.status(200).json({
