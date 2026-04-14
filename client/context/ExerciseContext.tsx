@@ -8,7 +8,12 @@ import {
 } from "react";
 import exercisesJSON from "../constants/exercises.json";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { addUserExercise } from "@/api/exercise";
+import {
+  addUserExercise,
+  archiveUserExercise,
+  getUserExercises,
+} from "@/api/exercise";
+import { useUserContext } from "./UserContext";
 
 type ExerciseContextType = {
   exercises: Exercise[];
@@ -22,27 +27,25 @@ const ExerciseContext = createContext<ExerciseContextType | null>(null);
 export const ExerciseProvider = ({ children }: { children: ReactNode }) => {
   const [exercises, setExercises] = useState<Exercise[]>(exercisesJSON);
 
+  const { authToken } = useUserContext();
+
   useEffect(() => {
     getExercises();
-  }, []);
+  }, [authToken.token]);
 
   const getExercises = async () => {
     try {
-      const stored = await AsyncStorage.getItem("exercises");
+      if (!authToken.token) return;
 
-      if (!stored) {
-        await AsyncStorage.setItem("exercises", JSON.stringify(exercisesJSON));
+      const res = await getUserExercises(authToken.token);
 
-        setExercises(exercisesJSON);
-        return;
-      }
-
-      setExercises(JSON.parse(stored));
+      setExercises(res.exercises);
     } catch (err) {
-      console.log("Error loading exercises:", err);
+      const message =
+        err instanceof Error ? err.message : "Error loading exercises";
+      console.log(message);
     }
   };
-
   const addExercise = async (exercise: Exercise) => {
     setExercises((prev) => {
       const updatedExercises = [...prev, exercise];
@@ -73,18 +76,15 @@ export const ExerciseProvider = ({ children }: { children: ReactNode }) => {
     });
   };
 
-  const archiveExercise = (exerciseId: string) => {
+  const archiveExercise = async (id: string) => {
     setExercises((prev) => {
       const updatedExercises = prev.map((exercise) =>
-        exercise.id === exerciseId ? { ...exercise, archived: true } : exercise,
+        exercise.id === id ? { ...exercise, archived: true } : exercise,
       );
-
-      AsyncStorage.setItem("exercises", JSON.stringify(updatedExercises)).catch(
-        (err) => console.log("Error archiving exercise:", err),
-      );
-
       return updatedExercises;
     });
+
+    await archiveUserExercise(authToken.token, id);
   };
 
   return (

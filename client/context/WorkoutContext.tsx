@@ -1,4 +1,4 @@
-import { Workout, WorkoutExercise } from "@/types/Global";
+import { Workout } from "@/types/Global";
 import {
   createContext,
   ReactNode,
@@ -7,7 +7,11 @@ import {
   useState,
 } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { addUserWorkout } from "@/api/workout";
+import {
+  addUserWorkout,
+  deleteUserWorkout,
+  getUserWorkouts,
+} from "@/api/workout";
 import { useUserContext } from "./UserContext";
 
 type WorkoutContextType = {
@@ -22,19 +26,23 @@ const WorkoutContext = createContext<WorkoutContextType | null>(null);
 export const WorkoutProvider = ({ children }: { children: ReactNode }) => {
   const [workouts, setWorkouts] = useState<Workout[]>([]);
 
+  const { authToken } = useUserContext();
+
   useEffect(() => {
     getWorkouts();
-  }, []);
+  }, [authToken.token]);
 
   const getWorkouts = async () => {
     try {
-      const stored = await AsyncStorage.getItem("workouts");
+      if (!authToken.token) return;
 
-      if (!stored) return;
+      const res = await getUserWorkouts(authToken.token);
 
-      setWorkouts(JSON.parse(stored));
+      setWorkouts(res.workouts);
     } catch (err) {
-      console.log("Error loading workouts:", err);
+      const message =
+        err instanceof Error ? err.message : "Error loading workouts";
+      console.log(message);
     }
   };
 
@@ -48,21 +56,18 @@ export const WorkoutProvider = ({ children }: { children: ReactNode }) => {
       return updatedWorkouts;
     });
 
-    const token = await AsyncStorage.getItem("token");
+    if (!authToken.token) return;
 
-    if (!token) return;
-
-    await addUserWorkout(workout, token);
+    await addUserWorkout(workout, authToken.token);
   };
 
-  const deleteWorkout = (id: string) => {
+  const deleteWorkout = async (id: string) => {
     setWorkouts((prev) => {
       const updatedWorkouts = prev.filter((workout) => workout.id !== id);
-      AsyncStorage.setItem("workouts", JSON.stringify(updatedWorkouts)).catch(
-        (err) => console.log("Error deleting workout:", err),
-      );
       return updatedWorkouts;
     });
+
+    await deleteUserWorkout(authToken.token, id);
   };
 
   const updateWorkout = (updatedWorkout: Workout) => {

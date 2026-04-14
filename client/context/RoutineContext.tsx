@@ -7,7 +7,12 @@ import {
   useState,
 } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { addUserRoutine } from "@/api/routines";
+import {
+  addUserRoutine,
+  deleteUserRoutine,
+  getUserRoutines,
+} from "@/api/routines";
+import { useUserContext } from "./UserContext";
 
 type RoutineContextType = {
   routines: Routine[];
@@ -20,20 +25,23 @@ const RoutineContext = createContext<RoutineContextType | null>(null);
 
 export const RoutineProvider = ({ children }: { children: ReactNode }) => {
   const [routines, setRoutines] = useState<Routine[]>([]);
+  const { authToken } = useUserContext();
 
   useEffect(() => {
     getRoutines();
-  }, []);
+  }, [authToken.token]);
 
   const getRoutines = async () => {
     try {
-      const stored = await AsyncStorage.getItem("routines");
+      if (!authToken.token) return;
 
-      if (!stored) return;
+      const res = await getUserRoutines(authToken.token);
 
-      setRoutines(JSON.parse(stored));
+      setRoutines(res.routines);
     } catch (err) {
-      console.log("Error loading routine:", err);
+      const message =
+        err instanceof Error ? err.message : "Error loading routines";
+      console.log(message);
     }
   };
 
@@ -53,14 +61,13 @@ export const RoutineProvider = ({ children }: { children: ReactNode }) => {
     await addUserRoutine(routine, token);
   };
 
-  const deleteRoutine = (id: string) => {
+  const deleteRoutine = async (id: string) => {
     setRoutines((prev) => {
       const updatedRoutines = prev.filter((routine) => routine.id !== id);
-      AsyncStorage.setItem("routines", JSON.stringify(updatedRoutines)).catch(
-        (err) => console.log("Error deleting routine:", err),
-      );
       return updatedRoutines;
     });
+
+    await deleteUserRoutine(authToken.token, id);
   };
 
   const updateRoutine = (updatedRoutine: Routine) => {
