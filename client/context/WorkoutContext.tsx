@@ -7,6 +7,8 @@ import {
   useState,
 } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { addUserWorkout } from "@/api/workout";
+import { useUserContext } from "./UserContext";
 
 type WorkoutContextType = {
   workouts: Workout[];
@@ -36,14 +38,21 @@ export const WorkoutProvider = ({ children }: { children: ReactNode }) => {
     }
   };
 
-  const addWorkout = (workout: Workout) => {
+  const addWorkout = async (workout: Workout) => {
     setWorkouts((prev) => {
       const updatedWorkouts = [...prev, workout];
       AsyncStorage.setItem("workouts", JSON.stringify(updatedWorkouts)).catch(
         (err) => console.log("Error saving workout:", err),
       );
+
       return updatedWorkouts;
     });
+
+    const token = await AsyncStorage.getItem("token");
+
+    if (!token) return;
+
+    await addUserWorkout(workout, token);
   };
 
   const deleteWorkout = (id: string) => {

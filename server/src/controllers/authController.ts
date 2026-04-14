@@ -1,6 +1,5 @@
-import { Request, response, Response } from "express";
+import { Request, Response } from "express";
 import { prisma } from "../lib/prisma";
-import nodemailer from "nodemailer";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import { AuthRequest } from "../../middleware/requireAuth";

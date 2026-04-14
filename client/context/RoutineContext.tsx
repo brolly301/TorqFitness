@@ -7,6 +7,7 @@ import {
   useState,
 } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { addUserRoutine } from "@/api/routines";
 
 type RoutineContextType = {
   routines: Routine[];
@@ -36,7 +37,7 @@ export const RoutineProvider = ({ children }: { children: ReactNode }) => {
     }
   };
 
-  const addRoutine = (routine: Routine) => {
+  const addRoutine = async (routine: Routine) => {
     setRoutines((prev) => {
       const updatedRoutines = [...prev, routine];
       AsyncStorage.setItem("routines", JSON.stringify(updatedRoutines)).catch(
@@ -44,6 +45,12 @@ export const RoutineProvider = ({ children }: { children: ReactNode }) => {
       );
       return updatedRoutines;
     });
+
+    const token = await AsyncStorage.getItem("token");
+
+    if (!token) return;
+
+    await addUserRoutine(routine, token);
   };
 
   const deleteRoutine = (id: string) => {

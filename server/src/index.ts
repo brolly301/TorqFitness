@@ -2,6 +2,8 @@ import "dotenv/config";
 import express from "express";
 import cors from "cors";
 import authRoutes from "./routes/authRoutes";
+import workoutRoutes from "./routes/workoutRoutes";
+import routineRoutes from "./routes/routineRoutes";
 
 const app = express();
 
@@ -26,6 +28,8 @@ app.use((req, res, next) => {
 
 //routes
 app.use("/api/auth", authRoutes);
+app.use("/api/workouts", workoutRoutes);
+app.use("/api/routines", routineRoutes);
 
 app.listen(5000, () => {
   console.log("Server is running on port 5000");
