@@ -79,7 +79,7 @@ export const getRoutines = async (req: AuthRequest, res: Response) => {
 
     const routines = await prisma.routine.findMany({
       where: { userId },
-      include: { exercises: true },
+      include: { exercises: { include: { sets: true } } },
     });
 
     res.status(200).json({

@@ -82,7 +82,7 @@ export const getWorkouts = async (req: AuthRequest, res: Response) => {
 
     const workouts = await prisma.workout.findMany({
       where: { userId },
-      include: { exercises: true },
+      include: { exercises: { include: { sets: true } } },
     });
 
     res.status(200).json({

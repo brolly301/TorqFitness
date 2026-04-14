@@ -1,16 +1,21 @@
 import { baseURL } from "@/constants/api";
 import { Routine } from "@/types/Global";
 
-type RoutineResponse = {
+type RoutinesResponse = {
   routines: Routine[];
+  message: string;
+};
+
+type RoutineResponse = {
+  routine: Routine;
   message: string;
 };
 
 export const addUserRoutine = async (
   routine: Routine,
   token: string,
-): Promise<Response> => {
-  return fetch(`${baseURL}/routines`, {
+): Promise<RoutineResponse> => {
+  const res = await fetch(`${baseURL}/routines`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -18,11 +23,19 @@ export const addUserRoutine = async (
     },
     body: JSON.stringify(routine),
   });
+
+  const data = await res.json();
+
+  if (!res.ok) {
+    throw new Error(data.message || "Failed to retrieve user routines.");
+  }
+
+  return data;
 };
 
 export const getUserRoutines = async (
   token: string,
-): Promise<RoutineResponse> => {
+): Promise<RoutinesResponse> => {
   const res = await fetch(`${baseURL}/routines`, {
     method: "GET",
     headers: {

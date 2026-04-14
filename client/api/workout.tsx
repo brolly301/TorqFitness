@@ -1,16 +1,21 @@
 import { baseURL } from "@/constants/api";
 import { Workout } from "@/types/Global";
 
-type WorkoutResponse = {
+type WorkoutsResponse = {
   workouts: Workout[];
+  message: string;
+};
+
+type WorkoutResponse = {
+  workout: Workout;
   message: string;
 };
 
 export const addUserWorkout = async (
   workout: Workout,
   token: string,
-): Promise<Response> => {
-  return fetch(`${baseURL}/workouts`, {
+): Promise<WorkoutResponse> => {
+  const res = await fetch(`${baseURL}/workouts`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -18,11 +23,19 @@ export const addUserWorkout = async (
     },
     body: JSON.stringify(workout),
   });
+
+  const data = await res.json();
+
+  if (!res.ok) {
+    throw new Error(data.message || "Failed to retrieve user workouts.");
+  }
+
+  return data;
 };
 
 export const getUserWorkouts = async (
   token: string,
-): Promise<WorkoutResponse> => {
+): Promise<WorkoutsResponse> => {
   const res = await fetch(`${baseURL}/workouts`, {
     method: "GET",
     headers: {

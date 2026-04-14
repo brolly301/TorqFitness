@@ -47,18 +47,14 @@ export const WorkoutProvider = ({ children }: { children: ReactNode }) => {
   };
 
   const addWorkout = async (workout: Workout) => {
-    setWorkouts((prev) => {
-      const updatedWorkouts = [...prev, workout];
-      AsyncStorage.setItem("workouts", JSON.stringify(updatedWorkouts)).catch(
-        (err) => console.log("Error saving workout:", err),
-      );
-
-      return updatedWorkouts;
-    });
-
     if (!authToken.token) return;
 
-    await addUserWorkout(workout, authToken.token);
+    const res = await addUserWorkout(workout, authToken.token);
+
+    setWorkouts((prev) => {
+      const updatedWorkouts = [...prev, res.workout];
+      return updatedWorkouts;
+    });
   };
 
   const deleteWorkout = async (id: string) => {

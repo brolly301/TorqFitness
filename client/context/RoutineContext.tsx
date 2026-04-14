@@ -46,19 +46,14 @@ export const RoutineProvider = ({ children }: { children: ReactNode }) => {
   };
 
   const addRoutine = async (routine: Routine) => {
+    if (!authToken.token) return;
+
+    const res = await addUserRoutine(routine, authToken.token);
+
     setRoutines((prev) => {
-      const updatedRoutines = [...prev, routine];
-      AsyncStorage.setItem("routines", JSON.stringify(updatedRoutines)).catch(
-        (err) => console.log("Error saving routine:", err),
-      );
+      const updatedRoutines = [...prev, res.routine];
       return updatedRoutines;
     });
-
-    const token = await AsyncStorage.getItem("token");
-
-    if (!token) return;
-
-    await addUserRoutine(routine, token);
   };
 
   const deleteRoutine = async (id: string) => {
