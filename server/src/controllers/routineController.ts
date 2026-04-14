@@ -2,6 +2,17 @@ import { Response } from "express";
 import { prisma } from "../lib/prisma";
 import { AuthRequest } from "../../middleware/requireAuth";
 
+type CreateRoutineExerciseInput = {
+  exerciseId: string;
+  order: number;
+  notes?: string;
+  sets: {
+    order: number;
+    reps: number;
+    weight?: number | null;
+  }[];
+};
+
 export const addRoutine = async (req: AuthRequest, res: Response) => {
   try {
     const userId = req.user?.userId;
@@ -14,11 +25,36 @@ export const addRoutine = async (req: AuthRequest, res: Response) => {
 
     const { name, notes } = req.body;
 
+    const { exercises } = req.body as {
+      exercises: CreateRoutineExerciseInput[];
+    };
+
     const routine = await prisma.routine.create({
       data: {
         name,
         notes,
         userId,
+        exercises: {
+          create: exercises.map((exercise) => ({
+            exerciseId: exercise.exerciseId,
+            order: exercise.order,
+            notes: exercise.notes,
+            sets: {
+              create: exercise.sets.map((set) => ({
+                order: set.order,
+                reps: set.reps,
+                weight: set.weight,
+              })),
+            },
+          })),
+        },
+      },
+      include: {
+        exercises: {
+          include: {
+            sets: true,
+          },
+        },
       },
     });
 

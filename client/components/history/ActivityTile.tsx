@@ -44,6 +44,8 @@ export default function ActivityTile({ workout }: Props) {
     : "No date";
   const workoutDuration = formatTime(workout.duration);
 
+  console.log(workout.exercises);
+
   return (
     <>
       <WorkoutDetailsModal
