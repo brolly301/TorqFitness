@@ -1,4 +1,4 @@
-import { Request, Response } from "express";
+import { Response } from "express";
 import { prisma } from "../lib/prisma";
 import { AuthRequest } from "../../middleware/requireAuth";
 
@@ -110,6 +110,62 @@ export const deleteWorkout = async (req: AuthRequest, res: Response) => {
     await prisma.workout.delete({ where: { id, userId } });
 
     return res.status(204).end();
+  } catch (e) {
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+export const updateWorkout = async (req: AuthRequest, res: Response) => {
+  try {
+    const userId = req.user?.userId;
+    const rawId = req.params.id;
+    const id = Array.isArray(rawId) ? rawId[0] : rawId;
+
+    if (!userId) {
+      res
+        .status(401)
+        .json({ message: "Cannot update user workouts. Unauthorized." });
+      return;
+    }
+
+    const { name, notes, duration } = req.body;
+
+    const { exercises } = req.body as {
+      exercises: CreateWorkoutExerciseInput[];
+    };
+
+    const workout = await prisma.workout.update({
+      where: { id },
+      data: {
+        name,
+        notes,
+        duration,
+        exercises: {
+          deleteMany: {},
+          create: exercises.map((exercise) => ({
+            exerciseId: exercise.exerciseId,
+            order: exercise.order,
+            notes: exercise.notes,
+            sets: {
+              create: exercise.sets.map((set) => ({
+                order: set.order,
+                reps: set.reps,
+                weight: set.weight,
+              })),
+            },
+          })),
+        },
+      },
+      include: {
+        exercises: {
+          include: {
+            sets: true,
+          },
+        },
+      },
+    });
+
+    res.status(201).json({ message: "Workout successfully updated.", workout });
   } catch (e) {
     res.status(500).json({ message: "Internal server error" });
   }

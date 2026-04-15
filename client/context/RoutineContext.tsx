@@ -6,11 +6,11 @@ import {
   useEffect,
   useState,
 } from "react";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import {
   addUserRoutine,
   deleteUserRoutine,
   getUserRoutines,
+  updateUserRoutine,
 } from "@/api/routines";
 import { useUserContext } from "./UserContext";
 
@@ -65,15 +65,16 @@ export const RoutineProvider = ({ children }: { children: ReactNode }) => {
     await deleteUserRoutine(authToken.token, id);
   };
 
-  const updateRoutine = (updatedRoutine: Routine) => {
+  const updateRoutine = async (updatedRoutine: Routine) => {
+    if (!authToken.token) return;
+
+    const res = await updateUserRoutine(updatedRoutine, authToken.token);
+
     setRoutines((prev) => {
       const updatedRoutines = prev.map((routine) =>
-        routine.id === updatedRoutine.id
-          ? { ...routine, ...updatedRoutine }
+        routine.id === res.routine.id
+          ? { ...routine, ...res.routine }
           : routine,
-      );
-      AsyncStorage.setItem("routines", JSON.stringify(updatedRoutines)).catch(
-        (err) => console.log("Error updating routine:", err),
       );
 
       return updatedRoutines;

@@ -1,16 +1,21 @@
 import { baseURL } from "@/constants/api";
 import { Exercise } from "@/types/Global";
 
-type WorkoutResponse = {
+type ExercisesResponse = {
   exercises: Exercise[];
+  message: string;
+};
+
+type ExerciseResponse = {
+  exercise: Exercise;
   message: string;
 };
 
 export const addUserExercise = async (
   exercise: Exercise,
   token: string,
-): Promise<Response> => {
-  return fetch(`${baseURL}/exercises`, {
+): Promise<ExerciseResponse> => {
+  const res = await fetch(`${baseURL}/exercises`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -18,11 +23,19 @@ export const addUserExercise = async (
     },
     body: JSON.stringify(exercise),
   });
+
+  const data = await res.json();
+
+  if (!res.ok) {
+    throw new Error(data.message || "Failed to add user exercise.");
+  }
+
+  return data;
 };
 
 export const getUserExercises = async (
   token: string,
-): Promise<WorkoutResponse> => {
+): Promise<ExercisesResponse> => {
   const res = await fetch(`${baseURL}/exercises`, {
     method: "GET",
     headers: {
@@ -55,4 +68,26 @@ export const archiveUserExercise = async (
     const data = await res.json();
     throw new Error(data.message || "Failed to archive user exercise.");
   }
+};
+
+export const updateUserExercise = async (
+  exercise: Exercise,
+  token: string,
+): Promise<ExerciseResponse> => {
+  const res = await fetch(`${baseURL}/exercises/${exercise.id}`, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify(exercise),
+  });
+
+  const data = await res.json();
+
+  if (!res.ok) {
+    throw new Error(data.message || "Failed to update user exercise.");
+  }
+
+  return data;
 };

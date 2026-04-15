@@ -11,6 +11,7 @@ import {
   addUserExercise,
   archiveUserExercise,
   getUserExercises,
+  updateUserExercise,
 } from "@/api/exercise";
 import { useUserContext } from "./UserContext";
 
@@ -46,31 +47,25 @@ export const ExerciseProvider = ({ children }: { children: ReactNode }) => {
     }
   };
   const addExercise = async (exercise: Exercise) => {
+    if (!authToken.token) return;
+
+    const res = await addUserExercise(exercise, authToken.token);
+
     setExercises((prev) => {
-      const updatedExercises = [...prev, exercise];
-      AsyncStorage.setItem("exercises", JSON.stringify(updatedExercises)).catch(
-        (err) => console.log("Error saving exercises:", err),
-      );
+      const updatedExercises = [...prev, res.exercise];
       return updatedExercises;
     });
-
-    const token = await AsyncStorage.getItem("token");
-
-    if (!token) return;
-
-    await addUserExercise(exercise, token);
   };
 
-  const updateExercise = (updatedExercise: Exercise) => {
+  const updateExercise = async (updatedExercise: Exercise) => {
+    if (!authToken.token) return;
+
+    const res = await updateUserExercise(updatedExercise, authToken.token);
+
     setExercises((prev) => {
       const updatedExercises = prev.map((exercise) =>
-        exercise.id === updatedExercise.id ? updatedExercise : exercise,
+        exercise.id === res.exercise.id ? res.exercise : exercise,
       );
-
-      AsyncStorage.setItem("exercises", JSON.stringify(updatedExercises)).catch(
-        (err) => console.log("Error updating exercise:", err),
-      );
-
       return updatedExercises;
     });
   };

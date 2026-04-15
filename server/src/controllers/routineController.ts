@@ -111,3 +111,58 @@ export const deleteRoutine = async (req: AuthRequest, res: Response) => {
     res.status(500).json({ message: "Internal server error" });
   }
 };
+
+export const updateRoutine = async (req: AuthRequest, res: Response) => {
+  try {
+    const userId = req.user?.userId;
+    const rawId = req.params.id;
+    const id = Array.isArray(rawId) ? rawId[0] : rawId;
+
+    if (!userId) {
+      res
+        .status(401)
+        .json({ message: "Cannot update user routines. Unauthorized." });
+      return;
+    }
+
+    const { name, notes } = req.body;
+
+    const { exercises } = req.body as {
+      exercises: CreateRoutineExerciseInput[];
+    };
+
+    const routine = await prisma.routine.update({
+      where: { id },
+      data: {
+        name,
+        notes,
+        exercises: {
+          deleteMany: {},
+          create: exercises.map((exercise) => ({
+            exerciseId: exercise.exerciseId,
+            order: exercise.order,
+            notes: exercise.notes,
+            sets: {
+              create: exercise.sets.map((set) => ({
+                order: set.order,
+                reps: set.reps,
+                weight: set.weight,
+              })),
+            },
+          })),
+        },
+      },
+      include: {
+        exercises: {
+          include: {
+            sets: true,
+          },
+        },
+      },
+    });
+
+    res.status(201).json({ message: "Routine successfully updated.", routine });
+  } catch (e) {
+    res.status(500).json({ message: "Internal server error" });
+  }
+};

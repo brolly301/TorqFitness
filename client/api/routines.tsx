@@ -27,7 +27,7 @@ export const addUserRoutine = async (
   const data = await res.json();
 
   if (!res.ok) {
-    throw new Error(data.message || "Failed to retrieve user routines.");
+    throw new Error(data.message || "Failed to add user routine.");
   }
 
   return data;
@@ -68,4 +68,26 @@ export const deleteUserRoutine = async (
     const data = await res.json();
     throw new Error(data.message || "Failed to delete user routine.");
   }
+};
+
+export const updateUserRoutine = async (
+  routine: Routine,
+  token: string,
+): Promise<RoutineResponse> => {
+  const res = await fetch(`${baseURL}/routines/${routine.id}`, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify(routine),
+  });
+
+  const data = await res.json();
+
+  if (!res.ok) {
+    throw new Error(data.message || "Failed to update user routine.");
+  }
+
+  return data;
 };

@@ -11,6 +11,7 @@ import {
   addUserWorkout,
   deleteUserWorkout,
   getUserWorkouts,
+  updateUserWorkout,
 } from "@/api/workout";
 import { useUserContext } from "./UserContext";
 
@@ -66,17 +67,17 @@ export const WorkoutProvider = ({ children }: { children: ReactNode }) => {
     await deleteUserWorkout(authToken.token, id);
   };
 
-  const updateWorkout = (updatedWorkout: Workout) => {
+  const updateWorkout = async (updatedWorkout: Workout) => {
+    if (!authToken.token) return;
+
+    const res = await updateUserWorkout(updatedWorkout, authToken.token);
+
     setWorkouts((prev) => {
       const updatedWorkouts = prev.map((workout) =>
-        workout.id === updatedWorkout.id
-          ? { ...workout, ...updatedWorkout }
+        workout.id === res.workout.id
+          ? { ...workout, ...res.workout }
           : workout,
       );
-      AsyncStorage.setItem("workouts", JSON.stringify(updatedWorkouts)).catch(
-        (err) => console.log("Error updating workout:", err),
-      );
-
       return updatedWorkouts;
     });
   };

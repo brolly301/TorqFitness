@@ -98,3 +98,48 @@ export const archiveExercise = async (req: AuthRequest, res: Response) => {
     res.status(500).json({ message: "Internal server error" });
   }
 };
+
+export const updateExercise = async (req: AuthRequest, res: Response) => {
+  try {
+    const userId = req.user?.userId;
+    const rawId = req.params.id;
+    const id = Array.isArray(rawId) ? rawId[0] : rawId;
+
+    if (!userId) {
+      res
+        .status(401)
+        .json({ message: "Cannot update user exercise. Unauthorized." });
+      return;
+    }
+    const {
+      name,
+      gifUrl,
+      bodyParts,
+      primaryMuscles,
+      secondaryMuscles,
+      equipment,
+      instructions,
+      userCreated,
+    } = req.body;
+
+    const exercise = await prisma.exercise.update({
+      where: { id },
+      data: {
+        name,
+        gifUrl,
+        bodyParts,
+        primaryMuscles,
+        secondaryMuscles,
+        equipment,
+        instructions,
+        userCreated,
+      },
+    });
+
+    res
+      .status(201)
+      .json({ message: "Exercise successfully updated.", exercise });
+  } catch (e) {
+    res.status(500).json({ message: "Internal server error" });
+  }
+};

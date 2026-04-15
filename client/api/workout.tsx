@@ -69,3 +69,25 @@ export const deleteUserWorkout = async (
     throw new Error(data.message || "Failed to delete user workouts.");
   }
 };
+
+export const updateUserWorkout = async (
+  workout: Workout,
+  token: string,
+): Promise<WorkoutResponse> => {
+  const res = await fetch(`${baseURL}/workouts/${workout.id}`, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify(workout),
+  });
+
+  const data = await res.json();
+
+  if (!res.ok) {
+    throw new Error(data.message || "Failed to update user workout.");
+  }
+
+  return data;
+};

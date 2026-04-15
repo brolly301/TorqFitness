@@ -4,6 +4,7 @@ import {
   addExercise,
   archiveExercise,
   getExercises,
+  updateExercise,
 } from "../controllers/exerciseController";
 
 const router = express.Router();
@@ -13,5 +14,7 @@ router.post("/", requireAuth, addExercise);
 router.get("/", requireAuth, getExercises);
 
 router.patch("/:id", requireAuth, archiveExercise);
+
+router.put("/:id", requireAuth, updateExercise);
 
 export default router;
