@@ -51,7 +51,7 @@ export default function WorkoutDetails({ workout, setModalVisible }: Props) {
   };
 
   const handleEditWorkout = () => {
-    router.navigate({
+    router.push({
       pathname: "/(tabs)/history/editWorkout",
       params: { workoutId: workout.id },
     });

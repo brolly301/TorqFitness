@@ -7,9 +7,9 @@ import ChartsTab from "./ChartsTab";
 import RecordsTab from "./RecordsTab";
 import HistoryTab from "./HistoryTab";
 import { capitalizeWords } from "@/utils/helpers";
-import ExerciseEditModal from "./ExerciseEditModal";
 import { Theme } from "@/types/Theme";
 import { useAppTheme } from "@/hooks/useAppTheme";
+import ExerciseEditForm from "@/components/exercises/ExerciseEditForm";
 
 type Props = ModalProps & {
   exercise: Exercise | null;
@@ -18,6 +18,8 @@ type Props = ModalProps & {
 };
 
 type TabName = "Details" | "History" | "Records" | "Charts";
+
+const TAB_NAMES: TabName[] = ["Details", "History", "Records", "Charts"];
 
 export default function ExerciseDetailsModal({
   modalVisible,
@@ -32,13 +34,26 @@ export default function ExerciseDetailsModal({
   const [tab, setTab] = useState<TabName>("Details");
   const [editModalVisible, setEditModalVisible] = useState(false);
 
-  const tabNames: TabName[] = ["Details", "History", "Records", "Charts"];
-
   useEffect(() => {
     if (modalVisible) {
       setTab("Details");
     }
   }, [modalVisible, exercise?.id]);
+
+  const handleClose = () => {
+    setModalVisible(false);
+  };
+
+  const handleSubmit = () => {
+    if (!exercise || !handleAddExercise) return;
+
+    handleAddExercise(exercise.id);
+    handleClose();
+  };
+
+  const handleEdit = () => {
+    setEditModalVisible(true);
+  };
 
   const renderTab = () => {
     switch (tab) {
@@ -55,36 +70,20 @@ export default function ExerciseDetailsModal({
     }
   };
 
-  const handleSubmit = () => {
-    if (!exercise || !handleAddExercise) return;
-
-    handleAddExercise(exercise.id);
-    setModalVisible(false);
-  };
-
-  const handleClose = () => {
-    setModalVisible(false);
-  };
-
-  const handleEdit = () => {
-    setModalVisible(false);
-    setEditModalVisible(true);
-  };
-
   return (
-    <>
-      <ExerciseEditModal
-        modalVisible={editModalVisible}
-        setModalVisible={setEditModalVisible}
-        exercise={exercise}
-      />
-
-      <Modal
-        visible={modalVisible}
-        transparent
-        animationType="fade"
-        onRequestClose={handleClose}
-      >
+    <Modal
+      visible={modalVisible}
+      transparent
+      animationType="fade"
+      onRequestClose={handleClose}
+    >
+      {editModalVisible ? (
+        <ExerciseEditForm
+          setModalVisible={setModalVisible}
+          setEditModalVisible={setEditModalVisible}
+          exercise={exercise}
+        />
+      ) : (
         <View style={styles.overlay}>
           <Pressable onPress={handleClose} style={StyleSheet.absoluteFill} />
 
@@ -127,7 +126,7 @@ export default function ExerciseDetailsModal({
             </Text>
 
             <View style={styles.tabRowContainer}>
-              {tabNames.map((tabName) => {
+              {TAB_NAMES.map((tabName) => {
                 const isActive = tab === tabName;
 
                 return (
@@ -157,8 +156,8 @@ export default function ExerciseDetailsModal({
             <View style={styles.contentContainer}>{renderTab()}</View>
           </View>
         </View>
-      </Modal>
-    </>
+      )}
+    </Modal>
   );
 }
 
@@ -225,9 +224,9 @@ export const makeStyles = (theme: Theme, scale: number) =>
       paddingVertical: 9 * scale,
       paddingHorizontal: 14 * scale,
       borderRadius: 10 * scale,
-      backgroundColor: theme.buttonPrimary + "15",
+      backgroundColor: `${theme.buttonPrimary}15`,
       borderWidth: 1,
-      borderColor: theme.buttonPrimary + "30",
+      borderColor: `${theme.buttonPrimary}30`,
     },
 
     secondaryButtonWithGap: {

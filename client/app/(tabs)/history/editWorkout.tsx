@@ -60,11 +60,15 @@ export default function EditWorkoutScreen() {
   }, [workoutDetails]);
 
   const handleSubmit = useCallback(() => {
+    if (!formData) return;
+
     updateWorkout(formData);
     router.back();
   }, [formData, updateWorkout]);
 
   const handleAddExercise = (exerciseId: string) => {
+    if (!formData) return;
+
     const newExercise = {
       id: crypto.randomUUID(),
       exerciseId,
@@ -73,10 +77,14 @@ export default function EditWorkoutScreen() {
       notes: "",
     };
 
-    setFormData((prev) => ({
-      ...prev,
-      exercises: [...prev.exercises, newExercise],
-    }));
+    setFormData((prev) => {
+      if (!prev) return prev;
+
+      return {
+        ...prev,
+        exercises: [...prev.exercises, newExercise],
+      };
+    });
   };
 
   if (!workoutDetails) {

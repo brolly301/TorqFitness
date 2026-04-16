@@ -40,7 +40,7 @@ export default function RoutineDetails({ routine, setModalVisible }: Props) {
   }, [routine.exercises]);
 
   const handleEditRoutine = () => {
-    router.navigate({
+    router.push({
       pathname: "/(tabs)/routines/editRoutine",
       params: { routineId: routine.id },
     });

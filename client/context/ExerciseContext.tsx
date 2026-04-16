@@ -71,14 +71,15 @@ export const ExerciseProvider = ({ children }: { children: ReactNode }) => {
   };
 
   const archiveExercise = async (id: string) => {
+    if (!authToken.token) return;
+    await archiveUserExercise(authToken.token, id);
+
     setExercises((prev) => {
       const updatedExercises = prev.map((exercise) =>
         exercise.id === id ? { ...exercise, archived: true } : exercise,
       );
       return updatedExercises;
     });
-
-    await archiveUserExercise(authToken.token, id);
   };
 
   return (
