@@ -1,4 +1,4 @@
-import { Pressable, StyleSheet, Text, View } from "react-native";
+import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import React, { useMemo } from "react";
 import SettingsList from "@/components/profile/settings/SettingsList";
 import AppWrapper from "@/components/ui/AppWrapper";
@@ -13,7 +13,7 @@ export default function SettingsScreen() {
 
   return (
     <AppWrapper>
-      <View style={styles.container}>
+      <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
         <View style={styles.header}>
           <Pressable
             style={styles.backButton}
@@ -28,7 +28,7 @@ export default function SettingsScreen() {
           <Text style={styles.description}>Make the app yours</Text>
         </View>
         <SettingsList />
-      </View>
+      </ScrollView>
     </AppWrapper>
   );
 }

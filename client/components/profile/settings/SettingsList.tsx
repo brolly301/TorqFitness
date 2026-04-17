@@ -1,82 +1,98 @@
-import { FlatList, StyleSheet, Text, View } from "react-native";
-import React from "react";
-import SettingsTile from "./SettingsTile";
-import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
-import MaterialIcons from "@expo/vector-icons/MaterialIcons";
+import { StyleSheet, Text, View } from "react-native";
+import React, { useMemo } from "react";
+import { Theme } from "@/types/Theme";
+import { useAppTheme } from "@/hooks/useAppTheme";
 import Feather from "@expo/vector-icons/Feather";
-import Ionicons from "@expo/vector-icons/Ionicons";
-import FontAwesome6 from "@expo/vector-icons/FontAwesome6";
-import ThemeToggle from "./ThemeToggle";
+import MaterialIcons from "@expo/vector-icons/MaterialIcons";
+import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
+import Entypo from "@expo/vector-icons/Entypo";
+import SettingsSection from "./SettingsSection";
+
+export type SettingsItem = {
+  label: string;
+  iconType: "feather" | "material" | "materialCommunity" | "entypo";
+  icon:
+    | React.ComponentProps<typeof Feather>["name"]
+    | React.ComponentProps<typeof MaterialIcons>["name"]
+    | React.ComponentProps<typeof MaterialCommunityIcons>["name"]
+    | React.ComponentProps<typeof Entypo>["name"];
+  danger?: boolean;
+  onPress?: () => void;
+};
+
+const ACCOUNT_ITEMS: SettingsItem[] = [
+  {
+    label: "Edit Profile",
+    icon: "edit-2",
+    iconType: "feather",
+  },
+  {
+    label: "Change Password",
+    icon: "lock-outline",
+    iconType: "materialCommunity",
+  },
+];
+
+const APP_ITEMS: SettingsItem[] = [
+  {
+    label: "Appearance",
+    icon: "palette",
+    iconType: "materialCommunity",
+  },
+  {
+    label: "Units",
+    icon: "straighten",
+    iconType: "material",
+  },
+];
+
+const SUPPORT_ITEMS: SettingsItem[] = [
+  {
+    label: "Contact",
+    icon: "mail",
+    iconType: "feather",
+  },
+  {
+    label: "Report Issue",
+    icon: "alert-outline",
+    iconType: "materialCommunity",
+  },
+  {
+    label: "Feedback",
+    icon: "message-square",
+    iconType: "feather",
+  },
+];
+
+const OTHER_ITEMS: SettingsItem[] = [
+  {
+    label: "Rate App",
+    icon: "star-outline",
+    iconType: "materialCommunity",
+  },
+  {
+    label: "Log Out",
+    icon: "log-out",
+    iconType: "feather",
+    danger: true,
+  },
+];
 
 export default function SettingsList() {
-  const accountSettings = [
-    {
-      id: "1",
-      name: "Edit Profile",
-      icon: <FontAwesome6 name="user" size={24} color="black" />,
-    },
-    {
-      id: "2",
-      name: "Privacy Settings",
-      icon: <MaterialIcons name="lock-outline" size={24} color="black" />,
-    },
-  ];
-
-  const appSettings = [
-    {
-      id: "1",
-      name: "Theme",
-      icon: <Ionicons name="color-palette" size={24} color="black" />,
-    },
-    {
-      id: "2",
-      name: "Units",
-      icon: <MaterialIcons name="straighten" size={24} color="black" />,
-    },
-    {
-      id: "3",
-      name: "Sync Workouts",
-      icon: <MaterialCommunityIcons name="sync" size={20} color={"black"} />,
-    },
-    {
-      id: "4",
-      name: "Help & Support",
-      icon: <Feather name="help-circle" size={24} color="black" />,
-    },
-    {
-      id: "5",
-      name: "Log out",
-      icon: <MaterialCommunityIcons name="abacus" size={20} color={"black"} />,
-    },
-  ];
+  const { theme, scale } = useAppTheme();
+  const styles = useMemo(() => makeStyles(theme, scale), [theme, scale]);
 
   return (
     <View style={styles.container}>
-      <Text style={styles.headerTitle}>Account Settings</Text>
-      <FlatList
-        data={accountSettings}
-        keyExtractor={(item) => item.id}
-        renderItem={({ item }) => {
-          return <SettingsTile setting={item} />;
-        }}
-      />
-      <ThemeToggle />
-      <Text style={styles.headerTitle}>App Settings</Text>
-      <FlatList
-        data={appSettings}
-        keyExtractor={(item) => item.id}
-        renderItem={({ item }) => {
-          return <SettingsTile setting={item} />;
-        }}
-      />
+      <SettingsSection title="Account" items={ACCOUNT_ITEMS} />
+      <SettingsSection title="App" items={APP_ITEMS} />
+      <SettingsSection title="Support" items={SUPPORT_ITEMS} />
+      <SettingsSection title="Other" items={OTHER_ITEMS} />
     </View>
   );
 }
 
-const styles = StyleSheet.create({
-  headerTitle: {
-    fontSize: 18,
-    fontWeight: "bold",
-  },
-  container: {},
-});
+export const makeStyles = (theme: Theme, scale: number) =>
+  StyleSheet.create({
+    container: {},
+  });
