@@ -29,4 +29,9 @@ export type Theme = {
   press: string;
   overlay: string;
   shadow: string;
+
+  cardSurface: string;
+  rowSurface: string;
+  headerSurface: string;
+  rowDivider: string;
 };

@@ -1,15 +1,14 @@
 import {
-  amoledTheme,
   darkTheme,
+  duneTheme,
   lightTheme,
   neonTheme,
-  purpleTheme,
+  nocturneTheme,
 } from "@/constants/theme";
 import { Theme } from "@/types/Theme";
 import { createContext, ReactNode, useContext, useMemo, useState } from "react";
 
-export type ThemeType = "light" | "dark" | "amoled" | "purple" | "neon";
-
+export type ThemeType = "Light" | "Dark" | "Nocturne" | "Dune" | "Neon";
 type ThemeContextType = {
   theme: Theme;
   themeType: ThemeType;
@@ -19,15 +18,15 @@ type ThemeContextType = {
 const ThemeContext = createContext<ThemeContextType | null>(null);
 
 const themes: Record<ThemeType, Theme> = {
-  light: lightTheme,
-  dark: darkTheme,
-  amoled: amoledTheme,
-  purple: purpleTheme,
-  neon: neonTheme,
+  Light: lightTheme,
+  Dark: darkTheme,
+  Nocturne: nocturneTheme,
+  Dune: duneTheme,
+  Neon: neonTheme,
 };
 
 export const ThemeProvider = ({ children }: { children: ReactNode }) => {
-  const [themeType, setThemeType] = useState<ThemeType>("light");
+  const [themeType, setThemeType] = useState<ThemeType>("Light");
 
   const theme = useMemo(() => themes[themeType], [themeType]);
 

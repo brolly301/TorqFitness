@@ -16,24 +16,19 @@ export default function WorkoutDetailsModal({
   const styles = useMemo(() => makeStyles(theme, scale), [theme, scale]);
 
   return (
-    <>
-      <Modal visible={modalVisible}>
-        <View style={styles.centeredView}>
-          <Pressable
-            onPress={() => {
-              setModalVisible(!modalVisible);
-            }}
-            style={StyleSheet.absoluteFill}
-          />
-          <View style={styles.modalView}>
-            <WorkoutDetails
-              workout={workout}
-              setModalVisible={setModalVisible}
-            />
-          </View>
+    <Modal visible={modalVisible} transparent animationType="fade">
+      <View style={styles.centeredView}>
+        <Pressable
+          onPress={() => {
+            setModalVisible(!modalVisible);
+          }}
+          style={StyleSheet.absoluteFill}
+        />
+        <View style={styles.modalView}>
+          <WorkoutDetails workout={workout} setModalVisible={setModalVisible} />
         </View>
-      </Modal>
-    </>
+      </View>
+    </Modal>
   );
 }
 
@@ -43,7 +38,7 @@ export const makeStyles = (theme: Theme, scale: number) =>
       justifyContent: "center",
       alignItems: "center",
       flex: 1,
-      backgroundColor: "rgba(0,0,0,0.6)",
+      backgroundColor: theme.shadow,
     },
     modalView: {
       width: "89%",

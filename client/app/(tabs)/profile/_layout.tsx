@@ -3,7 +3,7 @@ import { router, Stack } from "expo-router";
 
 export default function _layout() {
   return (
-    <Stack>
+    <Stack screenOptions={{ headerShown: false }}>
       <Stack.Screen
         name="index"
         options={{
@@ -20,6 +20,7 @@ export default function _layout() {
           },
         }}
       />
+      <Stack.Screen name="settings" />
     </Stack>
   );
 }

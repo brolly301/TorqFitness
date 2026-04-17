@@ -6,6 +6,7 @@ import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import Feather from "@expo/vector-icons/Feather";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import FontAwesome6 from "@expo/vector-icons/FontAwesome6";
+import ThemeToggle from "./ThemeToggle";
 
 export default function SettingsList() {
   const accountSettings = [
@@ -59,6 +60,7 @@ export default function SettingsList() {
           return <SettingsTile setting={item} />;
         }}
       />
+      <ThemeToggle />
       <Text style={styles.headerTitle}>App Settings</Text>
       <FlatList
         data={appSettings}

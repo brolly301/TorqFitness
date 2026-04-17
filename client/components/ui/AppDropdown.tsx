@@ -4,25 +4,24 @@ import { useAppTheme } from "@/hooks/useAppTheme";
 import { Theme } from "@/types/Theme";
 import EvilIcons from "@expo/vector-icons/EvilIcons";
 
-type Props = {
-  data: string[];
-  selected: string;
-  setSelected: (value: string) => void;
+type Props<T extends string> = {
+  data: T[];
+  selected: T;
+  setSelected: (value: T) => void;
   placeholder?: string;
 };
-
-export default function AppDropdown({
+export default function AppDropdown<T extends string>({
   data,
   selected,
   setSelected,
-  placeholder = "Select an option",
-}: Props) {
+  placeholder,
+}: Props<T>) {
   const { theme, scale } = useAppTheme();
   const styles = useMemo(() => makeStyles(theme, scale), [theme, scale]);
 
   const [active, setActive] = useState(false);
 
-  const handleSelected = (item: string) => {
+  const handleSelected = (item: any) => {
     setSelected(item);
     setActive(false);
   };

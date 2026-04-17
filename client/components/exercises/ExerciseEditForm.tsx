@@ -53,6 +53,7 @@ export default function ExerciseEditForm({
     if (!exerciseData) return;
 
     archiveExercise(exerciseData.id);
+    setEditModalVisible(false);
     setModalVisible(false);
   };
 

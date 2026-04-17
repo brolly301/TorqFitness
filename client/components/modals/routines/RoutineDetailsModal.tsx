@@ -16,7 +16,7 @@ export default function RoutineDetailsModal({
   const styles = useMemo(() => makeStyles(theme, scale), [theme, scale]);
 
   return (
-    <Modal visible={modalVisible}>
+    <Modal visible={modalVisible} transparent animationType="fade">
       <View style={styles.centeredView}>
         <Pressable
           onPress={() => setModalVisible(!modalVisible)}
@@ -36,7 +36,7 @@ export const makeStyles = (theme: Theme, scale: number) =>
       justifyContent: "center",
       alignItems: "center",
       flex: 1,
-      backgroundColor: "rgba(0,0,0,0.6)",
+      backgroundColor: theme.shadow,
     },
     modalView: {
       width: "89%",

@@ -181,13 +181,8 @@ export default function WorkoutDetails({ workout, setModalVisible }: Props) {
   );
 }
 
-export const makeStyles = (theme: Theme, scale: number) => {
-  const cardSurface = "#F2F2F5";
-  const rowSurface = "#FAFAFB";
-  const headerSurface = "#E7E6EB";
-  const rowDivider = "#ECECF0";
-
-  return StyleSheet.create({
+export const makeStyles = (theme: Theme, scale: number) =>
+  StyleSheet.create({
     container: {
       flex: 1,
     },
@@ -231,7 +226,7 @@ export const makeStyles = (theme: Theme, scale: number) => {
       borderRadius: 14 * scale,
       borderWidth: 1,
       borderColor: theme.border,
-      backgroundColor: cardSurface,
+      backgroundColor: theme.cardSurface,
       overflow: "hidden",
       shadowColor: "#000",
       shadowOpacity: 0.03,
@@ -269,7 +264,7 @@ export const makeStyles = (theme: Theme, scale: number) => {
       paddingHorizontal: 14 * scale,
       paddingTop: 10 * scale,
       paddingBottom: 6 * scale,
-      backgroundColor: headerSurface,
+      backgroundColor: theme.headerSurface,
     },
 
     columnHeaderLeft: {
@@ -290,12 +285,12 @@ export const makeStyles = (theme: Theme, scale: number) => {
       alignItems: "center",
       paddingHorizontal: 14 * scale,
       paddingVertical: 10 * scale,
-      backgroundColor: rowSurface,
+      backgroundColor: theme.rowSurface,
     },
 
     setCardBorder: {
       borderBottomWidth: 1,
-      borderBottomColor: rowDivider,
+      borderBottomColor: theme.rowDivider,
     },
 
     setNumber: {
@@ -382,4 +377,3 @@ export const makeStyles = (theme: Theme, scale: number) => {
       color: theme.buttonPrimaryText,
     },
   });
-};
