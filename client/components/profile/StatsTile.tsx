@@ -47,7 +47,7 @@ export const makeStyles = (theme: Theme, scale: number) =>
       flexDirection: "row",
       alignItems: "center",
       justifyContent: "space-between",
-      paddingVertical: 8 * scale,
+      paddingVertical: 18 * scale,
     },
 
     valueContainer: {

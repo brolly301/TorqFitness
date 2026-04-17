@@ -1,41 +1,41 @@
 import { Theme } from "@/types/Theme";
 
 export const lightTheme: Theme = {
-  background: "#F5F5F5",
+  background: "#F6F7F9",
   surface: "#FFFFFF",
   card: "#FFFFFF",
-  border: "#E0E0E0",
-  divider: "#E0E0E0",
+  border: "#E5E7EB",
+  divider: "#E5E7EB",
 
-  cardSurface: "#F2F2F5",
-  rowSurface: "#FAFAFB",
-  headerSurface: "#E7E6EB",
-  rowDivider: "#ECECF0",
+  cardSurface: "#F3F4F6",
+  rowSurface: "#FBFCFD",
+  headerSurface: "#ECEFF3",
+  rowDivider: "#E7EAF0",
 
-  text: "#1A1A1A",
-  textSecondary: "#555555",
-  textMuted: "#888888",
+  text: "#111827",
+  textSecondary: "#4B5563",
+  textMuted: "#9CA3AF",
 
   buttonPrimary: "#7B2CBF",
   buttonPrimaryText: "#FFFFFF",
-  buttonSecondary: "#EDEDED",
-  buttonSecondaryText: "#1A1A1A",
-  buttonDisabled: "#BDBDBD",
-  buttonDisabledText: "#777777",
+  buttonSecondary: "#EEF0F3",
+  buttonSecondaryText: "#111827",
+  buttonDisabled: "#D1D5DB",
+  buttonDisabledText: "#6B7280",
 
-  success: "#2E7D32",
-  error: "#D32F2F",
-  warning: "#6D28D9",
+  success: "#16A34A",
+  error: "#DC2626",
+  warning: "#7C3AED",
 
   inputBg: "#FFFFFF",
-  inputBorder: "#DDDDDD",
-  inputText: "#1A1A1A",
-  inputPlaceholder: "#999999",
+  inputBorder: "#D1D5DB",
+  inputText: "#111827",
+  inputPlaceholder: "#9CA3AF",
   inputFocusBorder: "#7B2CBF",
 
-  press: "#F2F2F2",
-  overlay: "rgba(0,0,0,0.05)",
-  shadow: "rgba(0,0,0,0.1)",
+  press: "#EDEFF2",
+  overlay: "rgba(0,0,0,0.5)",
+  shadow: "rgba(0,0,0,0.5)",
 };
 
 export const darkTheme: Theme = {
@@ -73,7 +73,7 @@ export const darkTheme: Theme = {
 
   press: "#1A1A1A",
   overlay: "rgba(0,0,0,0.7)",
-  shadow: "rgba(0,0,0,0.9)",
+  shadow: "rgba(0,0,0,0.7)",
 };
 
 export const nocturneTheme: Theme = {
@@ -110,8 +110,8 @@ export const nocturneTheme: Theme = {
   inputFocusBorder: "#8B5CF6",
 
   press: "#2A2350",
-  overlay: "rgba(139,92,246,0.12)",
-  shadow: "rgba(0,0,0,0.7)",
+  overlay: "rgba(139,92,246,0.5)",
+  shadow: "rgba(139,92,246,0.3)",
 };
 
 export const duneTheme: Theme = {
@@ -148,8 +148,8 @@ export const duneTheme: Theme = {
   inputFocusBorder: "#8C5E3C",
 
   press: "#DDD2C7",
-  overlay: "rgba(43,43,43,0.08)",
-  shadow: "rgba(43,43,43,0.18)",
+  overlay: "rgba(43,43,43,0.5)",
+  shadow: "rgba(43,43,43,0.5)",
 };
 
 export const neonTheme: Theme = {
@@ -187,5 +187,5 @@ export const neonTheme: Theme = {
 
   press: "#252525",
   overlay: "rgba(0,255,198,0.1)",
-  shadow: "rgba(0,255,198,0.25)",
+  shadow: "rgba(0,255,198,0.3)",
 };

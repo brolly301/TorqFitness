@@ -1,20 +1,19 @@
 import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import React, { useMemo } from "react";
-import SettingsList from "@/components/profile/settings/SettingsList";
 import AppWrapper from "@/components/ui/AppWrapper";
 import { Theme } from "@/types/Theme";
 import { useAppTheme } from "@/hooks/useAppTheme";
 import Feather from "@expo/vector-icons/Feather";
 import { router } from "expo-router";
-import ThemeToggle from "@/components/profile/settings/ThemeToggle";
+import EditProfileForm from "@/components/profile/settings/EditProfileForm";
 
-export default function SettingsScreen() {
+export default function EditProfileScreen() {
   const { theme, scale } = useAppTheme();
   const styles = useMemo(() => makeStyles(theme, scale), [theme, scale]);
 
   return (
     <AppWrapper>
-      <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
+      <View style={styles.container}>
         <View style={styles.header}>
           <Pressable
             style={styles.backButton}
@@ -25,12 +24,15 @@ export default function SettingsScreen() {
           </Pressable>
         </View>
         <View style={styles.titleContainer}>
-          <Text style={styles.title}>Settings</Text>
-          <Text style={styles.description}>Make the app yours</Text>
+          <Text style={styles.title}>Edit Profile</Text>
+          <Text style={styles.description}>
+            Change your profile details below
+          </Text>
         </View>
-        <SettingsList />
-        <ThemeToggle />
-      </ScrollView>
+        <View style={styles.formContainer}>
+          <EditProfileForm />
+        </View>
+      </View>
     </AppWrapper>
   );
 }
@@ -49,7 +51,6 @@ const makeStyles = (theme: Theme, scale: number) =>
       alignItems: "center",
       marginBottom: 12 * scale,
     },
-
     backButton: {
       width: 40 * scale,
       height: 40 * scale,
@@ -76,5 +77,8 @@ const makeStyles = (theme: Theme, scale: number) =>
       fontWeight: "400",
       color: theme.textSecondary,
       lineHeight: 22 * scale,
+    },
+    formContainer: {
+      flex: 1,
     },
   });

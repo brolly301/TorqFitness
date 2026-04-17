@@ -72,40 +72,44 @@ export default function SettingsSection({ title, items }: SectionProps) {
 
   return (
     <TileWrapper title={title}>
-      {items.map((item, index) => (
-        <React.Fragment key={item.label}>
-          <Pressable
-            style={styles.row}
-            onPress={item.onPress}
-            android_ripple={{ color: theme.press }}
-          >
-            <View style={styles.rowLeft}>
-              <View style={styles.rowIcon}>{renderIcon(item)}</View>
+      <View style={styles.container}>
+        {items.map((item, index) => (
+          <React.Fragment key={item.label}>
+            <Pressable
+              style={styles.row}
+              onPress={item.onPress}
+              android_ripple={{ color: theme.press }}
+            >
+              <View style={styles.rowLeft}>
+                <View style={styles.rowIcon}>{renderIcon(item)}</View>
 
-              <Text style={[styles.rowLabel, item.danger && styles.dangerText]}>
-                {item.label}
-              </Text>
-            </View>
+                <Text
+                  style={[styles.rowLabel, item.danger && styles.dangerText]}
+                >
+                  {item.label}
+                </Text>
+              </View>
 
-            <View style={styles.rowRight}>
-              <Feather
-                style={styles.rowArrow}
-                name="chevron-right"
-                size={18 * scale}
-                color={theme.textMuted}
-              />
-            </View>
-          </Pressable>
+              <View style={styles.rowRight}>
+                <Feather
+                  style={styles.rowArrow}
+                  name="chevron-right"
+                  size={18 * scale}
+                  color={theme.textMuted}
+                />
+              </View>
+            </Pressable>
 
-          {index !== items.length - 1 && <View style={styles.separator} />}
-        </React.Fragment>
-      ))}
+            {index !== items.length - 1 && <View style={styles.separator} />}
+          </React.Fragment>
+        ))}
+      </View>
     </TileWrapper>
   );
 }
 export const makeStyles = (theme: Theme, scale: number) =>
   StyleSheet.create({
-    container: {},
+    container: { paddingHorizontal: 12 },
 
     row: {
       flexDirection: "row",

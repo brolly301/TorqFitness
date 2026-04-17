@@ -3,12 +3,14 @@ import React, { useEffect } from "react";
 import Feather from "@expo/vector-icons/Feather";
 import FontAwesome6 from "@expo/vector-icons/FontAwesome6";
 import { useAppTheme } from "@/hooks/useAppTheme";
+import StartButton from "@/components/ui/StartButton";
 
 export default function TabLayout() {
   const { theme } = useAppTheme();
 
   return (
     <Tabs
+      initialRouteName="workout"
       screenOptions={{
         headerShown: false,
         tabBarStyle: {
@@ -29,14 +31,15 @@ export default function TabLayout() {
           },
         }}
       />
+
       <Tabs.Screen
-        name="exercises"
+        name="history"
         options={{
           tabBarLabel: () => null,
           tabBarIcon: () => {
             return (
               <FontAwesome6
-                name="dumbbell"
+                name="clock"
                 size={20}
                 color={theme.buttonPrimary}
               />
@@ -49,21 +52,19 @@ export default function TabLayout() {
         options={{
           tabBarLabel: () => null,
           tabBarIcon: () => {
-            return (
-              <FontAwesome6 name="plus" size={20} color={theme.buttonPrimary} />
-            );
+            return <StartButton />;
           },
         }}
       />
 
       <Tabs.Screen
-        name="history"
+        name="exercises"
         options={{
           tabBarLabel: () => null,
           tabBarIcon: () => {
             return (
               <FontAwesome6
-                name="clock"
+                name="dumbbell"
                 size={20}
                 color={theme.buttonPrimary}
               />

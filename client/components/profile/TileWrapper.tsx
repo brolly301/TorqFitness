@@ -22,14 +22,13 @@ export default function TileWrapper({ children, title }: Props) {
 export const makeStyles = (theme: Theme, scale: number) =>
   StyleSheet.create({
     container: {
-      padding: 10 * scale,
       backgroundColor: theme.card,
       borderRadius: 10,
       marginVertical: 5 * scale,
       marginBottom: 25,
     },
     title: {
-      fontSize: 20 * scale,
+      fontSize: 18 * scale,
       fontWeight: "500",
       color: theme.text,
       marginBottom: 5 * scale,

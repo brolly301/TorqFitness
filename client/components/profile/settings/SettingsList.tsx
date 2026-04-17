@@ -7,6 +7,7 @@ import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import Entypo from "@expo/vector-icons/Entypo";
 import SettingsSection from "./SettingsSection";
+import { router } from "expo-router";
 
 export type SettingsItem = {
   label: string;
@@ -25,11 +26,13 @@ const ACCOUNT_ITEMS: SettingsItem[] = [
     label: "Edit Profile",
     icon: "edit-2",
     iconType: "feather",
+    onPress: () => router.navigate("/profile/editProfile"),
   },
   {
     label: "Change Password",
     icon: "lock-outline",
     iconType: "materialCommunity",
+    onPress: () => router.navigate("/profile/changePassword"),
   },
 ];
 

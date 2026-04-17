@@ -45,7 +45,7 @@ export default function DetailsTile() {
 
 const makeStyles = (theme: Theme, scale: number) =>
   StyleSheet.create({
-    container: {},
+    container: { paddingHorizontal: 12, paddingVertical: 6 },
 
     row: {
       flexDirection: "row",
