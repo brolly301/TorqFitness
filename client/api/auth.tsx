@@ -1,5 +1,6 @@
 import { baseURL } from "@/constants/api";
 import { AuthResponse, Login, SignUp } from "../types/User";
+import { UserInputType } from "@/components/profile/settings/EditProfileForm";
 
 export const signUpUser = async (
   userDetails: SignUp,
@@ -55,4 +56,49 @@ export const deleteUser = async (token: string) => {
     method: "DELETE",
     headers: { Authorization: `Bearer ${token}` },
   });
+};
+
+export const updateUserDetails = async (
+  user: UserInputType,
+  token: string,
+): Promise<{ message: string }> => {
+  const res = await fetch(`${baseURL}/auth/user`, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify(user),
+  });
+
+  const data = await res.json();
+
+  if (!res.ok) {
+    throw new Error(data.message || "Failed to update user details.");
+  }
+
+  return data;
+};
+
+export const changeUserPassword = async (
+  password: string,
+  token: string,
+): Promise<{ message: string }> => {
+  console.log(password);
+  const res = await fetch(`${baseURL}/auth/user/changePassword`, {
+    method: "PATCH",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify({ password }),
+  });
+
+  const data = await res.json();
+
+  if (!res.ok) {
+    throw new Error(data.message || "Failed to update user password.");
+  }
+
+  return data;
 };

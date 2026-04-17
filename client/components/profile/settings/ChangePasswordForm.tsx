@@ -13,7 +13,7 @@ export default function ChangePasswordForm() {
   const { theme, scale } = useAppTheme();
   const styles = useMemo(() => makeStyles(theme, scale), [theme, scale]);
 
-  const { user } = useUserContext();
+  const { changePassword } = useUserContext();
 
   const [focused, setFocused] = useState<boolean>(false);
 
@@ -22,7 +22,11 @@ export default function ChangePasswordForm() {
     confirmPassword: "",
   });
 
-  const handleSubmit = () => {};
+  const handleSubmit = () => {
+    if (passwordData.password !== passwordData.confirmPassword) return;
+
+    changePassword(passwordData.password);
+  };
 
   return (
     <View>

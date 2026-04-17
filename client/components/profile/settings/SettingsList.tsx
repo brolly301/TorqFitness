@@ -8,6 +8,7 @@ import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import Entypo from "@expo/vector-icons/Entypo";
 import SettingsSection from "./SettingsSection";
 import { router } from "expo-router";
+import { useUserContext } from "@/context/UserContext";
 
 export type SettingsItem = {
   label: string;
@@ -67,23 +68,25 @@ const SUPPORT_ITEMS: SettingsItem[] = [
   },
 ];
 
-const OTHER_ITEMS: SettingsItem[] = [
-  {
-    label: "Rate App",
-    icon: "star-outline",
-    iconType: "materialCommunity",
-  },
-  {
-    label: "Log Out",
-    icon: "log-out",
-    iconType: "feather",
-    danger: true,
-  },
-];
-
 export default function SettingsList() {
   const { theme, scale } = useAppTheme();
   const styles = useMemo(() => makeStyles(theme, scale), [theme, scale]);
+  const { logout } = useUserContext();
+
+  const OTHER_ITEMS: SettingsItem[] = [
+    {
+      label: "Rate App",
+      icon: "star-outline",
+      iconType: "materialCommunity",
+    },
+    {
+      label: "Log Out",
+      icon: "log-out",
+      iconType: "feather",
+      danger: true,
+      onPress: () => logout(),
+    },
+  ];
 
   return (
     <View style={styles.container}>

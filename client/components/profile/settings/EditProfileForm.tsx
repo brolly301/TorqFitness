@@ -4,7 +4,7 @@ import { Theme } from "@/types/Theme";
 import { useAppTheme } from "@/hooks/useAppTheme";
 import { useUserContext } from "@/context/UserContext";
 
-type UserInputType = {
+export type UserInputType = {
   firstName: string;
   surname: string;
   email: string;
@@ -14,7 +14,7 @@ export default function EditProfileForm() {
   const { theme, scale } = useAppTheme();
   const styles = useMemo(() => makeStyles(theme, scale), [theme, scale]);
 
-  const { user } = useUserContext();
+  const { user, updateUser } = useUserContext();
 
   const [focused, setFocused] = useState<boolean>(false);
 
@@ -26,7 +26,9 @@ export default function EditProfileForm() {
     email: user?.email,
   });
 
-  const handleSubmit = () => {};
+  const handleSubmit = () => {
+    updateUser(userData);
+  };
 
   return (
     <View style={styles.container}>

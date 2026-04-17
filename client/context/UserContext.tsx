@@ -1,4 +1,12 @@
-import { deleteUser, getUser, loginUser, signUpUser } from "@/api/auth";
+import {
+  changeUserPassword,
+  deleteUser,
+  getUser,
+  loginUser,
+  signUpUser,
+  updateUserDetails,
+} from "@/api/auth";
+import { UserInputType } from "@/components/profile/settings/EditProfileForm";
 import { Login, SignUp, User } from "@/types/User";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import {
@@ -19,6 +27,8 @@ type UserContextType = {
   setUser: (user: User | null) => void;
   login: (data: Login) => void;
   signUp: (data: SignUp) => void;
+  updateUser: (data: UserInputType) => void;
+  changePassword: (password: string) => void;
   deleteAccount: () => void;
   authToken: AuthToken;
   logout: () => void;
@@ -99,15 +109,53 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
       await AsyncStorage.removeItem("token");
 
       setAuthToken({ token: "", valid: false });
+
       setUser(null);
     } catch (e) {
       console.error("Log out error:", e);
     }
   };
 
+  const updateUser = async (userDetails: UserInputType) => {
+    try {
+      if (!authToken.token) return;
+      const res = await updateUserDetails(userDetails, authToken.token);
+
+      setUser((prev) => {
+        if (!prev) return prev;
+        return { ...prev, ...userDetails };
+      });
+      console.log(res.message);
+    } catch (e) {
+      const message = e instanceof Error ? e.message : "Something went wrong";
+      console.log(message);
+    }
+  };
+
+  const changePassword = async (password: string) => {
+    try {
+      if (!authToken.token) return;
+      const res = await changeUserPassword(password, authToken.token);
+
+      console.log(res.message);
+    } catch (e) {
+      const message = e instanceof Error ? e.message : "Something went wrong";
+      console.log(message);
+    }
+  };
   return (
     <UserContext.Provider
-      value={{ deleteAccount, authToken, login, logout, signUp, setUser, user }}
+      value={{
+        changePassword,
+        updateUser,
+        deleteAccount,
+        authToken,
+        login,
+        logout,
+        signUp,
+        setUser,
+        user,
+      }}
     >
       {children}
     </UserContext.Provider>

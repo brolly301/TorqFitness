@@ -85,6 +85,56 @@ export const signUp = async (req: Request, res: Response) => {
   }
 };
 
+export const updateUser = async (req: AuthRequest, res: Response) => {
+  try {
+    const userId = req.user?.userId;
+    if (!userId) {
+      res.status(400).json({ message: "Cannot update user. Unauthorized." });
+      return;
+    }
+
+    const { firstName, surname, email } = req.body;
+
+    await prisma.user.update({
+      where: { id: userId },
+      data: {
+        firstName,
+        surname,
+        email,
+      },
+    });
+
+    res.status(201).json({
+      message: "User details updated successfully.",
+    });
+  } catch (e) {}
+};
+
+export const changePassword = async (req: AuthRequest, res: Response) => {
+  try {
+    const userId = req.user?.userId;
+    if (!userId) {
+      res.status(400).json({ message: "Cannot update user. Unauthorized." });
+      return;
+    }
+
+    const { password } = req.body;
+
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    await prisma.user.update({
+      where: { id: userId },
+      data: {
+        password: hashedPassword,
+      },
+    });
+
+    res.status(201).json({
+      message: "User password updated successfully.",
+    });
+  } catch (e) {}
+};
+
 export const getUser = async (req: Request, res: Response) => {
   try {
     const authorizationHeader = req.headers.authorization;
