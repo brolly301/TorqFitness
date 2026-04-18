@@ -1,19 +1,43 @@
-import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
+import { Pressable, StyleSheet, Text, View } from "react-native";
 import React, { useMemo } from "react";
-import SettingsList from "@/components/profile/settings/SettingsList";
+import { router, useLocalSearchParams } from "expo-router";
 import AppWrapper from "@/components/ui/AppWrapper";
-import { Theme } from "@/types/Theme";
-import { useAppTheme } from "@/hooks/useAppTheme";
 import Feather from "@expo/vector-icons/Feather";
-import { router } from "expo-router";
+import { useAppTheme } from "@/hooks/useAppTheme";
+import { Theme } from "@/types/Theme";
 
-export default function SettingsScreen() {
+type SupportFormType = "contact" | "report" | "feedback";
+
+const supportContent: Record<
+  SupportFormType,
+  { title: string; description: string }
+> = {
+  contact: {
+    title: "Contact Us",
+    description: "Send us a message",
+  },
+  report: {
+    title: "Report Issue",
+    description: "Fill out the details below to report an issue",
+  },
+  feedback: {
+    title: "Feedback",
+    description: "Let us know what you think",
+  },
+};
+
+export default function SupportScreen() {
   const { theme, scale } = useAppTheme();
   const styles = useMemo(() => makeStyles(theme, scale), [theme, scale]);
 
+  const params = useLocalSearchParams<{ formType?: SupportFormType }>();
+  const formType = params.formType ?? "contact";
+
+  const content = supportContent[formType] ?? supportContent.contact;
+
   return (
     <AppWrapper>
-      <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
+      <View style={styles.container}>
         <View style={styles.header}>
           <Pressable
             style={styles.backButton}
@@ -23,12 +47,12 @@ export default function SettingsScreen() {
             <Feather name="arrow-left" size={22 * scale} color={theme.text} />
           </Pressable>
         </View>
+
         <View style={styles.titleContainer}>
-          <Text style={styles.title}>Settings</Text>
-          <Text style={styles.description}>Make the app yours</Text>
+          <Text style={styles.title}>{content.title}</Text>
+          <Text style={styles.description}>{content.description}</Text>
         </View>
-        <SettingsList />
-      </ScrollView>
+      </View>
     </AppWrapper>
   );
 }

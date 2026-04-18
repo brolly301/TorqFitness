@@ -3,6 +3,7 @@ import React, { useMemo, useState } from "react";
 import { Theme, ThemeType } from "@/types/Theme";
 import { useAppTheme } from "@/hooks/useAppTheme";
 import AppDropdown from "@/components/ui/AppDropdown";
+import { useSettingsContext } from "@/context/SettingsContext";
 
 const themeData = ["Light", "Dark", "Nocturne", "Dune", "Neon"];
 
@@ -10,7 +11,11 @@ export default function ThemeToggle() {
   const { theme, scale, setTheme } = useAppTheme();
   const styles = useMemo(() => makeStyles(theme, scale), [theme, scale]);
 
-  const [selectedTheme, setSelectedTheme] = useState<ThemeType>("Light");
+  const { settings } = useSettingsContext();
+
+  const [selectedTheme, setSelectedTheme] = useState<ThemeType>(
+    settings?.theme ?? "Light",
+  );
 
   return (
     <View>

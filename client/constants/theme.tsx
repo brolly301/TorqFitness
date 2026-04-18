@@ -73,7 +73,7 @@ export const darkTheme: Theme = {
 
   press: "#1A1A1A",
   overlay: "rgba(0,0,0,0.7)",
-  shadow: "rgba(0,0,0,0.7)",
+  shadow: "rgba(24, 24, 24, 0.7)",
 };
 
 export const nocturneTheme: Theme = {

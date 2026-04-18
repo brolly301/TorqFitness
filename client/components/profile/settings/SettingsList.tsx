@@ -1,5 +1,5 @@
 import { StyleSheet, Text, View } from "react-native";
-import React, { useMemo } from "react";
+import React, { useMemo, useState } from "react";
 import { Theme } from "@/types/Theme";
 import { useAppTheme } from "@/hooks/useAppTheme";
 import Feather from "@expo/vector-icons/Feather";
@@ -9,6 +9,7 @@ import Entypo from "@expo/vector-icons/Entypo";
 import SettingsSection from "./SettingsSection";
 import { router } from "expo-router";
 import { useUserContext } from "@/context/UserContext";
+import AppearanceModal from "@/components/modals/settings/AppearanceModal";
 
 export type SettingsItem = {
   label: string;
@@ -37,34 +38,36 @@ const ACCOUNT_ITEMS: SettingsItem[] = [
   },
 ];
 
-const APP_ITEMS: SettingsItem[] = [
-  {
-    label: "Appearance",
-    icon: "palette",
-    iconType: "materialCommunity",
-  },
-  {
-    label: "Units",
-    icon: "straighten",
-    iconType: "material",
-  },
-];
-
 const SUPPORT_ITEMS: SettingsItem[] = [
   {
     label: "Contact",
     icon: "mail",
     iconType: "feather",
+    onPress: () =>
+      router.navigate({
+        pathname: "/profile/support",
+        params: { formType: "contact" },
+      }),
   },
   {
     label: "Report Issue",
     icon: "alert-outline",
     iconType: "materialCommunity",
+    onPress: () =>
+      router.navigate({
+        pathname: "/profile/support",
+        params: { formType: "report" },
+      }),
   },
   {
     label: "Feedback",
     icon: "message-square",
     iconType: "feather",
+    onPress: () =>
+      router.navigate({
+        pathname: "/profile/support",
+        params: { formType: "feedback" },
+      }),
   },
 ];
 
@@ -72,6 +75,7 @@ export default function SettingsList() {
   const { theme, scale } = useAppTheme();
   const styles = useMemo(() => makeStyles(theme, scale), [theme, scale]);
   const { logout } = useUserContext();
+  const [modalVisible, setModalVisible] = useState<boolean>(false);
 
   const OTHER_ITEMS: SettingsItem[] = [
     {
@@ -88,13 +92,33 @@ export default function SettingsList() {
     },
   ];
 
+  const APP_ITEMS: SettingsItem[] = [
+    {
+      label: "Appearance",
+      icon: "palette",
+      iconType: "materialCommunity",
+      onPress: () => setModalVisible(true),
+    },
+    {
+      label: "Units",
+      icon: "straighten",
+      iconType: "material",
+    },
+  ];
+
   return (
-    <View style={styles.container}>
-      <SettingsSection title="Account" items={ACCOUNT_ITEMS} />
-      <SettingsSection title="App" items={APP_ITEMS} />
-      <SettingsSection title="Support" items={SUPPORT_ITEMS} />
-      <SettingsSection title="Other" items={OTHER_ITEMS} />
-    </View>
+    <>
+      <AppearanceModal
+        modalVisible={modalVisible}
+        setModalVisible={setModalVisible}
+      />
+      <View style={styles.container}>
+        <SettingsSection title="Account" items={ACCOUNT_ITEMS} />
+        <SettingsSection title="App" items={APP_ITEMS} />
+        <SettingsSection title="Support" items={SUPPORT_ITEMS} />
+        <SettingsSection title="Other" items={OTHER_ITEMS} />
+      </View>
+    </>
   );
 }
 
