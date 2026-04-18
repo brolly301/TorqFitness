@@ -29,8 +29,9 @@ model User {
 
 model Settings {
   id        String   @id @default(uuid())
-  theme     String   @default("light")
-  font      String   @default("medium")
+  theme     String   @default("Light")
+  fontSize      String   @default("medium")
+  weightLabel      String   @default("kg")
 
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId    String   @unique

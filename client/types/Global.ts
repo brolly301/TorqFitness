@@ -53,9 +53,3 @@ export type Workout = WorkoutDraft & {
 };
 
 export type Routine = WorkoutDraft;
-
-export type Setting = {
-  id: string;
-  name: string;
-  icon: ReactNode;
-};

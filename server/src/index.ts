@@ -5,6 +5,7 @@ import authRoutes from "./routes/authRoutes";
 import workoutRoutes from "./routes/workoutRoutes";
 import routineRoutes from "./routes/routineRoutes";
 import exerciseRoutes from "./routes/exerciseRoutes";
+import settingRoutes from "./routes/settingRoutes";
 
 const app = express();
 
@@ -32,6 +33,7 @@ app.use("/api/auth", authRoutes);
 app.use("/api/workouts", workoutRoutes);
 app.use("/api/routines", routineRoutes);
 app.use("/api/exercises", exerciseRoutes);
+app.use("/api/settings", settingRoutes);
 
 app.listen(5000, () => {
   console.log("Server is running on port 5000");

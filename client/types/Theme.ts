@@ -35,3 +35,5 @@ export type Theme = {
   headerSurface: string;
   rowDivider: string;
 };
+
+export type ThemeType = "Light" | "Dark" | "Nocturne" | "Dune" | "Neon";

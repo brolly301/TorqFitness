@@ -1,15 +1,13 @@
 import { StyleSheet, Switch, Text, View } from "react-native";
 import React, { useMemo, useState } from "react";
-import { Theme } from "@/types/Theme";
+import { Theme, ThemeType } from "@/types/Theme";
 import { useAppTheme } from "@/hooks/useAppTheme";
-import { ThemeType, useThemeContext } from "@/context/ThemeProvider";
 import AppDropdown from "@/components/ui/AppDropdown";
 
 const themeData = ["Light", "Dark", "Nocturne", "Dune", "Neon"];
 
 export default function ThemeToggle() {
-  const { theme, scale } = useAppTheme();
-  const { themeType, toggleTheme } = useThemeContext();
+  const { theme, scale, setTheme } = useAppTheme();
   const styles = useMemo(() => makeStyles(theme, scale), [theme, scale]);
 
   const [selectedTheme, setSelectedTheme] = useState<ThemeType>("Light");
@@ -21,7 +19,7 @@ export default function ThemeToggle() {
         selected={selectedTheme}
         setSelected={(selected) => {
           setSelectedTheme(selected as ThemeType);
-          toggleTheme(selected as ThemeType);
+          setTheme(selected as ThemeType);
         }}
         placeholder="Theme"
       />

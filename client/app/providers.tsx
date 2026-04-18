@@ -4,13 +4,13 @@ import { ExerciseProvider } from "@/context/ExerciseContext";
 import { WorkoutProvider } from "@/context/WorkoutContext";
 import { RoutineProvider } from "@/context/RoutineContext";
 import { UserProvider } from "@/context/UserContext";
-import { ThemeProvider } from "@/context/ThemeProvider";
 import {
   useFonts,
   Inter_400Regular,
   Inter_500Medium,
   Inter_600SemiBold,
 } from "@expo-google-fonts/inter";
+import { SettingsProvider } from "@/context/SettingsContext";
 
 export default function Providers({ children }: { children: ReactNode }) {
   const [fontsLoaded] = useFonts({
@@ -22,15 +22,15 @@ export default function Providers({ children }: { children: ReactNode }) {
   if (!fontsLoaded) return null;
 
   return (
-    <ThemeProvider>
-      <UserProvider>
+    <UserProvider>
+      <SettingsProvider>
         <WorkoutProvider>
           <RoutineProvider>
             <ExerciseProvider>{children}</ExerciseProvider>
           </RoutineProvider>
         </WorkoutProvider>
-      </UserProvider>
-    </ThemeProvider>
+      </SettingsProvider>
+    </UserProvider>
   );
 }
 

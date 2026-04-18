@@ -61,8 +61,9 @@ export const signUp = async (req: Request, res: Response) => {
         ...body,
         password: hashedPassword,
       },
-      include: { settings: true },
     });
+
+    await prisma.settings.create({ data: { userId: user.id } });
 
     const token = jwt.sign({ userId: user.id }, JWT_SECRET, {
       expiresIn: "7d",
@@ -73,7 +74,6 @@ export const signUp = async (req: Request, res: Response) => {
       firstName: user.firstName,
       surname: user.surname,
       email: user.email,
-      settings: user.settings,
     };
 
     res
