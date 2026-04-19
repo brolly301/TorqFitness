@@ -11,6 +11,7 @@ import {
   Inter_600SemiBold,
 } from "@expo-google-fonts/inter";
 import { SettingsProvider } from "@/context/SettingsContext";
+import ToastConfig from "@/components/ui/ToastConfig";
 
 export default function Providers({ children }: { children: ReactNode }) {
   const [fontsLoaded] = useFonts({
@@ -26,7 +27,10 @@ export default function Providers({ children }: { children: ReactNode }) {
       <SettingsProvider>
         <WorkoutProvider>
           <RoutineProvider>
-            <ExerciseProvider>{children}</ExerciseProvider>
+            <ExerciseProvider>
+              {children}
+              <ToastConfig />
+            </ExerciseProvider>
           </RoutineProvider>
         </WorkoutProvider>
       </SettingsProvider>

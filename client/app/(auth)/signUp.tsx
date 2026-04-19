@@ -1,5 +1,5 @@
-import { StyleSheet, Text, TextInput, View } from "react-native";
-import React from "react";
+import { Pressable, StyleSheet, Text, TextInput, View } from "react-native";
+import React, { useMemo } from "react";
 import { Controller, useForm } from "react-hook-form";
 import {
   SignUpFormValues,
@@ -10,9 +10,14 @@ import { FormField } from "@/types/Global";
 import AppError from "@/components/ui/AppError";
 import { Button } from "@react-navigation/elements";
 import { useUserContext } from "@/context/UserContext";
-import { signUpUser } from "@/api/auth";
+import { useAppTheme } from "@/hooks/useAppTheme";
+import { Theme } from "@/types/Theme";
+import { router } from "expo-router";
 
 export default function SignUpScreen() {
+  const { theme, scale, themeType } = useAppTheme();
+  const styles = useMemo(() => makeStyles(theme, scale), [theme, scale]);
+
   const {
     control,
     handleSubmit,
@@ -66,7 +71,9 @@ export default function SignUpScreen() {
   };
 
   return (
-    <View>
+    <View style={styles.container}>
+      <Text style={styles.title}>Welcome Back</Text>
+      <Text style={styles.subtitle}>Access your notes anytime, anywhere.</Text>
       {signUpFields.map((field) => {
         return (
           <Controller
@@ -95,16 +102,80 @@ export default function SignUpScreen() {
           />
         );
       })}
-      <Button onPressIn={handleSubmit(onSubmit)}>Login</Button>
+      <Pressable
+        style={styles.buttonContainer}
+        onPress={handleSubmit(onSubmit)}
+      >
+        <Text style={styles.buttonText}>Sign Up</Text>
+      </Pressable>
+
+      <Pressable
+        onPress={() => router.replace("/(auth)/login")}
+        style={{ marginTop: 20 }}
+      >
+        <Text style={styles.switchText}>
+          Already have an account? <Text style={styles.link}>Log in</Text>
+        </Text>
+      </Pressable>
     </View>
   );
 }
 
-const styles = StyleSheet.create({
-  input: {
-    borderRadius: 10,
-    borderWidth: 1,
-    padding: 10,
-    borderColor: "black",
-  },
-});
+const makeStyles = (theme: Theme, scale: number) =>
+  StyleSheet.create({
+    input: {
+      borderWidth: 1,
+      backgroundColor: "rgba(255, 255, 255, 0.05)",
+      borderColor: theme.border,
+      padding: 13,
+      marginVertical: 8,
+      fontSize: 16,
+      borderRadius: 12,
+      color: theme.text,
+    },
+    container: {
+      backgroundColor: theme.background,
+      flex: 1,
+      paddingTop: 80,
+      paddingHorizontal: 30,
+    },
+    title: {
+      fontSize: 32,
+      fontWeight: "700",
+      marginBottom: 10,
+      alignSelf: "flex-start",
+      color: theme.text,
+    },
+    subtitle: {
+      color: theme.text,
+      fontSize: 15,
+      marginBottom: 40,
+      alignSelf: "flex-start",
+    },
+    buttonContainer: {
+      backgroundColor: theme.buttonPrimary,
+      borderWidth: 1,
+      borderRadius: 12,
+      paddingVertical: 11,
+      paddingHorizontal: 16,
+      width: "100%",
+      marginVertical: 10,
+      alignItems: "center",
+    },
+    buttonText: {
+      textAlign: "center",
+      color: theme.buttonPrimaryText,
+      fontWeight: "600",
+      letterSpacing: 0.5,
+      fontSize: 18,
+    },
+    switchText: {
+      color: "#999",
+      fontSize: 14,
+      textAlign: "center",
+    },
+    link: {
+      color: theme.text,
+      fontWeight: "600",
+    },
+  });

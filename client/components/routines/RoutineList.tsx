@@ -11,6 +11,7 @@ export default function RoutineList({ routines }: Props) {
   return (
     <View>
       <FlatList
+        showsVerticalScrollIndicator={false}
         data={routines}
         keyExtractor={(item) => item.id}
         renderItem={({ item }) => {

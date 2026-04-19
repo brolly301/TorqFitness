@@ -13,6 +13,7 @@ import {
   updateUserRoutine,
 } from "@/api/routines";
 import { useUserContext } from "./UserContext";
+import { toggleToast } from "@/utils/toggleToast";
 
 type RoutineContextType = {
   routines: Routine[];
@@ -54,6 +55,13 @@ export const RoutineProvider = ({ children }: { children: ReactNode }) => {
       const updatedRoutines = [...prev, res.routine];
       return updatedRoutines;
     });
+    setTimeout(() => {
+      toggleToast({
+        type: "success",
+        text1: "Routine created",
+        text2: `Successfully created ${res.routine.name}.`,
+      });
+    }, 800);
   };
 
   const deleteRoutine = async (id: string) => {
@@ -63,6 +71,13 @@ export const RoutineProvider = ({ children }: { children: ReactNode }) => {
     });
 
     await deleteUserRoutine(authToken.token, id);
+    setTimeout(() => {
+      toggleToast({
+        type: "success",
+        text1: "Routine deleted",
+        text2: `Successfully deleted routine.`,
+      });
+    }, 800);
   };
 
   const updateRoutine = async (updatedRoutine: Routine) => {
@@ -79,6 +94,13 @@ export const RoutineProvider = ({ children }: { children: ReactNode }) => {
 
       return updatedRoutines;
     });
+    setTimeout(() => {
+      toggleToast({
+        type: "success",
+        text1: "Routine saved",
+        text2: `Successfully saved ${res.routine.name}.`,
+      });
+    }, 800);
   };
 
   return (

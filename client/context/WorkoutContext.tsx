@@ -14,6 +14,7 @@ import {
   updateUserWorkout,
 } from "@/api/workout";
 import { useUserContext } from "./UserContext";
+import { toggleToast } from "@/utils/toggleToast";
 
 type WorkoutContextType = {
   workouts: Workout[];
@@ -56,6 +57,14 @@ export const WorkoutProvider = ({ children }: { children: ReactNode }) => {
       const updatedWorkouts = [...prev, res.workout];
       return updatedWorkouts;
     });
+
+    setTimeout(() => {
+      toggleToast({
+        type: "success",
+        text1: "Workout added",
+        text2: `Successfully created ${res.workout.name}.`,
+      });
+    }, 800);
   };
 
   const deleteWorkout = async (id: string) => {
@@ -65,6 +74,14 @@ export const WorkoutProvider = ({ children }: { children: ReactNode }) => {
     });
 
     await deleteUserWorkout(authToken.token, id);
+
+    setTimeout(() => {
+      toggleToast({
+        type: "success",
+        text1: "Workout deleted",
+        text2: `Successfully deleted workout.`,
+      });
+    }, 800);
   };
 
   const updateWorkout = async (updatedWorkout: Workout) => {
@@ -80,6 +97,14 @@ export const WorkoutProvider = ({ children }: { children: ReactNode }) => {
       );
       return updatedWorkouts;
     });
+
+    setTimeout(() => {
+      toggleToast({
+        type: "success",
+        text1: "Workout saved",
+        text2: `Successfully saved ${res.workout.name}.`,
+      });
+    }, 800);
   };
 
   return (

@@ -14,6 +14,7 @@ import {
   updateUserExercise,
 } from "@/api/exercise";
 import { useUserContext } from "./UserContext";
+import { toggleToast } from "@/utils/toggleToast";
 
 type ExerciseContextType = {
   exercises: Exercise[];
@@ -55,6 +56,12 @@ export const ExerciseProvider = ({ children }: { children: ReactNode }) => {
       const updatedExercises = [...prev, res.exercise];
       return updatedExercises;
     });
+
+    toggleToast({
+      type: "success",
+      text1: "Exercise created.",
+      text2: `You can now log this exercise in any new workouts or routines. `,
+    });
   };
 
   const updateExercise = async (updatedExercise: Exercise) => {
@@ -68,6 +75,12 @@ export const ExerciseProvider = ({ children }: { children: ReactNode }) => {
       );
       return updatedExercises;
     });
+
+    toggleToast({
+      type: "success",
+      text1: "Exercise updated.",
+      text2: `All of your new exercise details have been saved. `,
+    });
   };
 
   const archiveExercise = async (id: string) => {
@@ -79,6 +92,11 @@ export const ExerciseProvider = ({ children }: { children: ReactNode }) => {
         exercise.id === id ? { ...exercise, archived: true } : exercise,
       );
       return updatedExercises;
+    });
+    toggleToast({
+      type: "success",
+      text1: "Exercise archived.",
+      text2: `You will no longer see this exercise in the exercise list. `,
     });
   };
 

@@ -8,14 +8,31 @@ type Props = {
 };
 
 export default function AppWrapper({ children }: Props) {
-  const { theme } = useAppTheme();
+  const { theme, themeType } = useAppTheme();
+
+  const barStyle = () => {
+    switch (themeType) {
+      case "Light":
+        return "dark-content";
+      case "Dark":
+        return "light-content";
+      case "Nocturne":
+        return "light-content";
+      case "Dune":
+        return "dark-content";
+      case "Neon":
+        return "light-content";
+      default:
+        return "dark-content";
+    }
+  };
 
   return (
     <SafeAreaView
       style={[styles.container, { backgroundColor: theme.background }]}
       edges={["top", "left", "right"]}
     >
-      <StatusBar barStyle={"dark-content"} backgroundColor={theme.background} />
+      <StatusBar barStyle={barStyle()} backgroundColor={theme.background} />
       {children}
     </SafeAreaView>
   );

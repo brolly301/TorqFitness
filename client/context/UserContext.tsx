@@ -8,6 +8,7 @@ import {
 } from "@/api/auth";
 import { UserInputType } from "@/components/profile/settings/EditProfileForm";
 import { Login, SignUp, User } from "@/types/User";
+import { toggleToast } from "@/utils/toggleToast";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import {
   createContext,
@@ -73,6 +74,13 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
       setUser(res.userData);
       setAuthToken({ token: res.token, valid: true });
       await AsyncStorage.setItem("token", res.token);
+      setTimeout(() => {
+        toggleToast({
+          type: "success",
+          text1: "Login Successful",
+          text2: `Welcome back ${res.userData.firstName}`,
+        });
+      }, 800);
     } catch (e) {
       const message = e instanceof Error ? e.message : "Something went wrong";
       console.log(message);
@@ -98,6 +106,13 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
 
       setAuthToken({ token: "", valid: false });
       setUser(null);
+      setTimeout(() => {
+        toggleToast({
+          type: "success",
+          text1: "User Deleted.",
+          text2: `Account has now been deleted. Please recreate your account to reaccess Torq.`,
+        });
+      }, 800);
     } catch (e) {
       const message = e instanceof Error ? e.message : "Something went wrong";
       console.log(message);
@@ -111,6 +126,11 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
       setAuthToken({ token: "", valid: false });
 
       setUser(null);
+      toggleToast({
+        type: "success",
+        text1: "You've now been logged out.",
+        text2: `We hope to see you back again soon! `,
+      });
     } catch (e) {
       console.error("Log out error:", e);
     }
@@ -125,7 +145,11 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
         if (!prev) return prev;
         return { ...prev, ...userDetails };
       });
-      console.log(res.message);
+      toggleToast({
+        type: "success",
+        text1: "Account updated.",
+        text2: `Your new details have been saved. `,
+      });
     } catch (e) {
       const message = e instanceof Error ? e.message : "Something went wrong";
       console.log(message);
@@ -137,7 +161,11 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
       if (!authToken.token) return;
       const res = await changeUserPassword(password, authToken.token);
 
-      console.log(res.message);
+      toggleToast({
+        type: "success",
+        text1: "Password changed.",
+        text2: `Please log in with your new password once you log out. `,
+      });
     } catch (e) {
       const message = e instanceof Error ? e.message : "Something went wrong";
       console.log(message);
