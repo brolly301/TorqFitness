@@ -23,6 +23,11 @@ type AuthToken = {
   valid: boolean;
 };
 
+type ApiError = {
+  message: string;
+  status: string;
+};
+
 type UserContextType = {
   user: User | null;
   setUser: (user: User | null) => void;
@@ -33,6 +38,8 @@ type UserContextType = {
   deleteAccount: () => void;
   authToken: AuthToken;
   logout: () => void;
+  error: ApiError | null;
+  setError: (msg: ApiError | null) => void;
 };
 
 const UserContext = createContext<UserContextType | null>(null);
@@ -43,6 +50,8 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
     token: "",
     valid: false,
   });
+
+  const [error, setError] = useState<ApiError | null>(null);
 
   useEffect(() => {
     restoreUserSession();
@@ -71,6 +80,7 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
   const login = async (data: Login) => {
     try {
       const res = await loginUser(data);
+
       setUser(res.userData);
       setAuthToken({ token: res.token, valid: true });
       await AsyncStorage.setItem("token", res.token);
@@ -83,7 +93,7 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
       }, 800);
     } catch (e) {
       const message = e instanceof Error ? e.message : "Something went wrong";
-      console.log(message);
+      setError({ message, status: "" });
     }
   };
 
@@ -94,7 +104,7 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
       setAuthToken({ token: res.token, valid: true });
     } catch (e) {
       const message = e instanceof Error ? e.message : "Something went wrong";
-      console.log(message);
+      setError({ message, status: "" });
     }
   };
 
@@ -152,7 +162,7 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
       });
     } catch (e) {
       const message = e instanceof Error ? e.message : "Something went wrong";
-      console.log(message);
+      setError({ message, status: "" });
     }
   };
 
@@ -168,12 +178,15 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
       });
     } catch (e) {
       const message = e instanceof Error ? e.message : "Something went wrong";
-      console.log(message);
+      setError({ message, status: "" });
     }
   };
+
   return (
     <UserContext.Provider
       value={{
+        error,
+        setError,
         changePassword,
         updateUser,
         deleteAccount,

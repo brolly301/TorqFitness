@@ -1,5 +1,5 @@
 import { Pressable, StyleSheet, Text, TextInput, View } from "react-native";
-import React, { useMemo, useState } from "react";
+import React, { useLayoutEffect, useMemo, useState } from "react";
 import LoginForm from "@/components/auth/login/LoginForm";
 import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -10,7 +10,7 @@ import { Button } from "@react-navigation/elements";
 import { useUserContext } from "@/context/UserContext";
 import { useAppTheme } from "@/hooks/useAppTheme";
 import { Theme } from "@/types/Theme";
-import { router } from "expo-router";
+import { router, useNavigation } from "expo-router";
 
 export default function LoginScreen() {
   const { theme, scale } = useAppTheme();
@@ -26,15 +26,20 @@ export default function LoginScreen() {
       email: "",
       password: "",
     },
-    mode: "onChange",
+    mode: "onSubmit",
   });
 
-  const { login } = useUserContext();
+  const { login, error, setError } = useUserContext();
 
+  const navigation = useNavigation();
   const loginFields: FormField<LoginFormValues>[] = [
     { name: "email", placeholder: "Email" },
     { name: "password", placeholder: "Password", secureTextEntry: true },
   ];
+
+  useLayoutEffect(() => {
+    setError(null);
+  }, [navigation]);
 
   const onSubmit = (data: LoginFormValues) => {
     login(data);
@@ -72,6 +77,7 @@ export default function LoginScreen() {
           />
         );
       })}
+      {error?.message && <AppError>{error.message}</AppError>}
       <Pressable
         onPress={() => router.push("/(auth)/resetPassword")}
         style={styles.resetLinkWrapper}
@@ -80,7 +86,6 @@ export default function LoginScreen() {
           Forgot Password?<Text style={styles.forgotLink}> Reset it</Text>
         </Text>
       </Pressable>
-
       <Pressable
         style={styles.buttonContainer}
         onPress={handleSubmit(onSubmit)}
@@ -132,7 +137,6 @@ const makeStyles = (theme: Theme, scale: number) =>
     },
     buttonContainer: {
       backgroundColor: theme.buttonPrimary,
-      borderWidth: 1,
       borderRadius: 12,
       paddingVertical: 11,
       paddingHorizontal: 16,

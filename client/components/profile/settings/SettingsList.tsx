@@ -10,6 +10,8 @@ import SettingsSection from "./SettingsSection";
 import { router } from "expo-router";
 import { useUserContext } from "@/context/UserContext";
 import AppearanceModal from "@/components/modals/settings/AppearanceModal";
+import UnitsModal from "@/components/modals/settings/UnitsModal";
+import RateModal from "@/components/modals/settings/RateModal";
 
 export type SettingsItem = {
   label: string;
@@ -75,13 +77,16 @@ export default function SettingsList() {
   const { theme, scale } = useAppTheme();
   const styles = useMemo(() => makeStyles(theme, scale), [theme, scale]);
   const { logout } = useUserContext();
-  const [modalVisible, setModalVisible] = useState<boolean>(false);
+  const [appearanceVisible, setAppearanceVisible] = useState<boolean>(false);
+  const [unitsVisible, setUnitsVisible] = useState<boolean>(false);
+  const [rateVisible, setRateVisible] = useState<boolean>(false);
 
   const OTHER_ITEMS: SettingsItem[] = [
     {
       label: "Rate App",
       icon: "star-outline",
       iconType: "materialCommunity",
+      onPress: () => setRateVisible(true),
     },
     {
       label: "Log Out",
@@ -97,21 +102,27 @@ export default function SettingsList() {
       label: "Appearance",
       icon: "palette",
       iconType: "materialCommunity",
-      onPress: () => setModalVisible(true),
+      onPress: () => setAppearanceVisible(true),
     },
     {
       label: "Units",
       icon: "straighten",
       iconType: "material",
+      onPress: () => setUnitsVisible(true),
     },
   ];
 
   return (
     <>
       <AppearanceModal
-        modalVisible={modalVisible}
-        setModalVisible={setModalVisible}
+        modalVisible={appearanceVisible}
+        setModalVisible={setAppearanceVisible}
       />
+      <UnitsModal
+        modalVisible={unitsVisible}
+        setModalVisible={setUnitsVisible}
+      />
+      <RateModal modalVisible={rateVisible} setModalVisible={setRateVisible} />
       <View style={styles.container}>
         <SettingsSection title="Account" items={ACCOUNT_ITEMS} />
         <SettingsSection title="App" items={APP_ITEMS} />

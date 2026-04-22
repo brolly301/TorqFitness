@@ -2,6 +2,7 @@ import * as z from "zod/v4";
 
 export const emailSchema = z
   .email("Please enter a valid email address")
+  .trim()
   .min(1, "Email is required.");
 
 export const passwordSchema = z
@@ -29,5 +30,5 @@ export const firstNameSchema = z
 
 export const surnameSchema = z
   .string()
-  .min(1, "Name is required.")
+  .min(1, "Surname is required.")
   .max(30, "Surname must not exceed 30 characters.");

@@ -1,8 +1,17 @@
 import { Pressable, StyleSheet, Text, TextInput, View } from "react-native";
-import React, { useMemo, useState } from "react";
+import React, { useLayoutEffect, useMemo, useState } from "react";
 import { Theme } from "@/types/Theme";
 import { useAppTheme } from "@/hooks/useAppTheme";
 import { useUserContext } from "@/context/UserContext";
+import AppError from "@/components/ui/AppError";
+import { useNavigation } from "expo-router";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { Controller, useForm } from "react-hook-form";
+import {
+  ProfileFormValues,
+  profileSchema,
+} from "@/utils/validation/profileSchema";
+import { FormField } from "@/types/Global";
 
 export type UserInputType = {
   firstName: string;
@@ -14,84 +23,86 @@ export default function EditProfileForm() {
   const { theme, scale } = useAppTheme();
   const styles = useMemo(() => makeStyles(theme, scale), [theme, scale]);
 
-  const { user, updateUser } = useUserContext();
+  const { user, updateUser, error, setError } = useUserContext();
 
   const [focused, setFocused] = useState<boolean>(false);
 
   if (!user) return;
 
-  const [userData, setUserData] = useState<UserInputType>({
-    firstName: user?.firstName,
-    surname: user?.surname,
-    email: user?.email,
+  console.log(user);
+
+  const {
+    control,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<ProfileFormValues>({
+    resolver: zodResolver(profileSchema),
+    defaultValues: {
+      firstName: user.firstName,
+      surname: user.surname,
+      email: user.email,
+    },
+    mode: "onSubmit",
   });
 
-  const handleSubmit = () => {
-    updateUser(userData);
+  const onSubmit = (data: ProfileFormValues) => {
+    updateUser(data);
   };
+
+  const navigation = useNavigation();
+
+  useLayoutEffect(() => {
+    setError(null);
+  }, [navigation]);
+
+  const profileFields: FormField<ProfileFormValues>[] = [
+    {
+      name: "firstName",
+      placeholder: "First Name",
+    },
+    {
+      name: "surname",
+      placeholder: "Surname",
+    },
+    {
+      name: "email",
+      placeholder: "Email",
+    },
+  ];
 
   return (
     <View style={styles.container}>
-      <Text style={styles.label}>First name</Text>
-      <TextInput
-        placeholder="First name"
-        returnKeyType="done"
-        placeholderTextColor={theme.textSecondary}
-        onFocus={() => setFocused(true)}
-        onBlur={() => setFocused(false)}
-        value={userData.firstName}
-        style={[
-          styles.input,
-          {
-            borderColor: focused ? theme.inputFocusBorder : theme.inputBorder,
-          },
-        ]}
-        textAlignVertical="center"
-        onChangeText={(text) =>
-          setUserData((prev) => ({ ...prev, firstName: text }))
-        }
-      />
-      <Text style={styles.label}>Surname</Text>
-      <TextInput
-        placeholder="Surname"
-        returnKeyType="done"
-        placeholderTextColor={theme.textSecondary}
-        onFocus={() => setFocused(true)}
-        onBlur={() => setFocused(false)}
-        value={userData.surname}
-        style={[
-          styles.input,
-          {
-            borderColor: focused ? theme.inputFocusBorder : theme.inputBorder,
-          },
-        ]}
-        textAlignVertical="center"
-        onChangeText={(text) =>
-          setUserData((prev) => ({ ...prev, surname: text }))
-        }
-      />
-      <Text style={styles.label}>Email</Text>
-      <TextInput
-        placeholder="Email"
-        returnKeyType="done"
-        placeholderTextColor={theme.textSecondary}
-        onFocus={() => setFocused(true)}
-        onBlur={() => setFocused(false)}
-        value={userData.email}
-        style={[
-          styles.input,
-          {
-            borderColor: focused ? theme.inputFocusBorder : theme.inputBorder,
-          },
-        ]}
-        textAlignVertical="center"
-        onChangeText={(text) =>
-          setUserData((prev) => ({ ...prev, email: text }))
-        }
-      />
-
+      {profileFields.map((field) => {
+        return (
+          <Controller
+            name={field.name}
+            control={control}
+            key={field.name}
+            render={({ field: { onChange, value } }) => (
+              <View style={{ marginBottom: 10 }}>
+                <Text style={styles.label}>{field.placeholder}</Text>
+                <TextInput
+                  placeholder={field.placeholder}
+                  onChangeText={onChange}
+                  textAlignVertical="center"
+                  value={value}
+                  placeholderTextColor={theme.text}
+                  autoComplete="off"
+                  textContentType="oneTimeCode"
+                  importantForAutofill="no"
+                  style={styles.input}
+                />
+                {errors[field.name] && (
+                  <AppError>{errors[field.name]?.message}</AppError>
+                )}
+              </View>
+            )}
+          />
+        );
+      })}
+      {error?.message && <AppError>{error.message}</AppError>}
       <Pressable
-        onPress={handleSubmit}
+        onPress={handleSubmit(onSubmit)}
         // disabled={isDisabled}
         style={[
           styles.button,
@@ -124,7 +135,9 @@ const makeStyles = (theme: Theme, scale: number) =>
   StyleSheet.create({
     container: {
       padding: 16 * scale,
-      backgroundColor: theme.card,
+      paddingVertical: 20,
+
+      backgroundColor: theme.surface,
       borderRadius: 14 * scale,
       borderWidth: 1,
       borderColor: theme.border,
@@ -148,7 +161,7 @@ const makeStyles = (theme: Theme, scale: number) =>
       paddingHorizontal: 12 * scale,
       paddingVertical: 12 * scale,
       backgroundColor: theme.buttonSecondary,
-      marginBottom: 16 * scale,
+      marginBottom: 5 * scale,
       fontSize: 15 * scale,
       color: theme.text,
     },

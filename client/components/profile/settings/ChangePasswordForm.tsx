@@ -1,8 +1,17 @@
 import { Pressable, StyleSheet, Text, TextInput, View } from "react-native";
-import React, { useMemo, useState } from "react";
+import React, { useLayoutEffect, useMemo, useState } from "react";
 import { useAppTheme } from "@/hooks/useAppTheme";
 import { useUserContext } from "@/context/UserContext";
 import { Theme } from "@/types/Theme";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { Controller, useForm } from "react-hook-form";
+import {
+  changePasswordSchema,
+  ChnagePasswordFormValues,
+} from "@/utils/validation/changePasswordSchema";
+import { useNavigation } from "expo-router";
+import { FormField } from "@/types/Global";
+import AppError from "@/components/ui/AppError";
 
 type PasswordInputType = {
   password: string;
@@ -13,67 +22,84 @@ export default function ChangePasswordForm() {
   const { theme, scale } = useAppTheme();
   const styles = useMemo(() => makeStyles(theme, scale), [theme, scale]);
 
-  const { changePassword } = useUserContext();
+  const { changePassword, error, setError } = useUserContext();
 
   const [focused, setFocused] = useState<boolean>(false);
 
-  const [passwordData, setPasswordData] = useState<PasswordInputType>({
-    password: "",
-    confirmPassword: "",
+  const {
+    control,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<ChnagePasswordFormValues>({
+    resolver: zodResolver(changePasswordSchema),
+    defaultValues: {
+      password: "",
+      confirmPassword: "",
+    },
+    mode: "onSubmit",
   });
 
-  const handleSubmit = () => {
-    if (passwordData.password !== passwordData.confirmPassword) return;
+  const onSubmit = (data: ChnagePasswordFormValues) => {
+    const { confirmPassword, password } = data;
 
-    changePassword(passwordData.password);
+    if (data.password !== confirmPassword) return;
+
+    changePassword(password);
   };
 
+  const navigation = useNavigation();
+
+  useLayoutEffect(() => {
+    setError(null);
+  }, [navigation]);
+
+  const profileFields: FormField<ChnagePasswordFormValues>[] = [
+    {
+      name: "password",
+      placeholder: "Password",
+      secureTextEntry: true,
+    },
+    {
+      name: "confirmPassword",
+      placeholder: "Confirm Password",
+      secureTextEntry: true,
+    },
+  ];
+
   return (
-    <View>
-      <Text style={styles.label}>Password</Text>
-
-      <TextInput
-        placeholder="Password"
-        returnKeyType="done"
-        placeholderTextColor={theme.textSecondary}
-        onFocus={() => setFocused(true)}
-        onBlur={() => setFocused(false)}
-        value={passwordData.password}
-        secureTextEntry
-        style={[
-          styles.input,
-          {
-            borderColor: focused ? theme.inputFocusBorder : theme.inputBorder,
-          },
-        ]}
-        textAlignVertical="center"
-        onChangeText={(text) =>
-          setPasswordData((prev) => ({ ...prev, password: text }))
-        }
-      />
-      <Text style={styles.label}>Confirm Password</Text>
-
-      <TextInput
-        placeholder="Confirm Password"
-        returnKeyType="done"
-        placeholderTextColor={theme.textSecondary}
-        onFocus={() => setFocused(true)}
-        secureTextEntry
-        onBlur={() => setFocused(false)}
-        value={passwordData.confirmPassword}
-        style={[
-          styles.input,
-          {
-            borderColor: focused ? theme.inputFocusBorder : theme.inputBorder,
-          },
-        ]}
-        textAlignVertical="center"
-        onChangeText={(text) =>
-          setPasswordData((prev) => ({ ...prev, confirmPassword: text }))
-        }
-      />
+    <View style={styles.container}>
+      {profileFields.map((field) => {
+        return (
+          <Controller
+            name={field.name}
+            control={control}
+            key={field.name}
+            render={({ field: { onChange, value } }) => (
+              <View style={{ marginBottom: 10 }}>
+                <Text style={styles.label}>{field.placeholder}</Text>
+                <TextInput
+                  placeholder={field.placeholder}
+                  onChangeText={onChange}
+                  textAlignVertical="center"
+                  value={value}
+                  secureTextEntry
+                  placeholderTextColor={theme.text}
+                  autoComplete="off"
+                  textContentType="oneTimeCode"
+                  importantForAutofill="no"
+                  style={styles.input}
+                />
+                {errors[field.name] && (
+                  <AppError>{errors[field.name]?.message}</AppError>
+                )}
+              </View>
+            )}
+          />
+        );
+      })}
+      {error?.message && <AppError>{error.message}</AppError>}
       <Pressable
-        onPress={handleSubmit}
+        onPress={handleSubmit(onSubmit)}
         // disabled={isDisabled}
         style={[
           styles.button,
@@ -106,7 +132,8 @@ const makeStyles = (theme: Theme, scale: number) =>
   StyleSheet.create({
     container: {
       padding: 16 * scale,
-      backgroundColor: theme.card,
+      paddingVertical: 20,
+      backgroundColor: theme.surface,
       borderRadius: 14 * scale,
       borderWidth: 1,
       borderColor: theme.border,
@@ -118,7 +145,7 @@ const makeStyles = (theme: Theme, scale: number) =>
     },
 
     label: {
-      fontSize: 13 * scale,
+      fontSize: 14 * scale,
       color: theme.textSecondary,
       marginBottom: 6 * scale,
     },
@@ -130,8 +157,8 @@ const makeStyles = (theme: Theme, scale: number) =>
       paddingHorizontal: 12 * scale,
       paddingVertical: 12 * scale,
       backgroundColor: theme.buttonSecondary,
-      marginBottom: 16 * scale,
       fontSize: 15 * scale,
+      marginBottom: 5 * scale,
       color: theme.text,
     },
 

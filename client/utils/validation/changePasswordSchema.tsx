@@ -1,16 +1,8 @@
 import * as z from "zod/v4";
-import {
-  emailSchema,
-  firstNameSchema,
-  passwordSchema,
-  surnameSchema,
-} from "./sharedSchemas";
+import { passwordSchema } from "./sharedSchemas";
 
-export const signUpSchema = z
+export const changePasswordSchema = z
   .object({
-    firstName: firstNameSchema,
-    surname: surnameSchema,
-    email: emailSchema,
     password: passwordSchema,
     confirmPassword: z.string().min(1, "Please confirm your password"),
   })
@@ -19,4 +11,4 @@ export const signUpSchema = z
     path: ["confirmPassword"],
   });
 
-export type SignUpFormValues = z.infer<typeof signUpSchema>;
+export type ChnagePasswordFormValues = z.infer<typeof changePasswordSchema>;

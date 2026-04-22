@@ -8,6 +8,7 @@ export type User = {
 export type AuthResponse = {
   userData: User;
   token: string;
+  message: string;
 };
 
 export type Settings = {

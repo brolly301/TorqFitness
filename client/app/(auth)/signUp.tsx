@@ -1,5 +1,5 @@
 import { Pressable, StyleSheet, Text, TextInput, View } from "react-native";
-import React, { useMemo } from "react";
+import React, { useLayoutEffect, useMemo } from "react";
 import { Controller, useForm } from "react-hook-form";
 import {
   SignUpFormValues,
@@ -8,11 +8,10 @@ import {
 import { zodResolver } from "@hookform/resolvers/zod";
 import { FormField } from "@/types/Global";
 import AppError from "@/components/ui/AppError";
-import { Button } from "@react-navigation/elements";
 import { useUserContext } from "@/context/UserContext";
 import { useAppTheme } from "@/hooks/useAppTheme";
 import { Theme } from "@/types/Theme";
-import { router } from "expo-router";
+import { router, useNavigation } from "expo-router";
 
 export default function SignUpScreen() {
   const { theme, scale, themeType } = useAppTheme();
@@ -31,9 +30,12 @@ export default function SignUpScreen() {
       password: "",
       confirmPassword: "",
     },
+    mode: "onSubmit",
   });
 
-  const { signUp } = useUserContext();
+  const { signUp, setError, error } = useUserContext();
+
+  const navigation = useNavigation();
 
   const signUpFields: FormField<SignUpFormValues>[] = [
     {
@@ -59,6 +61,10 @@ export default function SignUpScreen() {
       secureTextEntry: true,
     },
   ];
+
+  useLayoutEffect(() => {
+    setError(null);
+  }, [navigation]);
 
   const onSubmit = (data: SignUpFormValues) => {
     const { confirmPassword, ...body } = data;
@@ -102,6 +108,7 @@ export default function SignUpScreen() {
           />
         );
       })}
+      {error?.message && <AppError>{error.message}</AppError>}
       <Pressable
         style={styles.buttonContainer}
         onPress={handleSubmit(onSubmit)}
@@ -125,8 +132,8 @@ const makeStyles = (theme: Theme, scale: number) =>
   StyleSheet.create({
     input: {
       borderWidth: 1,
-      backgroundColor: "rgba(255, 255, 255, 0.05)",
-      borderColor: theme.border,
+      backgroundColor: theme.inputBg,
+      borderColor: theme.inputBorder,
       padding: 13,
       marginVertical: 8,
       fontSize: 16,
@@ -154,7 +161,6 @@ const makeStyles = (theme: Theme, scale: number) =>
     },
     buttonContainer: {
       backgroundColor: theme.buttonPrimary,
-      borderWidth: 1,
       borderRadius: 12,
       paddingVertical: 11,
       paddingHorizontal: 16,

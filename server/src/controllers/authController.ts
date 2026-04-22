@@ -16,8 +16,9 @@ export const login = async (req: Request, res: Response) => {
     });
 
     if (!user || !(await bcrypt.compare(password, user.password))) {
-      res.status(400).json({ message: "Invalid email or password" });
-      return;
+      return res
+        .status(401)
+        .json({ message: "Invalid email or password", success: false });
     }
 
     const token = jwt.sign({ userId: user.id }, JWT_SECRET, {
@@ -32,10 +33,11 @@ export const login = async (req: Request, res: Response) => {
       settings: user.settings,
     };
 
-    res.status(200).json({ message: "Login successful.", userData, token });
+    res
+      .status(200)
+      .json({ message: "Login successful.", userData, token, success: true });
   } catch (e) {
-    console.log("Login error", e);
-    res.status(500).json({ message: "Internal server error" });
+    res.status(500).json({ message: "Something went wrong.", success: false });
   }
 };
 
@@ -48,10 +50,10 @@ export const signUp = async (req: Request, res: Response) => {
     });
 
     if (existingEmail) {
-      res
-        .status(400)
-        .json({ message: "A user with this email already exists." });
-      return;
+      return res.status(409).json({
+        message: "A user with this email already exists.",
+        success: false,
+      });
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
@@ -76,12 +78,15 @@ export const signUp = async (req: Request, res: Response) => {
       email: user.email,
     };
 
-    res
-      .status(200)
-      .json({ message: "Successfully signed up", token, userData });
+    res.status(201).json({
+      message: "Successfully signed up",
+      token,
+      userData,
+      success: true,
+    });
   } catch (err) {
     console.error("Sign up error:", err);
-    res.status(500).json({ message: "Internal server error" });
+    res.status(500).json({ message: "Something went wrong.", success: false });
   }
 };
 
@@ -89,11 +94,24 @@ export const updateUser = async (req: AuthRequest, res: Response) => {
   try {
     const userId = req.user?.userId;
     if (!userId) {
-      res.status(400).json({ message: "Cannot update user. Unauthorized." });
-      return;
+      return res.status(401).json({ message: "Unauthorized.", success: false });
     }
 
     const { firstName, surname, email } = req.body;
+
+    const existingEmail = await prisma.user.findFirst({
+      where: {
+        email,
+        NOT: { id: userId },
+      },
+    });
+
+    if (existingEmail) {
+      return res.status(409).json({
+        message: "A user with this email already exists.",
+        success: false,
+      });
+    }
 
     await prisma.user.update({
       where: { id: userId },
@@ -104,17 +122,20 @@ export const updateUser = async (req: AuthRequest, res: Response) => {
       },
     });
 
-    res.status(201).json({
+    res.status(200).json({
       message: "User details updated successfully.",
+      success: true,
     });
-  } catch (e) {}
+  } catch (err) {
+    res.status(500).json({ message: "Something went wrong", success: false });
+  }
 };
 
 export const changePassword = async (req: AuthRequest, res: Response) => {
   try {
     const userId = req.user?.userId;
     if (!userId) {
-      res.status(400).json({ message: "Cannot update user. Unauthorized." });
+      res.status(401).json({ message: "Unauthorized.", success: false });
       return;
     }
 
@@ -129,33 +150,48 @@ export const changePassword = async (req: AuthRequest, res: Response) => {
       },
     });
 
-    res.status(201).json({
+    res.status(200).json({
       message: "User password updated successfully.",
+      success: true,
     });
-  } catch (e) {}
+  } catch (err) {
+    console.error("Sign up error:", err);
+    res.status(500).json({ message: "Something went wrong.", success: false });
+  }
 };
 
 export const getUser = async (req: Request, res: Response) => {
+  const authorizationHeader = req.headers.authorization;
+
+  const token = authorizationHeader?.split(" ")[1];
+
+  if (!token) {
+    res.status(401).json({ message: "No token was provided.", success: false });
+    return;
+  }
+
+  let userId: string;
+
   try {
-    const authorizationHeader = req.headers.authorization;
+    const decoded = jwt.verify(token, JWT_SECRET) as { userId: string };
+    userId = decoded.userId;
+  } catch {
+    return res.status(401).json({
+      message: "Invalid or expired token.",
+      success: false,
+    });
+  }
 
-    const token = authorizationHeader?.split(" ")[1];
-
-    if (!token) {
-      res.status(401).json({ message: "No token was provided." });
-      return;
-    }
-
-    const { userId } = jwt.verify(token, JWT_SECRET) as { userId: string };
-
+  try {
     const user = await prisma.user.findFirst({
       where: { id: userId },
       include: { settings: true },
     });
 
     if (!user) {
-      res.status(404).json({ message: "User not found" });
-      return;
+      return res
+        .status(404)
+        .json({ message: "User not found", success: false });
     }
 
     const userData = {
@@ -166,10 +202,13 @@ export const getUser = async (req: Request, res: Response) => {
       settings: user.settings,
     };
 
-    res.status(200).json({ message: "Successfully retrieved user", userData });
+    res.status(200).json({
+      message: "Successfully retrieved user",
+      success: true,
+      userData,
+    });
   } catch (err) {
-    console.error("Get user error:", err);
-    res.status(500).json({ message: "Internal server error" });
+    res.status(500).json({ message: "Something went wrong..", success: false });
   }
 };
 
@@ -178,7 +217,7 @@ export const deleteUser = async (req: AuthRequest, res: Response) => {
     const userId = req.user?.userId;
 
     if (!userId) {
-      res.status(401).json({ message: "Unauthorized" });
+      res.status(401).json({ message: "Unauthorized", success: false });
       return;
     }
 
@@ -188,7 +227,6 @@ export const deleteUser = async (req: AuthRequest, res: Response) => {
 
     res.status(204).end();
   } catch (err) {
-    console.error("Delete user error:", err);
-    res.status(500).json({ message: "Internal server error" });
+    res.status(500).json({ message: "Something went wrong.", success: false });
   }
 };
