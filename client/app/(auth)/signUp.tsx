@@ -4,7 +4,7 @@ import { Controller, useForm } from "react-hook-form";
 import {
   SignUpFormValues,
   signUpSchema,
-} from "@/utils/validation/signUpSchema";
+} from "../../../server/src/validation/signUpSchema";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { FormField } from "@/types/Global";
 import AppError from "@/components/ui/AppError";

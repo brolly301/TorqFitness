@@ -8,23 +8,16 @@ import { Controller, useForm } from "react-hook-form";
 import {
   changePasswordSchema,
   ChnagePasswordFormValues,
-} from "@/utils/validation/changePasswordSchema";
+} from "../../../../server/src/validation/changePasswordSchema";
 import { useNavigation } from "expo-router";
 import { FormField } from "@/types/Global";
 import AppError from "@/components/ui/AppError";
-
-type PasswordInputType = {
-  password: string;
-  confirmPassword: string;
-};
 
 export default function ChangePasswordForm() {
   const { theme, scale } = useAppTheme();
   const styles = useMemo(() => makeStyles(theme, scale), [theme, scale]);
 
   const { changePassword, error, setError } = useUserContext();
-
-  const [focused, setFocused] = useState<boolean>(false);
 
   const {
     control,

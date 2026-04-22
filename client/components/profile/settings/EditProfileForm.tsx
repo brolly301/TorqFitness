@@ -10,7 +10,7 @@ import { Controller, useForm } from "react-hook-form";
 import {
   ProfileFormValues,
   profileSchema,
-} from "@/utils/validation/profileSchema";
+} from "../../../../server/src/validation/profileSchema";
 import { FormField } from "@/types/Global";
 
 export type UserInputType = {

@@ -3,7 +3,10 @@ import React, { useLayoutEffect, useMemo, useState } from "react";
 import LoginForm from "@/components/auth/login/LoginForm";
 import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { LoginFormValues, loginSchema } from "@/utils/validation/loginSchema";
+import {
+  LoginFormValues,
+  loginSchema,
+} from "../../../server/src/validation/loginSchema";
 import type { FormField } from "@/types/Global";
 import AppError from "@/components/ui/AppError";
 import { Button } from "@react-navigation/elements";
