@@ -1,5 +1,3 @@
-import { ReactNode } from "react";
-
 export type ModalProps = {
   modalVisible: boolean;
   setModalVisible: React.Dispatch<React.SetStateAction<boolean>>;
@@ -14,7 +12,7 @@ export type FormField<T> = {
 export type Exercise = {
   id: string;
   name: string;
-  gifUrl: string | null;
+  gifUrl?: string;
   bodyParts: string[];
   primaryMuscles: string[];
   secondaryMuscles: string[];
@@ -28,7 +26,7 @@ export type WorkoutSet = {
   id: string;
   order: number;
   reps: number;
-  weight?: number | null;
+  weight: number;
 };
 
 export type WorkoutExercise = {

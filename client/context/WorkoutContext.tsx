@@ -51,7 +51,25 @@ export const WorkoutProvider = ({ children }: { children: ReactNode }) => {
   const addWorkout = async (workout: Workout) => {
     if (!authToken.token) return;
 
-    const res = await addUserWorkout(workout, authToken.token);
+    const payload = {
+      name: workout.name,
+      notes: workout.notes,
+      startedAt: workout.startedAt,
+      completedAt: workout.completedAt,
+      duration: workout.duration,
+      exercises: workout.exercises.map((ex) => ({
+        exerciseId: ex.exerciseId,
+        order: ex.order,
+        notes: ex.notes,
+        sets: ex.sets.map((set) => ({
+          order: set.order,
+          reps: set.reps,
+          weight: set.weight,
+        })),
+      })),
+    };
+
+    const res = await addUserWorkout(payload, authToken.token);
 
     setWorkouts((prev) => {
       const updatedWorkouts = [...prev, res.workout];

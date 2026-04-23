@@ -70,7 +70,7 @@ export default function EditRoutineScreen() {
       id: crypto.randomUUID(),
       exerciseId,
       order: formData.exercises.length + 1,
-      sets: [{ id: crypto.randomUUID(), order: 1, reps: 0, weight: null }],
+      sets: [{ id: crypto.randomUUID(), order: 1, reps: 0, weight: 0 }],
       notes: "",
     };
 

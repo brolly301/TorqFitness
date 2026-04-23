@@ -8,7 +8,7 @@ import { Controller, useForm } from "react-hook-form";
 import {
   changePasswordSchema,
   ChnagePasswordFormValues,
-} from "../../../../server/src/validation/changePasswordSchema";
+} from "../../../utils/validation/authSchema";
 import { useNavigation } from "expo-router";
 import { FormField } from "@/types/Global";
 import AppError from "@/components/ui/AppError";

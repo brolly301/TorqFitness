@@ -6,9 +6,7 @@ export const addExercise = async (req: AuthRequest, res: Response) => {
   try {
     const userId = req.user?.userId;
     if (!userId) {
-      res
-        .status(400)
-        .json({ message: "Routine cannot be created. Unauthorized." });
+      res.status(400).json({ message: "Unauthorized." });
       return;
     }
 

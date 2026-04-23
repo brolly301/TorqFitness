@@ -11,8 +11,23 @@ type RoutineResponse = {
   message: string;
 };
 
+type RoutinePayloadType = {
+  name: string;
+  notes?: string | null;
+  exercises: {
+    exerciseId: string;
+    order: number;
+    notes?: string;
+    sets: {
+      order: number;
+      reps: number;
+      weight: number;
+    }[];
+  }[];
+};
+
 export const addUserRoutine = async (
-  routine: Routine,
+  routine: RoutinePayloadType,
   token: string,
 ): Promise<RoutineResponse> => {
   const res = await fetch(`${baseURL}/routines`, {

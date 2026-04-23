@@ -11,8 +11,18 @@ type ExerciseResponse = {
   message: string;
 };
 
+type ExercisePayloadType = {
+  name: string;
+  bodyParts: string[];
+  primaryMuscles: string[];
+  secondaryMuscles: string[];
+  equipment: string[];
+  instructions: string[];
+  userCreated?: boolean;
+};
+
 export const addUserExercise = async (
-  exercise: Exercise,
+  exercise: ExercisePayloadType,
   token: string,
 ): Promise<ExerciseResponse> => {
   const res = await fetch(`${baseURL}/exercises`, {

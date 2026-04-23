@@ -6,7 +6,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import {
   LoginFormValues,
   loginSchema,
-} from "../../../server/src/validation/loginSchema";
+} from "../../utils/validation/authSchema";
 import type { FormField } from "@/types/Global";
 import AppError from "@/components/ui/AppError";
 import { Button } from "@react-navigation/elements";

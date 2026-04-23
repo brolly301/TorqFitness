@@ -49,7 +49,22 @@ export const RoutineProvider = ({ children }: { children: ReactNode }) => {
   const addRoutine = async (routine: Routine) => {
     if (!authToken.token) return;
 
-    const res = await addUserRoutine(routine, authToken.token);
+    const payload = {
+      name: routine.name,
+      notes: routine.notes,
+      exercises: routine.exercises.map((ex) => ({
+        exerciseId: ex.exerciseId,
+        order: ex.order,
+        notes: ex.notes,
+        sets: ex.sets.map((set) => ({
+          order: set.order,
+          reps: set.reps,
+          weight: set.weight,
+        })),
+      })),
+    };
+
+    const res = await addUserRoutine(payload, authToken.token);
 
     setRoutines((prev) => {
       const updatedRoutines = [...prev, res.routine];

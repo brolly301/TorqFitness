@@ -50,7 +50,17 @@ export const ExerciseProvider = ({ children }: { children: ReactNode }) => {
   const addExercise = async (exercise: Exercise) => {
     if (!authToken.token) return;
 
-    const res = await addUserExercise(exercise, authToken.token);
+    const payload = {
+      name: exercise.name,
+      bodyParts: exercise.bodyParts,
+      primaryMuscles: exercise.primaryMuscles,
+      secondaryMuscles: exercise.secondaryMuscles,
+      equipment: exercise.equipment,
+      instructions: exercise.instructions,
+      userCreated: exercise.userCreated,
+    };
+
+    const res = await addUserExercise(payload, authToken.token);
 
     setExercises((prev) => {
       const updatedExercises = [...prev, res.exercise];

@@ -17,7 +17,6 @@ export default function CreateExerciseScreen() {
     id: crypto.randomUUID(),
     name: "",
     primaryMuscles: [],
-    gifUrl: "",
     instructions: [],
     secondaryMuscles: [],
     bodyParts: [],

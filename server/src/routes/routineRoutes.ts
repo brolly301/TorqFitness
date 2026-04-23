@@ -6,10 +6,12 @@ import {
   getRoutines,
   updateRoutine,
 } from "../controllers/routineController";
+import { validate } from "../../middleware/validate";
+import { routineSchema } from "../validation/routineSchema";
 
 const router = express.Router();
 
-router.post("/", requireAuth, addRoutine);
+router.post("/", requireAuth, validate({ body: routineSchema }), addRoutine);
 
 router.get("/", requireAuth, getRoutines);
 

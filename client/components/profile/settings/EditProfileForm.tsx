@@ -8,9 +8,9 @@ import { useNavigation } from "expo-router";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Controller, useForm } from "react-hook-form";
 import {
-  ProfileFormValues,
-  profileSchema,
-} from "../../../../server/src/validation/profileSchema";
+  UpdateProfileFormValues,
+  updateProfileSchema,
+} from "../../../utils/validation/authSchema";
 import { FormField } from "@/types/Global";
 
 export type UserInputType = {
@@ -35,8 +35,8 @@ export default function EditProfileForm() {
     control,
     handleSubmit,
     formState: { errors },
-  } = useForm<ProfileFormValues>({
-    resolver: zodResolver(profileSchema),
+  } = useForm<UpdateProfileFormValues>({
+    resolver: zodResolver(updateProfileSchema),
     defaultValues: {
       firstName: user.firstName,
       surname: user.surname,
@@ -45,7 +45,7 @@ export default function EditProfileForm() {
     mode: "onSubmit",
   });
 
-  const onSubmit = (data: ProfileFormValues) => {
+  const onSubmit = (data: UpdateProfileFormValues) => {
     updateUser(data);
   };
 
@@ -55,7 +55,7 @@ export default function EditProfileForm() {
     setError(null);
   }, [navigation]);
 
-  const profileFields: FormField<ProfileFormValues>[] = [
+  const profileFields: FormField<UpdateProfileFormValues>[] = [
     {
       name: "firstName",
       placeholder: "First Name",

@@ -6,10 +6,12 @@ import {
   updateWorkout,
 } from "../controllers/workoutController";
 import { requireAuth } from "../../middleware/requireAuth";
+import { validate } from "../../middleware/validate";
+import { workoutSchema } from "../validation/workoutSchema";
 
 const router = express.Router();
 
-router.post("/", requireAuth, addWorkout);
+router.post("/", requireAuth, validate({ body: workoutSchema }), addWorkout);
 
 router.get("/", requireAuth, getWorkouts);
 
