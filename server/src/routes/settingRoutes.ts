@@ -3,6 +3,7 @@ import { requireAuth } from "../../middleware/requireAuth";
 import {
   getSettings,
   submitContactForm,
+  submitRating,
   updateSettings,
 } from "../controllers/settingController";
 import { validate } from "../../middleware/validate";
@@ -37,6 +38,12 @@ router.post(
   requireAuth,
   validate({ body: issueSchmea }),
   submitContactForm("issue"),
+);
+router.post(
+  "/contact/rating",
+  requireAuth,
+  // validate({ body: issueSchmea }),
+  submitRating,
 );
 
 export default router;

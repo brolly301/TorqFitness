@@ -71,3 +71,18 @@ export const submitContactForm =
       res.status(500).json({ message: "Something went wrong." });
     }
   };
+
+export const submitRating = async (req: AuthRequest, res: Response) => {
+  try {
+    const userId = req.user?.userId;
+    if (!userId) {
+      res.status(400).json({ message: "Unauthorized." });
+      return;
+    }
+    console.log(req.body);
+
+    res.status(201).json({ message: `Rating successfully submitted.` });
+  } catch (e) {
+    res.status(500).json({ message: "Something went wrong." });
+  }
+};

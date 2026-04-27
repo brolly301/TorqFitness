@@ -74,3 +74,25 @@ export const submitUserContactForm = async (
 
   return data;
 };
+
+export const submitRating = async (
+  rating: number,
+  token: string,
+): Promise<SettingsResponse> => {
+  const res = await fetch(`${baseURL}/settings/contact/rating`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify({ rating }),
+  });
+
+  const data = await res.json();
+
+  if (!res.ok) {
+    throw new Error(data.message || "Failed to retrieve send rating.");
+  }
+
+  return data;
+};

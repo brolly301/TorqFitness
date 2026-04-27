@@ -5,6 +5,8 @@ import { useAppTheme } from "@/hooks/useAppTheme";
 import { Theme } from "@/types/Theme";
 import AntDesign from "@expo/vector-icons/AntDesign";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
+import { submitRating } from "@/api/settings";
+import { useUserContext } from "@/context/UserContext";
 
 type Props = ModalProps;
 
@@ -12,6 +14,12 @@ export default function RateModal({ modalVisible, setModalVisible }: Props) {
   const { theme, scale } = useAppTheme();
   const styles = useMemo(() => makeStyles(theme, scale), [theme, scale]);
   const [rating, setRating] = useState<number | null>(null);
+  const { authToken } = useUserContext();
+
+  const handleSubmit = async () => {
+    if (!rating) return;
+    await submitRating(rating, authToken.token);
+  };
 
   return (
     <Modal visible={modalVisible} transparent animationType="fade">
@@ -45,6 +53,13 @@ export default function RateModal({ modalVisible, setModalVisible }: Props) {
                 );
               })}
             </View>
+            <Pressable
+              onPress={handleSubmit}
+              // disabled={isDisabled}
+              style={[styles.button]}
+            >
+              <Text style={[styles.buttonText]}>Submit Rating</Text>
+            </Pressable>
           </View>
         </View>
       </View>
@@ -109,5 +124,18 @@ export const makeStyles = (theme: Theme, scale: number) =>
       flexDirection: "row",
       justifyContent: "space-between",
       alignItems: "center",
+    },
+    button: {
+      flexDirection: "row",
+      justifyContent: "center",
+      alignItems: "center",
+      borderRadius: 12 * scale,
+      paddingVertical: 12 * scale,
+      marginTop: 10 * scale,
+    },
+
+    buttonText: {
+      fontSize: 15 * scale,
+      fontWeight: "700",
     },
   });
