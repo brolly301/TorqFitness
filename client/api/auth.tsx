@@ -81,17 +81,17 @@ export const updateUserDetails = async (
 };
 
 export const changeUserPassword = async (
-  password: string,
+  currentPassword: string,
+  newPassword: string,
   token: string,
 ): Promise<{ message: string }> => {
-  console.log(password);
   const res = await fetch(`${baseURL}/auth/user/changePassword`, {
     method: "PATCH",
     headers: {
       "Content-Type": "application/json",
       Authorization: `Bearer ${token}`,
     },
-    body: JSON.stringify({ password }),
+    body: JSON.stringify({ currentPassword, newPassword }),
   });
 
   const data = await res.json();

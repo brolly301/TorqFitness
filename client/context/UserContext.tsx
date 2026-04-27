@@ -34,7 +34,7 @@ type UserContextType = {
   login: (data: Login) => void;
   signUp: (data: SignUp) => void;
   updateUser: (data: UserInputType) => void;
-  changePassword: (password: string) => void;
+  changePassword: (currentPassword: string, newPassword: string) => void;
   deleteAccount: () => void;
   authToken: AuthToken;
   logout: () => void;
@@ -166,10 +166,17 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
     }
   };
 
-  const changePassword = async (password: string) => {
+  const changePassword = async (
+    currentPassword: string,
+    newPassword: string,
+  ) => {
     try {
       if (!authToken.token) return;
-      const res = await changeUserPassword(password, authToken.token);
+      const res = await changeUserPassword(
+        currentPassword,
+        newPassword,
+        authToken.token,
+      );
 
       toggleToast({
         type: "success",

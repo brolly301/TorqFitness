@@ -6,9 +6,7 @@ export const getSettings = async (req: AuthRequest, res: Response) => {
   try {
     const userId = req.user?.userId;
     if (!userId) {
-      res
-        .status(400)
-        .json({ message: "Cannot get user workouts. Unauthorized." });
+      res.status(400).json({ message: "Unauthorized." });
       return;
     }
 
@@ -27,7 +25,7 @@ export const getSettings = async (req: AuthRequest, res: Response) => {
       settings: settingsData,
     });
   } catch (e) {
-    res.status(500).json({ message: "Internal server error" });
+    res.status(500).json({ message: "Something went wrong." });
   }
 };
 
@@ -35,9 +33,7 @@ export const updateSettings = async (req: AuthRequest, res: Response) => {
   try {
     const userId = req.user?.userId;
     if (!userId) {
-      res
-        .status(400)
-        .json({ message: "Cannot get user workouts. Unauthorized." });
+      res.status(400).json({ message: " Unauthorized." });
       return;
     }
     const { type, value } = req.body;
@@ -55,6 +51,23 @@ export const updateSettings = async (req: AuthRequest, res: Response) => {
 
     res.status(201).json({ message: "User settings successfully updated." });
   } catch (e) {
-    res.status(500).json({ message: "Internal server error" });
+    res.status(500).json({ message: "Something went wrong." });
   }
 };
+
+export const submitContactForm =
+  (type: "contact" | "feedback" | "issue") =>
+  async (req: AuthRequest, res: Response) => {
+    try {
+      const userId = req.user?.userId;
+      if (!userId) {
+        res.status(400).json({ message: "Unauthorized." });
+        return;
+      }
+      console.log(req.body);
+
+      res.status(201).json({ message: `${type} successfully submitted.` });
+    } catch (e) {
+      res.status(500).json({ message: "Something went wrong." });
+    }
+  };

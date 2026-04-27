@@ -26,18 +26,19 @@ export default function ChangePasswordForm() {
   } = useForm<ChnagePasswordFormValues>({
     resolver: zodResolver(changePasswordSchema),
     defaultValues: {
-      password: "",
+      currentPassword: "",
+      newPassword: "",
       confirmPassword: "",
     },
     mode: "onSubmit",
   });
 
   const onSubmit = (data: ChnagePasswordFormValues) => {
-    const { confirmPassword, password } = data;
+    const { currentPassword, newPassword, confirmPassword } = data;
 
-    if (data.password !== confirmPassword) return;
+    if (newPassword !== confirmPassword) return;
 
-    changePassword(password);
+    changePassword(currentPassword, newPassword);
   };
 
   const navigation = useNavigation();
@@ -48,8 +49,13 @@ export default function ChangePasswordForm() {
 
   const profileFields: FormField<ChnagePasswordFormValues>[] = [
     {
-      name: "password",
-      placeholder: "Password",
+      name: "currentPassword",
+      placeholder: "Current Password",
+      secureTextEntry: true,
+    },
+    {
+      name: "newPassword",
+      placeholder: "New Password",
       secureTextEntry: true,
     },
     {

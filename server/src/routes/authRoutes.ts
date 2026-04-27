@@ -8,20 +8,37 @@ import {
   updateUser,
 } from "../controllers/authController";
 import { requireAuth } from "../../middleware/requireAuth";
+import { validate } from "../../middleware/validate";
+import {
+  changePasswordSchema,
+  loginSchema,
+  signUpSchema,
+  updateProfileSchema,
+} from "../validation/authSchema";
 
 const router = express.Router();
 
-router.post("/login", login);
+router.post("/login", validate({ body: loginSchema }), login);
 
-router.post("/signUp", signUp);
+router.post("/signUp", validate({ body: signUpSchema }), signUp);
 
-router.put("/user", requireAuth, updateUser);
+router.put(
+  "/user",
+  requireAuth,
+  validate({ body: updateProfileSchema }),
+  updateUser,
+);
 
 router.delete("/user", requireAuth, deleteUser);
 
 router.get("/user", requireAuth, getUser);
 
-router.patch("/user/changePassword", requireAuth, changePassword);
+router.patch(
+  "/user/changePassword",
+  requireAuth,
+  validate({ body: changePasswordSchema }),
+  changePassword,
+);
 
 // router.post("/requestResetCode");
 

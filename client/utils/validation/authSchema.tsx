@@ -32,10 +32,11 @@ export const updateProfileSchema = z.object({
 
 export const changePasswordSchema = z
   .object({
-    password: passwordSchema,
+    currentPassword: passwordSchema,
+    newPassword: passwordSchema,
     confirmPassword: z.string().min(1, "Please confirm your password"),
   })
-  .refine((data) => data.password.trim() === data.confirmPassword.trim(), {
+  .refine((data) => data.newPassword.trim() === data.confirmPassword.trim(), {
     message: "Passwords do not match",
     path: ["confirmPassword"],
   });

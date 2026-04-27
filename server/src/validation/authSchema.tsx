@@ -30,15 +30,10 @@ export const updateProfileSchema = z.object({
   email: emailSchema,
 });
 
-export const changePasswordSchema = z
-  .object({
-    password: passwordSchema,
-    confirmPassword: z.string().min(1, "Please confirm your password"),
-  })
-  .refine((data) => data.password.trim() === data.confirmPassword.trim(), {
-    message: "Passwords do not match",
-    path: ["confirmPassword"],
-  });
+export const changePasswordSchema = z.object({
+  currentPassword: passwordSchema,
+  newPassword: passwordSchema,
+});
 
 export type LoginFormValues = z.infer<typeof loginSchema>;
 export type SignUpFormValues = z.infer<typeof signUpSchema>;
