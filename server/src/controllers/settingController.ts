@@ -1,6 +1,7 @@
 import { Response } from "express";
 import { AuthRequest } from "../../middleware/requireAuth";
 import { prisma } from "../lib/prisma";
+import nodemailer from "nodemailer";
 
 export const getSettings = async (req: AuthRequest, res: Response) => {
   try {
@@ -55,19 +56,60 @@ export const updateSettings = async (req: AuthRequest, res: Response) => {
   }
 };
 
+const transporter = nodemailer.createTransport({
+  service: "gmail",
+  auth: {
+    user: process.env.APP_EM,
+    pass: process.env.APP_PW,
+  },
+});
+
 export const submitContactForm =
   (type: "contact" | "feedback" | "issue") =>
   async (req: AuthRequest, res: Response) => {
     try {
       const userId = req.user?.userId;
       if (!userId) {
-        res.status(400).json({ message: "Unauthorized." });
-        return;
+        return res.status(400).json({ message: "Unauthorized." });
       }
-      console.log(req.body);
+
+      const { email, subject, message, issue } = req.body;
+
+      const mailOptions = () => {
+        switch (type) {
+          case "contact":
+            return {
+              from: process.env.APP_EM,
+              to: process.env.APP_EM,
+              subject: `Torq - User Message from ${email}`,
+              text: `User ID: ${userId}\nEmail: ${email}\nSubject: ${subject}\nMessage: ${message}`,
+            };
+          case "issue":
+            return {
+              from: process.env.APP_EM,
+              to: process.env.APP_EM,
+              subject: `Torq - Issue Reported from ${email}`,
+              text: `User ID: ${userId}\nEmail: ${email}\nIssue: ${issue}\nMessage: ${message}`,
+            };
+          case "feedback":
+            return {
+              from: process.env.APP_EM,
+              to: process.env.APP_EM,
+              subject: `Torq - User Feedback`,
+              text: `User ID: ${userId}\nMessage: ${message}`,
+            };
+        }
+      };
+
+      const options = mailOptions();
+      if (!options) {
+        return res.status(400).json({ message: "Invalid form type." });
+      }
+
+      await transporter.sendMail(options);
 
       res.status(201).json({ message: `${type} successfully submitted.` });
-    } catch (e) {
+    } catch {
       res.status(500).json({ message: "Something went wrong." });
     }
   };
