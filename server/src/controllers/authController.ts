@@ -3,6 +3,8 @@ import { prisma } from "../lib/prisma";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import { AuthRequest } from "../../middleware/requireAuth";
+import { randomBytes } from "crypto";
+import nodemailer from "nodemailer";
 
 const JWT_SECRET = process.env.JWT_SECRET as string;
 
@@ -255,5 +257,48 @@ export const deleteUser = async (req: AuthRequest, res: Response) => {
     res.status(204).end();
   } catch (err) {
     res.status(500).json({ message: "Something went wrong.", success: false });
+  }
+};
+
+export const requestResetCode = async (req: Request, res: Response) => {
+  try {
+    const { email } = req.body;
+
+    const user = await prisma.user.findFirst({ where: { email } });
+
+    if (!user) {
+      return res
+        .status(404)
+        .json({ message: "Invalid email address", success: false });
+    }
+
+    const resetToken = randomBytes(8).toString("hex");
+    const tokenExpiry = new Date(Date.now() + 1000 * 60 * 15);
+
+    await prisma.user.update({
+      where: { email },
+      data: { resetToken, resetTokenExp: tokenExpiry },
+    });
+
+    const transporter = nodemailer.createTransport({
+      service: "gmail",
+      auth: {
+        user: process.env.APP_EM,
+        pass: process.env.APP_PW,
+      },
+    });
+
+    const mailOptions = {
+      from: process.env.APP_EM,
+      to: email,
+      subject: "Torq - Email reset code",
+      text: `Your reset code is - ${resetToken}`,
+    };
+
+    await transporter.sendMail(mailOptions);
+
+    res.status(200).json({ message: "Successfully sent reset token" });
+  } catch {
+    res.status(500).json({ message: "Something went wrong." });
   }
 };

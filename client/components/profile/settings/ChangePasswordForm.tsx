@@ -7,7 +7,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Controller, useForm } from "react-hook-form";
 import {
   changePasswordSchema,
-  ChnagePasswordFormValues,
+  ChangePasswordFormValues,
 } from "../../../utils/validation/authSchema";
 import { useNavigation } from "expo-router";
 import { FormField } from "@/types/Global";
@@ -23,7 +23,7 @@ export default function ChangePasswordForm() {
     control,
     handleSubmit,
     formState: { errors },
-  } = useForm<ChnagePasswordFormValues>({
+  } = useForm<ChangePasswordFormValues>({
     resolver: zodResolver(changePasswordSchema),
     defaultValues: {
       currentPassword: "",
@@ -33,7 +33,7 @@ export default function ChangePasswordForm() {
     mode: "onSubmit",
   });
 
-  const onSubmit = (data: ChnagePasswordFormValues) => {
+  const onSubmit = (data: ChangePasswordFormValues) => {
     const { currentPassword, newPassword, confirmPassword } = data;
 
     if (newPassword !== confirmPassword) return;
@@ -47,7 +47,7 @@ export default function ChangePasswordForm() {
     setError(null);
   }, [navigation]);
 
-  const profileFields: FormField<ChnagePasswordFormValues>[] = [
+  const profileFields: FormField<ChangePasswordFormValues>[] = [
     {
       name: "currentPassword",
       placeholder: "Current Password",

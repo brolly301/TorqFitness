@@ -4,6 +4,7 @@ import {
   deleteUser,
   getUser,
   login,
+  requestResetCode,
   signUp,
   updateUser,
 } from "../controllers/authController";
@@ -40,7 +41,7 @@ router.patch(
   changePassword,
 );
 
-// router.post("/requestResetCode");
+router.post("/user/requestResetCode", requestResetCode);
 
 // router.post("/verifyResetCode");
 

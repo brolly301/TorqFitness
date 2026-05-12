@@ -3,6 +3,7 @@ import {
   deleteUser,
   getUser,
   loginUser,
+  requestUserResetCode,
   signUpUser,
   updateUserDetails,
 } from "@/api/auth";
@@ -36,6 +37,7 @@ type UserContextType = {
   updateUser: (data: UserInputType) => void;
   changePassword: (currentPassword: string, newPassword: string) => void;
   deleteAccount: () => void;
+  requestResetCode: (email: string) => void;
   authToken: AuthToken;
   logout: () => void;
   error: ApiError | null;
@@ -189,6 +191,21 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
     }
   };
 
+  const requestResetCode = async (email: string) => {
+    try {
+      const res = await requestUserResetCode(email);
+
+      toggleToast({
+        type: "success",
+        text1: "Reset code sent.",
+        text2: `Please check your email and enter the reset code provided. `,
+      });
+    } catch (e) {
+      const message = e instanceof Error ? e.message : "Something went wrong";
+      setError({ message, status: "" });
+    }
+  };
+
   return (
     <UserContext.Provider
       value={{
@@ -203,6 +220,7 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
         signUp,
         setUser,
         user,
+        requestResetCode,
       }}
     >
       {children}

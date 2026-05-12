@@ -102,3 +102,23 @@ export const changeUserPassword = async (
 
   return data;
 };
+
+export const requestUserResetCode = async (
+  email: string,
+): Promise<{ message: string }> => {
+  const res = await fetch(`${baseURL}/auth/user/requestResetCode`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ email }),
+  });
+
+  const data = await res.json();
+
+  if (!res.ok) {
+    throw new Error(data.message || "Failed to request reset code.");
+  }
+
+  return data;
+};

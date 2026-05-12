@@ -41,7 +41,12 @@ export const changePasswordSchema = z
     path: ["confirmPassword"],
   });
 
+export const resetPasswordSchema = z.object({
+  email: emailSchema,
+});
+
 export type LoginFormValues = z.infer<typeof loginSchema>;
 export type SignUpFormValues = z.infer<typeof signUpSchema>;
 export type UpdateProfileFormValues = z.infer<typeof updateProfileSchema>;
-export type ChnagePasswordFormValues = z.infer<typeof changePasswordSchema>;
+export type ChangePasswordFormValues = z.infer<typeof changePasswordSchema>;
+export type ResetPasswordFormValues = z.infer<typeof resetPasswordSchema>;
