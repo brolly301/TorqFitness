@@ -122,3 +122,45 @@ export const requestUserResetCode = async (
 
   return data;
 };
+
+export const verifyUserResetCode = async (
+  code: string,
+  email: string,
+): Promise<{ message: string }> => {
+  const res = await fetch(`${baseURL}/auth/user/verifyResetCode`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ code, email }),
+  });
+
+  const data = await res.json();
+
+  if (!res.ok) {
+    throw new Error(data.message || "Failed to verify reset code.");
+  }
+
+  return data;
+};
+
+export const resetUserPassword = async (
+  password: string,
+  email: string,
+): Promise<{ message: string }> => {
+  const res = await fetch(`${baseURL}/auth/user/resetPassword`, {
+    method: "PATCH",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ password, email }),
+  });
+
+  const data = await res.json();
+
+  if (!res.ok) {
+    throw new Error(data.message || "Failed to reset user password.");
+  }
+
+  return data;
+};

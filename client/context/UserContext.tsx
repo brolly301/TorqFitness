@@ -4,8 +4,10 @@ import {
   getUser,
   loginUser,
   requestUserResetCode,
+  resetUserPassword,
   signUpUser,
   updateUserDetails,
+  verifyUserResetCode,
 } from "@/api/auth";
 import { UserInputType } from "@/components/profile/settings/EditProfileForm";
 import { Login, SignUp, User } from "@/types/User";
@@ -38,6 +40,8 @@ type UserContextType = {
   changePassword: (currentPassword: string, newPassword: string) => void;
   deleteAccount: () => void;
   requestResetCode: (email: string) => void;
+  verifyResetCode: (code: string, email: string) => void;
+  resetPassword: (password: string, email: string) => void;
   authToken: AuthToken;
   logout: () => void;
   error: ApiError | null;
@@ -206,6 +210,36 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
     }
   };
 
+  const verifyResetCode = async (code: string, email: string) => {
+    try {
+      const res = await verifyUserResetCode(code, email);
+
+      toggleToast({
+        type: "success",
+        text1: "Reset code verified.",
+        text2: `You can now enter your new password. `,
+      });
+    } catch (e) {
+      const message = e instanceof Error ? e.message : "Something went wrong";
+      setError({ message, status: "" });
+    }
+  };
+
+  const resetPassword = async (password: string, email: string) => {
+    try {
+      const res = await resetUserPassword(password, email);
+
+      toggleToast({
+        type: "success",
+        text1: "Password reset.",
+        text2: `Please log in with your new password. `,
+      });
+    } catch (e) {
+      const message = e instanceof Error ? e.message : "Something went wrong";
+      setError({ message, status: "" });
+    }
+  };
+
   return (
     <UserContext.Provider
       value={{
@@ -221,6 +255,8 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
         setUser,
         user,
         requestResetCode,
+        verifyResetCode,
+        resetPassword,
       }}
     >
       {children}

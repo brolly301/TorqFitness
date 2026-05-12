@@ -41,12 +41,28 @@ export const changePasswordSchema = z
     path: ["confirmPassword"],
   });
 
-export const resetPasswordSchema = z.object({
+export const resetEmailSchema = z.object({
   email: emailSchema,
 });
+
+export const resetCodeSchema = z.object({
+  code: z.string().min(1, "Code is required."),
+});
+
+export const resetPasswordSchema = z
+  .object({
+    password: passwordSchema,
+    confirmPassword: z.string().min(1, "Please confirm your password"),
+  })
+  .refine((data) => data.password.trim() === data.confirmPassword.trim(), {
+    message: "Passwords do not match",
+    path: ["confirmPassword"],
+  });
 
 export type LoginFormValues = z.infer<typeof loginSchema>;
 export type SignUpFormValues = z.infer<typeof signUpSchema>;
 export type UpdateProfileFormValues = z.infer<typeof updateProfileSchema>;
 export type ChangePasswordFormValues = z.infer<typeof changePasswordSchema>;
+export type ResetEmailFormValues = z.infer<typeof resetEmailSchema>;
+export type ResetCodeFormValues = z.infer<typeof resetCodeSchema>;
 export type ResetPasswordFormValues = z.infer<typeof resetPasswordSchema>;

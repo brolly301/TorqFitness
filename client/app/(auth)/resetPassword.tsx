@@ -1,77 +1,28 @@
 import { Pressable, StyleSheet, Text, TextInput, View } from "react-native";
-import React, { useLayoutEffect, useMemo } from "react";
+import React, { useLayoutEffect, useMemo, useState } from "react";
 import { Theme } from "@/types/Theme";
 import { useAppTheme } from "@/hooks/useAppTheme";
-import { Controller, useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import {
-  ResetPasswordFormValues,
-  resetPasswordSchema,
-} from "@/utils/validation/authSchema";
-import AppError from "@/components/ui/AppError";
-import { useUserContext } from "@/context/UserContext";
-import { useNavigation } from "expo-router";
+import EmailForm from "@/components/auth/resetPassword/EmailForm";
+import PasswordForm from "@/components/auth/resetPassword/PasswordForm";
+import CodeForm from "@/components/auth/resetPassword/CodeForm";
+import SuccessForm from "@/components/auth/resetPassword/SuccessForm";
+
+export type ResetStep = "email" | "code" | "password" | "success";
 
 export default function ResetPasswordScreen() {
   const { theme, scale, themeType } = useAppTheme();
   const styles = useMemo(() => makeStyles(theme, scale), [theme, scale]);
-  const { error, setError, requestResetCode } = useUserContext();
 
-  const {
-    control,
-    handleSubmit,
-    formState: { errors },
-  } = useForm<ResetPasswordFormValues>({
-    resolver: zodResolver(resetPasswordSchema),
-    defaultValues: {
-      email: "",
-    },
-    mode: "onSubmit",
-  });
-
-  const navigation = useNavigation();
-
-  useLayoutEffect(() => {
-    setError(null);
-  }, [navigation]);
-
-  const onSubmit = (data: ResetPasswordFormValues) => {
-    const { email } = data;
-    requestResetCode(email);
-  };
+  const [step, setStep] = useState<ResetStep>("email");
+  const [email, setEmail] = useState<string>("");
 
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Reset Password</Text>
-      <Text style={styles.subtitle}>Please enter your email below.</Text>
-      <Controller
-        name="email"
-        key="email"
-        control={control}
-        render={({ field: { onChange, value } }) => (
-          <>
-            <TextInput
-              placeholder="Email"
-              placeholderTextColor={"black"}
-              onChangeText={onChange}
-              textAlignVertical="center"
-              value={value}
-              autoComplete="off"
-              textContentType="oneTimeCode"
-              importantForAutofill="no"
-              style={styles.input}
-            />
-          </>
-        )}
-      />
-      {errors.email && <AppError>{errors.email?.message}</AppError>}
-      {error?.message && <AppError>{error.message}</AppError>}
-      <Pressable
-        style={styles.buttonContainer}
-        onPress={handleSubmit(onSubmit)}
-      >
-        <Text style={styles.buttonText}>Submit</Text>
-      </Pressable>
+      {step === "email" && <EmailForm setStep={setStep} setEmail={setEmail} />}
+      {step === "code" && <CodeForm setStep={setStep} email={email} />}
+      {step === "password" && <PasswordForm setStep={setStep} email={email} />}
+      {step === "success" && <SuccessForm setStep={setStep} />}
     </View>
   );
 }

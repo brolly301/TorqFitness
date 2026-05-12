@@ -302,3 +302,56 @@ export const requestResetCode = async (req: Request, res: Response) => {
     res.status(500).json({ message: "Something went wrong." });
   }
 };
+
+export const verifyResetCode = async (req: Request, res: Response) => {
+  try {
+    const { email, code } = req.body;
+
+    const user = await prisma.user.findFirst({
+      where: { email, resetToken: code },
+    });
+
+    if (!user) {
+      return res
+        .status(404)
+        .json({ message: "Invalid email address", success: false });
+    }
+
+    if (!user.resetTokenExp || user.resetTokenExp < new Date()) {
+      return res
+        .status(400)
+        .json({ message: "Invalid or expired reset code", success: false });
+    }
+
+    res.status(200).json({ message: "Successfully verified reset token" });
+  } catch {
+    res.status(500).json({ message: "Something went wrong." });
+  }
+};
+
+export const resetPassword = async (req: Request, res: Response) => {
+  try {
+    const { email, password } = req.body;
+
+    const user = await prisma.user.findFirst({ where: { email } });
+
+    if (!user) {
+      return res
+        .status(404)
+        .json({ message: "Invalid email address", success: false });
+    }
+
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    await prisma.user.update({
+      where: { email },
+      data: { password: hashedPassword, resetToken: null, resetTokenExp: null },
+    });
+
+    res
+      .status(200)
+      .json({ message: "Successfully reset password. You can now login." });
+  } catch {
+    res.status(500).json({ message: "Something went wrong." });
+  }
+};

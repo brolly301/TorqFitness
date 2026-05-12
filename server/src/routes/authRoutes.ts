@@ -5,8 +5,10 @@ import {
   getUser,
   login,
   requestResetCode,
+  resetPassword,
   signUp,
   updateUser,
+  verifyResetCode,
 } from "../controllers/authController";
 import { requireAuth } from "../../middleware/requireAuth";
 import { validate } from "../../middleware/validate";
@@ -43,8 +45,8 @@ router.patch(
 
 router.post("/user/requestResetCode", requestResetCode);
 
-// router.post("/verifyResetCode");
+router.post("/user/verifyResetCode", verifyResetCode);
 
-// router.put("/resetPassword");
+router.patch("/user/resetPassword", resetPassword);
 
 export default router;
