@@ -1,21 +1,33 @@
-import { Pressable, StyleSheet, Text, TextInput, View } from "react-native";
+import {
+  ImageBackground,
+  Pressable,
+  StyleSheet,
+  Text,
+  TextInput,
+  View,
+} from "react-native";
 import React, { useLayoutEffect, useMemo, useState } from "react";
-import LoginForm from "@/components/auth/login/LoginForm";
 import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
   LoginFormValues,
   loginSchema,
-} from "../../utils/validation/authSchema";
+} from "../../../utils/validation/authSchema";
 import type { FormField } from "@/types/Global";
 import AppError from "@/components/ui/AppError";
-import { Button } from "@react-navigation/elements";
 import { useUserContext } from "@/context/UserContext";
 import { useAppTheme } from "@/hooks/useAppTheme";
 import { Theme } from "@/types/Theme";
 import { router, useNavigation } from "expo-router";
+import { Image } from "expo-image";
+import { SectionType } from "@/app/(auth)";
+import EvilIcons from "@expo/vector-icons/EvilIcons";
 
-export default function LoginScreen() {
+type Props = {
+  setSection: (section: SectionType) => void;
+};
+
+export default function LoginSection({ setSection }: Props) {
   const { theme, scale } = useAppTheme();
   const styles = useMemo(() => makeStyles(theme, scale), [theme, scale]);
 
@@ -50,7 +62,6 @@ export default function LoginScreen() {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Torq</Text>
       <Text style={styles.title}>Welcome Back</Text>
       <Text style={styles.subtitle}>
         Your progress starts where you left off
@@ -82,7 +93,7 @@ export default function LoginScreen() {
       })}
       {error?.message && <AppError>{error.message}</AppError>}
       <Pressable
-        onPress={() => router.push("/(auth)/resetPassword")}
+        onPress={() => setSection("resetPassword")}
         style={styles.resetLinkWrapper}
       >
         <Text style={styles.forgotPassword}>
@@ -97,7 +108,7 @@ export default function LoginScreen() {
       </Pressable>
 
       <Pressable
-        onPress={() => router.replace("/(auth)/signUp")}
+        onPress={() => setSection("signUp")}
         style={styles.signUpWrapper}
       >
         <Text style={styles.switchText}>
@@ -111,48 +122,49 @@ export default function LoginScreen() {
 const makeStyles = (theme: Theme, scale: number) =>
   StyleSheet.create({
     input: {
+      borderRadius: 12 * scale,
       borderWidth: 1,
       borderColor: theme.inputBorder,
-      padding: 13,
-      backgroundColor: theme.inputBg,
-      marginVertical: 8,
-      fontSize: 16,
-      borderRadius: 12,
+      paddingHorizontal: 12 * scale,
+      paddingVertical: 12 * scale,
+      backgroundColor: theme.buttonSecondary,
+      marginBottom: 10 * scale,
+      fontSize: 15 * scale,
       color: theme.text,
     },
-    container: {
-      flex: 1,
-      paddingTop: 80,
-      paddingHorizontal: 30,
-    },
+
+    container: {},
+
     title: {
       fontSize: 32,
       fontWeight: "700",
       marginBottom: 10,
       alignSelf: "flex-start",
-      color: theme.text,
+      color: "white",
     },
+
     subtitle: {
-      color: theme.text,
+      color: "white",
       fontSize: 15,
       marginBottom: 40,
       alignSelf: "flex-start",
     },
     buttonContainer: {
-      backgroundColor: theme.buttonPrimary,
+      backgroundColor: "rgba(40, 25, 60, 0.8)",
+      borderColor: "rgba(180, 140, 255, 0.25)",
+      borderWidth: 2,
       borderRadius: 12,
-      paddingVertical: 11,
-      paddingHorizontal: 16,
+      paddingVertical: 12,
+
       width: "100%",
-      marginVertical: 10,
+      marginVertical: 8,
       alignItems: "center",
     },
     buttonText: {
-      textAlign: "center",
-      color: theme.buttonPrimaryText,
+      color: "#F4EEFF",
       fontWeight: "600",
-      letterSpacing: 0.5,
-      fontSize: 18,
+      letterSpacing: 2,
+      fontSize: 14,
     },
     switchText: {
       color: "#999",

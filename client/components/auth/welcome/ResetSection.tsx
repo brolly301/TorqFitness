@@ -1,4 +1,11 @@
-import { Pressable, StyleSheet, Text, TextInput, View } from "react-native";
+import {
+  ImageBackground,
+  Pressable,
+  StyleSheet,
+  Text,
+  TextInput,
+  View,
+} from "react-native";
 import React, { useLayoutEffect, useMemo, useState } from "react";
 import { Theme } from "@/types/Theme";
 import { useAppTheme } from "@/hooks/useAppTheme";
@@ -6,10 +13,15 @@ import EmailForm from "@/components/auth/resetPassword/EmailForm";
 import PasswordForm from "@/components/auth/resetPassword/PasswordForm";
 import CodeForm from "@/components/auth/resetPassword/CodeForm";
 import SuccessForm from "@/components/auth/resetPassword/SuccessForm";
+import { SectionType } from "@/app/(auth)";
 
 export type ResetStep = "email" | "code" | "password" | "success";
 
-export default function ResetPasswordScreen() {
+type Props = {
+  setSection: (section: SectionType) => void;
+};
+
+export default function ResetSection({ setSection }: Props) {
   const { theme, scale, themeType } = useAppTheme();
   const styles = useMemo(() => makeStyles(theme, scale), [theme, scale]);
 
@@ -30,48 +42,22 @@ export default function ResetPasswordScreen() {
 const makeStyles = (theme: Theme, scale: number) =>
   StyleSheet.create({
     container: {
-      backgroundColor: theme.background,
       flex: 1,
-      paddingTop: 80,
-      paddingHorizontal: 30,
+    },
+    overlay: {
+      ...StyleSheet.absoluteFillObject,
+      backgroundColor: "rgba(10, 5, 20, 0.6)",
+    },
+    background: {
+      flex: 1,
+      width: "100%",
+      alignItems: "center",
     },
     title: {
       fontSize: 32,
       fontWeight: "700",
       marginBottom: 10,
       alignSelf: "flex-start",
-      color: theme.text,
-    },
-    subtitle: {
-      color: theme.text,
-      fontSize: 15,
-      marginBottom: 40,
-      alignSelf: "flex-start",
-    },
-    input: {
-      borderWidth: 1,
-      backgroundColor: theme.inputBg,
-      borderColor: theme.inputBorder,
-      padding: 13,
-      marginVertical: 8,
-      fontSize: 16,
-      borderRadius: 12,
-      color: theme.text,
-    },
-    buttonContainer: {
-      backgroundColor: theme.buttonPrimary,
-      borderRadius: 12,
-      paddingVertical: 11,
-      paddingHorizontal: 16,
-      width: "100%",
-      marginVertical: 10,
-      alignItems: "center",
-    },
-    buttonText: {
-      textAlign: "center",
-      color: theme.buttonPrimaryText,
-      fontWeight: "600",
-      letterSpacing: 0.5,
-      fontSize: 18,
+      color: "white",
     },
   });
