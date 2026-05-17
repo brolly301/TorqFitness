@@ -9,9 +9,9 @@ import {
 import AppError from "@/components/ui/AppError";
 import { useUserContext } from "@/context/UserContext";
 import { useNavigation } from "expo-router";
-import { ResetStep } from "@/app/(auth)/resetPassword";
 import { Theme } from "@/types/Theme";
 import { useAppTheme } from "@/hooks/useAppTheme";
+import { ResetStep } from "../welcome/ResetSection";
 
 type Props = {
   setStep: React.Dispatch<React.SetStateAction<ResetStep>>;
@@ -43,10 +43,13 @@ export default function PasswordForm({ setStep, email }: Props) {
     setError(null);
   }, [navigation]);
 
-  const onSubmit = (data: ResetPasswordFormValues) => {
+  const onSubmit = async (data: ResetPasswordFormValues) => {
     const { password } = data;
-    resetPassword(password, email);
-    setStep("success");
+    const success = await resetPassword(password, email);
+
+    if (success) {
+      setStep("success");
+    }
   };
 
   return (
@@ -57,7 +60,7 @@ export default function PasswordForm({ setStep, email }: Props) {
         key="password"
         control={control}
         render={({ field: { onChange, value } }) => (
-          <>
+          <View style={styles.inputContainer}>
             <TextInput
               placeholder="Password"
               placeholderTextColor={"black"}
@@ -67,18 +70,18 @@ export default function PasswordForm({ setStep, email }: Props) {
               autoComplete="off"
               textContentType="oneTimeCode"
               importantForAutofill="no"
-              style={styles.input}
+              style={[styles.input, { marginBottom: errors.password ? 10 : 0 }]}
             />
-          </>
+            {errors.password && <AppError>{errors.password?.message}</AppError>}
+          </View>
         )}
       />
-      {errors.password && <AppError>{errors.password?.message}</AppError>}
       <Controller
         name="confirmPassword"
         key="confirmPassword"
         control={control}
         render={({ field: { onChange, value } }) => (
-          <>
+          <View style={styles.inputContainer}>
             <TextInput
               placeholder="Confirm Password"
               placeholderTextColor={"black"}
@@ -88,14 +91,18 @@ export default function PasswordForm({ setStep, email }: Props) {
               autoComplete="off"
               textContentType="oneTimeCode"
               importantForAutofill="no"
-              style={styles.input}
+              style={[
+                styles.input,
+                { marginBottom: errors.confirmPassword ? 10 : 0 },
+              ]}
             />
-          </>
+            {errors.confirmPassword && (
+              <AppError>{errors.confirmPassword?.message}</AppError>
+            )}
+          </View>
         )}
       />
-      {errors.confirmPassword && (
-        <AppError>{errors.confirmPassword?.message}</AppError>
-      )}
+
       {error?.message && <AppError>{error.message}</AppError>}
       <Pressable
         style={styles.buttonContainer}
@@ -110,7 +117,7 @@ export default function PasswordForm({ setStep, email }: Props) {
 const makeStyles = (theme: Theme, scale: number) =>
   StyleSheet.create({
     subtitle: {
-      color: "#F4EEFF",
+      color: "rgba(255,255,255,0.78)",
       fontSize: 15,
       marginBottom: 40,
       alignSelf: "flex-start",
@@ -121,11 +128,11 @@ const makeStyles = (theme: Theme, scale: number) =>
       borderColor: theme.inputBorder,
       paddingHorizontal: 12 * scale,
       paddingVertical: 12 * scale,
-      backgroundColor: theme.buttonSecondary,
-      marginBottom: 10 * scale,
+      backgroundColor: "rgba(255,255,255,0.92)",
       fontSize: 15 * scale,
       color: theme.text,
     },
+    inputContainer: { marginBottom: 10 },
     buttonContainer: {
       backgroundColor: "rgba(40, 25, 60, 0.8)",
       borderColor: "rgba(180, 140, 255, 0.25)",
@@ -140,7 +147,7 @@ const makeStyles = (theme: Theme, scale: number) =>
     buttonText: {
       color: "#F4EEFF",
       fontWeight: "600",
-      letterSpacing: 2,
+      letterSpacing: 1.6,
       fontSize: 14,
     },
   });

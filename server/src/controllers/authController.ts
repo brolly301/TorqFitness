@@ -308,21 +308,21 @@ export const verifyResetCode = async (req: Request, res: Response) => {
     const { email, code } = req.body;
 
     const user = await prisma.user.findFirst({
-      where: { email, resetToken: code },
+      where: { email },
     });
 
-    if (!user) {
-      return res
-        .status(404)
-        .json({ message: "Invalid email address", success: false });
+    if (!user || user.resetToken !== code) {
+      return res.status(400).json({
+        message: "Invalid reset code",
+        success: false,
+      });
     }
-
     if (!user.resetTokenExp || user.resetTokenExp < new Date()) {
-      return res
-        .status(400)
-        .json({ message: "Invalid or expired reset code", success: false });
+      return res.status(400).json({
+        message: "Reset code expired",
+        success: false,
+      });
     }
-
     res.status(200).json({ message: "Successfully verified reset token" });
   } catch {
     res.status(500).json({ message: "Something went wrong." });

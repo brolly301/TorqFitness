@@ -34,7 +34,9 @@ export default function ResetSection({ setSection }: Props) {
       {step === "email" && <EmailForm setStep={setStep} setEmail={setEmail} />}
       {step === "code" && <CodeForm setStep={setStep} email={email} />}
       {step === "password" && <PasswordForm setStep={setStep} email={email} />}
-      {step === "success" && <SuccessForm setStep={setStep} />}
+      {step === "success" && (
+        <SuccessForm setStep={setStep} setSection={setSection} />
+      )}
     </View>
   );
 }

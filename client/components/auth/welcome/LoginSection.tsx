@@ -73,20 +73,23 @@ export default function LoginSection({ setSection }: Props) {
             control={control}
             key={field.name}
             render={({ field: { onChange, value } }) => (
-              <>
+              <View style={styles.inputContainer}>
                 <TextInput
                   placeholder={field.placeholder}
                   placeholderTextColor={"black"}
                   onChangeText={onChange}
                   value={value}
-                  style={styles.input}
+                  style={[
+                    styles.input,
+                    { marginBottom: errors[field.name] ? 10 : 0 },
+                  ]}
                   textAlignVertical="center"
                   secureTextEntry={field.secureTextEntry}
                 />
                 {errors[field.name] && (
                   <AppError>{errors[field.name]?.message}</AppError>
                 )}
-              </>
+              </View>
             )}
           />
         );
@@ -127,12 +130,12 @@ const makeStyles = (theme: Theme, scale: number) =>
       borderColor: theme.inputBorder,
       paddingHorizontal: 12 * scale,
       paddingVertical: 12 * scale,
-      backgroundColor: theme.buttonSecondary,
-      marginBottom: 10 * scale,
+      backgroundColor: "rgba(255,255,255,0.92)",
       fontSize: 15 * scale,
+
       color: theme.text,
     },
-
+    inputContainer: { marginBottom: 10 },
     container: {},
 
     title: {
@@ -144,7 +147,7 @@ const makeStyles = (theme: Theme, scale: number) =>
     },
 
     subtitle: {
-      color: "white",
+      color: "rgba(255,255,255,0.78)",
       fontSize: 15,
       marginBottom: 40,
       alignSelf: "flex-start",
@@ -163,27 +166,27 @@ const makeStyles = (theme: Theme, scale: number) =>
     buttonText: {
       color: "#F4EEFF",
       fontWeight: "600",
-      letterSpacing: 2,
+      letterSpacing: 1.6,
       fontSize: 14,
     },
     switchText: {
-      color: "#999",
+      color: "rgba(255,255,255,0.78)",
       fontSize: 14,
       textAlign: "center",
     },
 
     link: {
-      color: theme.text,
-      fontWeight: "600",
+      color: "#C084FC",
+      fontWeight: "700",
     },
     forgotPassword: {
-      color: "#888",
+      color: "rgba(255,255,255,0.78)",
       fontSize: 14,
       textAlign: "right",
     },
     forgotLink: {
-      color: theme.textSecondary,
-      fontWeight: "500",
+      color: "#C084FC",
+      fontWeight: "700",
     },
     resetLinkWrapper: {
       marginTop: 6,

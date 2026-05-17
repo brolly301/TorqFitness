@@ -9,15 +9,17 @@ import {
 import AppError from "@/components/ui/AppError";
 import { useUserContext } from "@/context/UserContext";
 import { router, useNavigation } from "expo-router";
-import { ResetStep } from "@/app/(auth)/resetPassword";
 import { Theme } from "@/types/Theme";
 import { useAppTheme } from "@/hooks/useAppTheme";
+import { SectionType } from "@/app/(auth)";
+import { ResetStep } from "../welcome/ResetSection";
 
 type Props = {
   setStep: React.Dispatch<React.SetStateAction<ResetStep>>;
+  setSection: (section: SectionType) => void;
 };
 
-export default function SuccessForm({ setStep }: Props) {
+export default function SuccessForm({ setStep, setSection }: Props) {
   const { theme, scale, themeType } = useAppTheme();
   const styles = useMemo(() => makeStyles(theme, scale), [theme, scale]);
 
@@ -30,7 +32,7 @@ export default function SuccessForm({ setStep }: Props) {
 
       <Pressable
         style={styles.buttonContainer}
-        onPress={() => router.replace("/(auth)/login")}
+        onPress={() => setSection("login")}
       >
         <Text style={styles.buttonText}>Login</Text>
       </Pressable>
@@ -41,35 +43,26 @@ export default function SuccessForm({ setStep }: Props) {
 const makeStyles = (theme: Theme, scale: number) =>
   StyleSheet.create({
     subtitle: {
-      color: theme.text,
+      color: "rgba(255,255,255,0.78)",
       fontSize: 15,
       marginBottom: 40,
       alignSelf: "flex-start",
     },
-    input: {
-      borderWidth: 1,
-      backgroundColor: theme.inputBg,
-      borderColor: theme.inputBorder,
-      padding: 13,
-      marginVertical: 8,
-      fontSize: 16,
-      borderRadius: 12,
-      color: theme.text,
-    },
     buttonContainer: {
-      backgroundColor: theme.buttonPrimary,
+      backgroundColor: "rgba(40, 25, 60, 0.8)",
+      borderColor: "rgba(180, 140, 255, 0.25)",
+      borderWidth: 2,
       borderRadius: 12,
-      paddingVertical: 11,
-      paddingHorizontal: 16,
+      paddingVertical: 12,
+
       width: "100%",
-      marginVertical: 10,
+      marginVertical: 8,
       alignItems: "center",
     },
     buttonText: {
-      textAlign: "center",
-      color: theme.buttonPrimaryText,
+      color: "#F4EEFF",
       fontWeight: "600",
-      letterSpacing: 0.5,
-      fontSize: 18,
+      letterSpacing: 1.6,
+      fontSize: 14,
     },
   });

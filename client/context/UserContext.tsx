@@ -39,9 +39,9 @@ type UserContextType = {
   updateUser: (data: UserInputType) => void;
   changePassword: (currentPassword: string, newPassword: string) => void;
   deleteAccount: () => void;
-  requestResetCode: (email: string) => void;
-  verifyResetCode: (code: string, email: string) => void;
-  resetPassword: (password: string, email: string) => void;
+  requestResetCode: (email: string) => Promise<boolean>;
+  verifyResetCode: (code: string, email: string) => Promise<boolean>;
+  resetPassword: (password: string, email: string) => Promise<boolean>;
   authToken: AuthToken;
   logout: () => void;
   error: ApiError | null;
@@ -204,9 +204,12 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
         text1: "Reset code sent.",
         text2: `Please check your email and enter the reset code provided. `,
       });
+
+      return true;
     } catch (e) {
       const message = e instanceof Error ? e.message : "Something went wrong";
       setError({ message, status: "" });
+      return false;
     }
   };
 
@@ -219,9 +222,11 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
         text1: "Reset code verified.",
         text2: `You can now enter your new password. `,
       });
+      return true;
     } catch (e) {
       const message = e instanceof Error ? e.message : "Something went wrong";
       setError({ message, status: "" });
+      return false;
     }
   };
 
@@ -234,9 +239,11 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
         text1: "Password reset.",
         text2: `Please log in with your new password. `,
       });
+      return true;
     } catch (e) {
       const message = e instanceof Error ? e.message : "Something went wrong";
       setError({ message, status: "" });
+      return false;
     }
   };
 

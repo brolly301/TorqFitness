@@ -19,10 +19,7 @@ import { useUserContext } from "@/context/UserContext";
 import { useAppTheme } from "@/hooks/useAppTheme";
 import { Theme } from "@/types/Theme";
 import { router, useNavigation } from "expo-router";
-import { Image } from "expo-image";
 import { SectionType } from "@/app/(auth)";
-import EvilIcons from "@expo/vector-icons/EvilIcons";
-import Header from "./Header";
 
 type Props = {
   setSection: (section: SectionType) => void;
@@ -93,8 +90,8 @@ export default function SignUpSection({ setSection }: Props) {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Welcome Back</Text>
-      <Text style={styles.subtitle}>Access your notes anytime, anywhere.</Text>
+      <Text style={styles.title}>Start Your Journey</Text>
+      <Text style={styles.subtitle}>Track workouts. Build consistency.</Text>
       {signUpFields.map((field) => {
         return (
           <Controller
@@ -102,7 +99,7 @@ export default function SignUpSection({ setSection }: Props) {
             key={field.name}
             control={control}
             render={({ field: { onChange, value } }) => (
-              <>
+              <View style={styles.inputContainer}>
                 <TextInput
                   placeholder={field.placeholder}
                   placeholderTextColor={"black"}
@@ -113,12 +110,15 @@ export default function SignUpSection({ setSection }: Props) {
                   autoComplete="off"
                   textContentType="oneTimeCode"
                   importantForAutofill="no"
-                  style={styles.input}
+                  style={[
+                    styles.input,
+                    { marginBottom: errors[field.name] ? 10 : 0 },
+                  ]}
                 />
                 {errors[field.name] && (
                   <AppError>{errors[field.name]?.message}</AppError>
                 )}
-              </>
+              </View>
             )}
           />
         );
@@ -147,11 +147,12 @@ const makeStyles = (theme: Theme, scale: number) =>
       borderColor: theme.inputBorder,
       paddingHorizontal: 12 * scale,
       paddingVertical: 12 * scale,
-      backgroundColor: theme.buttonSecondary,
-      marginBottom: 10 * scale,
+      backgroundColor: "rgba(255,255,255,0.92)",
       fontSize: 15 * scale,
+
       color: theme.text,
     },
+    inputContainer: { marginBottom: 10 },
     overlay: {
       ...StyleSheet.absoluteFillObject,
       backgroundColor: "rgba(10, 5, 20, 0.6)",
@@ -160,24 +161,6 @@ const makeStyles = (theme: Theme, scale: number) =>
       flex: 1,
       width: "100%",
       alignItems: "center",
-    },
-    header: {
-      height: 120 * scale,
-      alignItems: "center",
-      justifyContent: "center",
-      marginBottom: 50 * scale,
-    },
-
-    backButton: {
-      position: "absolute",
-      left: 0,
-      top: 34 * scale,
-      zIndex: 2,
-    },
-
-    logo: {
-      width: 110 * scale,
-      height: 110 * scale,
     },
     container: {
       flex: 1,
@@ -191,7 +174,7 @@ const makeStyles = (theme: Theme, scale: number) =>
     },
 
     subtitle: {
-      color: "white",
+      color: "rgba(255,255,255,0.78)",
       fontSize: 15,
       marginBottom: 40,
       alignSelf: "flex-start",
@@ -210,17 +193,18 @@ const makeStyles = (theme: Theme, scale: number) =>
     buttonText: {
       color: "#F4EEFF",
       fontWeight: "600",
-      letterSpacing: 2,
+      letterSpacing: 1.6,
       fontSize: 14,
     },
 
     switchText: {
-      color: "#999",
+      color: "rgba(255,255,255,0.78)",
       fontSize: 14,
       textAlign: "center",
     },
+
     link: {
-      color: theme.text,
-      fontWeight: "600",
+      color: "#C084FC",
+      fontWeight: "700",
     },
   });
