@@ -1,4 +1,5 @@
 import {
+  ActivityIndicator,
   ImageBackground,
   Pressable,
   StyleSheet,
@@ -6,7 +7,7 @@ import {
   TextInput,
   View,
 } from "react-native";
-import React, { useLayoutEffect, useMemo } from "react";
+import React, { useLayoutEffect, useMemo, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import {
   SignUpFormValues,
@@ -28,6 +29,8 @@ type Props = {
 export default function SignUpSection({ setSection }: Props) {
   const { theme, scale, themeType } = useAppTheme();
   const styles = useMemo(() => makeStyles(theme, scale), [theme, scale]);
+
+  const [loading, setLoading] = useState<boolean>(false);
 
   const {
     control,
@@ -78,14 +81,21 @@ export default function SignUpSection({ setSection }: Props) {
     setError(null);
   }, [navigation]);
 
-  const onSubmit = (data: SignUpFormValues) => {
-    const { confirmPassword, ...body } = data;
+  const onSubmit = async (data: SignUpFormValues) => {
+    if (loading) return;
+    try {
+      setLoading(true);
 
-    if (confirmPassword !== body.password) {
-      return console.log("NOPE");
+      const { confirmPassword, ...body } = data;
+
+      if (confirmPassword !== body.password) {
+        return console.log("NOPE");
+      }
+
+      await signUp(body);
+    } finally {
+      setLoading(false);
     }
-
-    signUp(body);
   };
 
   return (
@@ -102,7 +112,7 @@ export default function SignUpSection({ setSection }: Props) {
               <View style={styles.inputContainer}>
                 <TextInput
                   placeholder={field.placeholder}
-                  placeholderTextColor={"black"}
+                  placeholderTextColor={"#111827"}
                   onChangeText={onChange}
                   textAlignVertical={"center"}
                   secureTextEntry={field.secureTextEntry}
@@ -125,10 +135,25 @@ export default function SignUpSection({ setSection }: Props) {
       })}
       {error?.message && <AppError>{error.message}</AppError>}
       <Pressable
-        style={styles.buttonContainer}
+        disabled={loading}
+        style={[
+          styles.buttonContainer,
+          {
+            backgroundColor: loading
+              ? "rgba(53, 44, 66, 0.8)"
+              : "rgba(40, 25, 60, 0.8)",
+          },
+        ]}
         onPress={handleSubmit(onSubmit)}
       >
-        <Text style={styles.buttonText}>Sign Up</Text>
+        {loading ? (
+          <ActivityIndicator
+            color={"rgba(255,255,255,0.78)"}
+            style={{ zIndex: 1 }}
+          />
+        ) : (
+          <Text style={styles.buttonText}>Sign Up</Text>
+        )}
       </Pressable>
       <Pressable onPress={() => setSection("login")} style={{ marginTop: 20 }}>
         <Text style={styles.switchText}>
@@ -144,13 +169,12 @@ const makeStyles = (theme: Theme, scale: number) =>
     input: {
       borderRadius: 12 * scale,
       borderWidth: 1,
-      borderColor: theme.inputBorder,
+      borderColor: "#D1D5DB",
       paddingHorizontal: 12 * scale,
       paddingVertical: 12 * scale,
       backgroundColor: "rgba(255,255,255,0.92)",
       fontSize: 15 * scale,
-
-      color: theme.text,
+      color: "#111827",
     },
     inputContainer: { marginBottom: 10 },
     overlay: {

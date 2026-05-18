@@ -34,8 +34,8 @@ type ApiError = {
 type UserContextType = {
   user: User | null;
   setUser: (user: User | null) => void;
-  login: (data: Login) => void;
-  signUp: (data: SignUp) => void;
+  login: (data: Login) => Promise<void>;
+  signUp: (data: SignUp) => Promise<void>;
   updateUser: (data: UserInputType) => void;
   changePassword: (currentPassword: string, newPassword: string) => void;
   deleteAccount: () => void;

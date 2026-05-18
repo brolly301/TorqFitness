@@ -11,18 +11,12 @@ export const loginSchema = z.object({
   password: z.string().min(1, "Password is required."),
 });
 
-export const signUpSchema = z
-  .object({
-    firstName: firstNameSchema,
-    surname: surnameSchema,
-    email: emailSchema,
-    password: passwordSchema,
-    confirmPassword: z.string().min(1, "Please confirm your password"),
-  })
-  .refine((data) => data.password.trim() === data.confirmPassword.trim(), {
-    message: "Passwords do not match",
-    path: ["confirmPassword"],
-  });
+export const signUpSchema = z.object({
+  firstName: firstNameSchema,
+  surname: surnameSchema,
+  email: emailSchema,
+  password: passwordSchema,
+});
 
 export const updateProfileSchema = z.object({
   firstName: firstNameSchema,

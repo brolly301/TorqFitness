@@ -1,4 +1,5 @@
 import {
+  ActivityIndicator,
   ImageBackground,
   Pressable,
   StyleSheet,
@@ -30,6 +31,7 @@ type Props = {
 export default function LoginSection({ setSection }: Props) {
   const { theme, scale } = useAppTheme();
   const styles = useMemo(() => makeStyles(theme, scale), [theme, scale]);
+  const [loading, setLoading] = useState<boolean>(false);
 
   const {
     control,
@@ -56,8 +58,14 @@ export default function LoginSection({ setSection }: Props) {
     setError(null);
   }, [navigation]);
 
-  const onSubmit = (data: LoginFormValues) => {
-    login(data);
+  const onSubmit = async (data: LoginFormValues) => {
+    if (loading) return;
+    try {
+      setLoading(true);
+      await login(data);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -76,7 +84,7 @@ export default function LoginSection({ setSection }: Props) {
               <View style={styles.inputContainer}>
                 <TextInput
                   placeholder={field.placeholder}
-                  placeholderTextColor={"black"}
+                  placeholderTextColor={"#111827"}
                   onChangeText={onChange}
                   value={value}
                   style={[
@@ -104,10 +112,25 @@ export default function LoginSection({ setSection }: Props) {
         </Text>
       </Pressable>
       <Pressable
-        style={styles.buttonContainer}
+        disabled={loading}
+        style={[
+          styles.buttonContainer,
+          {
+            backgroundColor: loading
+              ? "rgba(53, 44, 66, 0.8)"
+              : "rgba(40, 25, 60, 0.8)",
+          },
+        ]}
         onPress={handleSubmit(onSubmit)}
       >
-        <Text style={styles.buttonText}>Login</Text>
+        {loading ? (
+          <ActivityIndicator
+            color={"rgba(255,255,255,0.78)"}
+            style={{ zIndex: 1 }}
+          />
+        ) : (
+          <Text style={styles.buttonText}>Login</Text>
+        )}
       </Pressable>
 
       <Pressable
@@ -127,13 +150,11 @@ const makeStyles = (theme: Theme, scale: number) =>
     input: {
       borderRadius: 12 * scale,
       borderWidth: 1,
-      borderColor: theme.inputBorder,
+      borderColor: "#D1D5DB",
       paddingHorizontal: 12 * scale,
       paddingVertical: 12 * scale,
       backgroundColor: "rgba(255,255,255,0.92)",
       fontSize: 15 * scale,
-
-      color: theme.text,
     },
     inputContainer: { marginBottom: 10 },
     container: {},

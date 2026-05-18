@@ -1,5 +1,12 @@
-import { Pressable, StyleSheet, Text, TextInput, View } from "react-native";
-import React, { useLayoutEffect, useMemo } from "react";
+import {
+  ActivityIndicator,
+  Pressable,
+  StyleSheet,
+  Text,
+  TextInput,
+  View,
+} from "react-native";
+import React, { useLayoutEffect, useMemo, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
@@ -23,6 +30,8 @@ export default function EmailForm({ setStep, setEmail }: Props) {
   const { theme, scale, themeType } = useAppTheme();
   const styles = useMemo(() => makeStyles(theme, scale), [theme, scale]);
 
+  const [loading, setLoading] = useState<boolean>(false);
+
   const { error, setError, requestResetCode } = useUserContext();
 
   const {
@@ -44,12 +53,18 @@ export default function EmailForm({ setStep, setEmail }: Props) {
   }, [navigation]);
 
   const onSubmit = async (data: ResetEmailFormValues) => {
-    const { email } = data;
-    const success = await requestResetCode(email);
+    if (loading) return;
+    try {
+      setLoading(true);
+      const { email } = data;
+      const success = await requestResetCode(email);
 
-    if (success) {
-      setEmail(email);
-      setStep("code");
+      if (success) {
+        setEmail(email);
+        setStep("code");
+      }
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -79,10 +94,25 @@ export default function EmailForm({ setStep, setEmail }: Props) {
       />
       {error?.message && <AppError>{error.message}</AppError>}
       <Pressable
-        style={styles.buttonContainer}
+        disabled={loading}
+        style={[
+          styles.buttonContainer,
+          {
+            backgroundColor: loading
+              ? "rgba(53, 44, 66, 0.8)"
+              : "rgba(40, 25, 60, 0.8)",
+          },
+        ]}
         onPress={handleSubmit(onSubmit)}
       >
-        <Text style={styles.buttonText}>Send Reset Link</Text>
+        {loading ? (
+          <ActivityIndicator
+            color={"rgba(255,255,255,0.78)"}
+            style={{ zIndex: 1 }}
+          />
+        ) : (
+          <Text style={styles.buttonText}>Send Reset Link</Text>
+        )}
       </Pressable>
     </View>
   );

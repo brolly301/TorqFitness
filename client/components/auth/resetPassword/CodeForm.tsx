@@ -1,5 +1,12 @@
-import { Pressable, StyleSheet, Text, TextInput, View } from "react-native";
-import React, { useLayoutEffect, useMemo } from "react";
+import {
+  ActivityIndicator,
+  Pressable,
+  StyleSheet,
+  Text,
+  TextInput,
+  View,
+} from "react-native";
+import React, { useLayoutEffect, useMemo, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
@@ -22,6 +29,8 @@ export default function CodeForm({ setStep, email }: Props) {
   const { theme, scale, themeType } = useAppTheme();
   const styles = useMemo(() => makeStyles(theme, scale), [theme, scale]);
 
+  const [loading, setLoading] = useState<boolean>(false);
+
   const { error, setError, verifyResetCode } = useUserContext();
 
   const {
@@ -43,15 +52,25 @@ export default function CodeForm({ setStep, email }: Props) {
   }, [navigation]);
 
   const onSubmit = async (data: ResetCodeFormValues) => {
-    const { code } = data;
-    const success = await verifyResetCode(code, email);
+    if (loading) return;
 
-    if (success) {
-      setStep("password");
+    try {
+      setLoading(true);
+      const { code } = data;
+
+      setError(null);
+
+      const success = await verifyResetCode(code, email);
+
+      if (success) {
+        setStep("password");
+        setError(null);
+      }
+    } finally {
+      setLoading(false);
     }
   };
 
-  console.log(email);
   return (
     <View>
       <Text style={styles.subtitle}>Please enter your code below.</Text>
@@ -76,12 +95,27 @@ export default function CodeForm({ setStep, email }: Props) {
           </View>
         )}
       />
-      {error?.message && <AppError>{error.message}</AppError>}
+      {error?.message && !errors.code && <AppError>{error.message}</AppError>}
       <Pressable
-        style={styles.buttonContainer}
+        disabled={loading}
+        style={[
+          styles.buttonContainer,
+          {
+            backgroundColor: loading
+              ? "rgba(53, 44, 66, 0.8)"
+              : "rgba(40, 25, 60, 0.8)",
+          },
+        ]}
         onPress={handleSubmit(onSubmit)}
       >
-        <Text style={styles.buttonText}>Submit Code</Text>
+        {loading ? (
+          <ActivityIndicator
+            color={"rgba(255,255,255,0.78)"}
+            style={{ zIndex: 1 }}
+          />
+        ) : (
+          <Text style={styles.buttonText}>Verify Code</Text>
+        )}
       </Pressable>
     </View>
   );

@@ -1,5 +1,12 @@
-import { Pressable, StyleSheet, Text, TextInput, View } from "react-native";
-import React, { useLayoutEffect, useMemo } from "react";
+import {
+  ActivityIndicator,
+  Pressable,
+  StyleSheet,
+  Text,
+  TextInput,
+  View,
+} from "react-native";
+import React, { useLayoutEffect, useMemo, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
@@ -23,6 +30,7 @@ export default function PasswordForm({ setStep, email }: Props) {
   const styles = useMemo(() => makeStyles(theme, scale), [theme, scale]);
 
   const { error, setError, resetPassword } = useUserContext();
+  const [loading, setLoading] = useState<boolean>(false);
 
   const {
     control,
@@ -44,11 +52,18 @@ export default function PasswordForm({ setStep, email }: Props) {
   }, [navigation]);
 
   const onSubmit = async (data: ResetPasswordFormValues) => {
-    const { password } = data;
-    const success = await resetPassword(password, email);
+    if (loading) return;
+    try {
+      setLoading(true);
 
-    if (success) {
-      setStep("success");
+      const { password } = data;
+      const success = await resetPassword(password, email);
+
+      if (success) {
+        setStep("success");
+      }
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -67,6 +82,7 @@ export default function PasswordForm({ setStep, email }: Props) {
               onChangeText={onChange}
               textAlignVertical="center"
               value={value}
+              secureTextEntry
               autoComplete="off"
               textContentType="oneTimeCode"
               importantForAutofill="no"
@@ -88,6 +104,7 @@ export default function PasswordForm({ setStep, email }: Props) {
               onChangeText={onChange}
               textAlignVertical="center"
               value={value}
+              secureTextEntry
               autoComplete="off"
               textContentType="oneTimeCode"
               importantForAutofill="no"
@@ -105,10 +122,25 @@ export default function PasswordForm({ setStep, email }: Props) {
 
       {error?.message && <AppError>{error.message}</AppError>}
       <Pressable
-        style={styles.buttonContainer}
+        disabled={loading}
+        style={[
+          styles.buttonContainer,
+          {
+            backgroundColor: loading
+              ? "rgba(53, 44, 66, 0.8)"
+              : "rgba(40, 25, 60, 0.8)",
+          },
+        ]}
         onPress={handleSubmit(onSubmit)}
       >
-        <Text style={styles.buttonText}>Submit</Text>
+        {loading ? (
+          <ActivityIndicator
+            color={"rgba(255,255,255,0.78)"}
+            style={{ zIndex: 1 }}
+          />
+        ) : (
+          <Text style={styles.buttonText}>Submit</Text>
+        )}
       </Pressable>
     </View>
   );
