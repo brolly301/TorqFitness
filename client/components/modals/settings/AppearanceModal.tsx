@@ -57,16 +57,14 @@ export const makeStyles = (theme: Theme, scale: number) =>
     },
     modalView: {
       width: "89%",
-      height: "30%",
+      maxHeight: "60%",
       borderRadius: 12,
       backgroundColor: theme.background,
       paddingTop: 15,
       paddingHorizontal: 15,
-      paddingBottom: 26,
+      paddingBottom: 15,
     },
-    container: {
-      flex: 1,
-    },
+    container: {},
     name: {
       position: "absolute",
       left: 60 * scale,

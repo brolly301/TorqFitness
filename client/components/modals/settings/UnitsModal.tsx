@@ -43,7 +43,7 @@ export default function UnitsModal({ modalVisible, setModalVisible }: Props) {
                 style={[
                   styles.unitTile,
                   {
-                    borderColor:
+                    backgroundColor:
                       settings?.weightLabel === "kg"
                         ? theme.buttonPrimary
                         : theme.inputBorder,
@@ -57,7 +57,7 @@ export default function UnitsModal({ modalVisible, setModalVisible }: Props) {
                 style={[
                   styles.unitTile,
                   {
-                    borderColor:
+                    backgroundColor:
                       settings?.weightLabel === "lb"
                         ? theme.buttonPrimary
                         : theme.inputBorder,
@@ -84,17 +84,14 @@ export const makeStyles = (theme: Theme, scale: number) =>
     },
     modalView: {
       width: "89%",
-      height: "18%",
+      maxHeight: "60%",
       borderRadius: 12,
       backgroundColor: theme.background,
       paddingTop: 15,
       paddingHorizontal: 15,
-      paddingBottom: 26,
+      paddingBottom: 15,
     },
-    container: {
-      flex: 1,
-    },
-
+    container: {},
     header: {
       height: 44 * scale,
       justifyContent: "center",
@@ -126,6 +123,7 @@ export const makeStyles = (theme: Theme, scale: number) =>
       flexDirection: "row",
       justifyContent: "space-between",
       alignItems: "center",
+      paddingVertical: 15,
     },
     unitTile: {
       width: "48%",

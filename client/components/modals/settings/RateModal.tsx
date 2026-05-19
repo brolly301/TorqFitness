@@ -39,12 +39,14 @@ export default function RateModal({ modalVisible, setModalVisible }: Props) {
               </Pressable>
               <Text style={styles.name}>Rate App</Text>
             </View>
+            <Text style={styles.subText}>How are you enjoying Torq?</Text>
             <View style={styles.starContainer}>
               {[1, 2, 3, 4, 5].map((stars) => {
                 return (
-                  <Pressable onPress={() => setRating(stars)}>
+                  <Pressable onPress={() => setRating(stars)} key={stars}>
                     <FontAwesome
-                      size={50}
+                      color={theme.buttonPrimary}
+                      size={40}
                       name={
                         rating !== null && stars <= rating ? "star" : "star-o"
                       }
@@ -77,16 +79,14 @@ export const makeStyles = (theme: Theme, scale: number) =>
     },
     modalView: {
       width: "89%",
-      height: "30%",
+      maxHeight: "50%",
       borderRadius: 12,
       backgroundColor: theme.background,
       paddingTop: 15,
       paddingHorizontal: 15,
       paddingBottom: 26,
     },
-    container: {
-      flex: 1,
-    },
+    container: {},
     name: {
       position: "absolute",
       left: 60 * scale,
@@ -100,8 +100,8 @@ export const makeStyles = (theme: Theme, scale: number) =>
     header: {
       height: 44 * scale,
       justifyContent: "center",
-      marginBottom: 20 * scale,
       position: "relative",
+      marginBottom: 20 * scale,
     },
     label: {
       fontSize: 18 * scale,
@@ -124,6 +124,7 @@ export const makeStyles = (theme: Theme, scale: number) =>
       flexDirection: "row",
       justifyContent: "space-between",
       alignItems: "center",
+      marginVertical: 30,
     },
     button: {
       flexDirection: "row",
@@ -132,10 +133,17 @@ export const makeStyles = (theme: Theme, scale: number) =>
       borderRadius: 12 * scale,
       paddingVertical: 12 * scale,
       marginTop: 10 * scale,
+      backgroundColor: theme.buttonPrimary,
     },
 
     buttonText: {
       fontSize: 15 * scale,
       fontWeight: "700",
+      color: theme.buttonPrimaryText,
+    },
+    subText: {
+      fontSize: 18 * scale,
+      color: theme.textSecondary,
+      fontWeight: "500",
     },
   });

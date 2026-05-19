@@ -10,6 +10,7 @@ import { Theme } from "@/types/Theme";
 import AntDesign from "@expo/vector-icons/AntDesign";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { router } from "expo-router";
+import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 
 type Props = {
   workout: Workout;
@@ -176,6 +177,16 @@ export default function WorkoutDetails({ workout, setModalVisible }: Props) {
             );
           }}
         />
+        {exerciseList.length < 1 ? (
+          <View style={styles.placeholderContainer}>
+            <MaterialCommunityIcons
+              name="dumbbell"
+              color={theme.text + "CC"}
+              size={17}
+            />
+            <Text style={styles.placeholderText}>No exercises added yet</Text>
+          </View>
+        ) : null}
       </View>
     </>
   );
@@ -184,7 +195,7 @@ export default function WorkoutDetails({ workout, setModalVisible }: Props) {
 export const makeStyles = (theme: Theme, scale: number) =>
   StyleSheet.create({
     container: {
-      flex: 1,
+      flexShrink: 1,
     },
 
     header: {
@@ -375,5 +386,14 @@ export const makeStyles = (theme: Theme, scale: number) =>
       fontSize: 15 * scale,
       fontWeight: "600",
       color: theme.buttonPrimaryText,
+    },
+    placeholderContainer: {
+      flexDirection: "row",
+      paddingVertical: 10,
+    },
+    placeholderText: {
+      color: theme.text + "CC",
+      fontSize: 14 * scale,
+      marginLeft: 10,
     },
   });
