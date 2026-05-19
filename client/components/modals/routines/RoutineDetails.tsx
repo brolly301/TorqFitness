@@ -11,6 +11,9 @@ import { Theme } from "@/types/Theme";
 import AntDesign from "@expo/vector-icons/AntDesign";
 import Entypo from "@expo/vector-icons/Entypo";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
+import EvilIcons from "@expo/vector-icons/EvilIcons";
+import Feather from "@expo/vector-icons/Feather";
+import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 
 type Props = {
   routine: Routine;
@@ -92,7 +95,6 @@ export default function RoutineDetails({ routine, setModalVisible }: Props) {
             </Pressable>
           </View>
         </View>
-
         <FlatList
           data={exerciseList}
           keyExtractor={(item) => item.id}
@@ -161,6 +163,16 @@ export default function RoutineDetails({ routine, setModalVisible }: Props) {
           }}
           ListFooterComponent={<View style={styles.footerSpacer} />}
         />
+        {exerciseList.length < 1 ? (
+          <View style={styles.placeholderContainer}>
+            <MaterialCommunityIcons
+              name="dumbbell"
+              color={theme.text + "CC"}
+              size={17}
+            />
+            <Text style={styles.placeholderText}>No exercises added yet</Text>
+          </View>
+        ) : null}
 
         <Pressable
           style={styles.startButton}
@@ -182,7 +194,7 @@ export default function RoutineDetails({ routine, setModalVisible }: Props) {
 export const makeStyles = (theme: Theme, scale: number) =>
   StyleSheet.create({
     container: {
-      flex: 1,
+      flexShrink: 1,
     },
 
     header: {
@@ -331,12 +343,21 @@ export const makeStyles = (theme: Theme, scale: number) =>
       borderRadius: 12 * scale,
       backgroundColor: theme.buttonPrimary,
       paddingVertical: 12 * scale,
-      marginTop: 12 * scale,
+      marginTop: 15 * scale,
     },
 
     startText: {
       fontSize: 15 * scale,
       color: theme.buttonPrimaryText,
       fontWeight: "700",
+    },
+    placeholderContainer: {
+      flexDirection: "row",
+      paddingVertical: 10,
+    },
+    placeholderText: {
+      color: theme.text + "CC",
+      fontSize: 14 * scale,
+      marginLeft: 10,
     },
   });

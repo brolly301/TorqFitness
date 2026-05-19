@@ -40,11 +40,12 @@ export const makeStyles = (theme: Theme, scale: number) =>
     },
     modalView: {
       width: "89%",
-      height: "60%",
+      maxHeight: "60%",
+      minHeight: 200,
       borderRadius: 12,
       backgroundColor: theme.background,
       paddingTop: 15,
       paddingHorizontal: 15,
-      paddingBottom: 26,
+      paddingBottom: 20,
     },
   });

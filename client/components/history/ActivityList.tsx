@@ -20,6 +20,9 @@ export default function ActivityList({ workouts }: Props) {
         keyExtractor={(item) => item.id}
         renderItem={({ item }) => <ActivityTile workout={item} />}
         style={styles.list}
+        maxToRenderPerBatch={5}
+        initialNumToRender={8}
+        windowSize={5}
         contentContainerStyle={styles.contentContainer}
         showsVerticalScrollIndicator={false}
       />

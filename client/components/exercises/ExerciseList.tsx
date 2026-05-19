@@ -33,6 +33,9 @@ export default function ExerciseList({
       <View style={styles.container}>
         <FlatList
           data={exercises}
+          maxToRenderPerBatch={5}
+          initialNumToRender={8}
+          windowSize={5}
           keyExtractor={(item) => item.id}
           renderItem={({ item }) => (
             <Pressable

@@ -13,6 +13,9 @@ export default function RoutineList({ routines }: Props) {
       <FlatList
         showsVerticalScrollIndicator={false}
         data={routines}
+        maxToRenderPerBatch={5}
+        initialNumToRender={8}
+        windowSize={5}
         keyExtractor={(item) => item.id}
         renderItem={({ item }) => {
           return <RoutineTile routine={item} />;
