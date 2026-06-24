@@ -182,6 +182,7 @@ const makeStyles = (theme: Theme, scale: number) =>
       borderRadius: 16 * scale,
       borderWidth: 1,
       borderColor: theme.border,
+      elevation: 2,
     },
 
     sectionHeader: {

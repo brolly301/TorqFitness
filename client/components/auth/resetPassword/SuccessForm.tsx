@@ -1,14 +1,5 @@
 import { Pressable, StyleSheet, Text, TextInput, View } from "react-native";
 import React, { useLayoutEffect, useMemo } from "react";
-import { Controller, useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import {
-  ResetPasswordFormValues,
-  resetPasswordSchema,
-} from "@/utils/validation/authSchema";
-import AppError from "@/components/ui/AppError";
-import { useUserContext } from "@/context/UserContext";
-import { router, useNavigation } from "expo-router";
 import { Theme } from "@/types/Theme";
 import { useAppTheme } from "@/hooks/useAppTheme";
 import { SectionType } from "@/app/(auth)";

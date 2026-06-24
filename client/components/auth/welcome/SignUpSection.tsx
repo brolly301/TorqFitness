@@ -1,13 +1,12 @@
 import {
   ActivityIndicator,
-  ImageBackground,
   Pressable,
   StyleSheet,
   Text,
   TextInput,
   View,
 } from "react-native";
-import React, { useLayoutEffect, useMemo, useState } from "react";
+import React, { useEffect, useLayoutEffect, useMemo, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import {
   SignUpFormValues,
@@ -15,12 +14,11 @@ import {
 } from "../../../utils/validation/authSchema";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { FormField } from "@/types/Global";
-import AppError from "@/components/ui/AppError";
 import { useUserContext } from "@/context/UserContext";
 import { useAppTheme } from "@/hooks/useAppTheme";
 import { Theme } from "@/types/Theme";
-import { router, useNavigation } from "expo-router";
 import { SectionType } from "@/app/(auth)";
+import { toggleToast } from "@/utils/toggleToast";
 
 type Props = {
   setSection: (section: SectionType) => void;
@@ -35,7 +33,7 @@ export default function SignUpSection({ setSection }: Props) {
   const {
     control,
     handleSubmit,
-    formState: { errors },
+    formState: { isValid },
   } = useForm<SignUpFormValues>({
     resolver: zodResolver(signUpSchema),
     defaultValues: {
@@ -45,12 +43,10 @@ export default function SignUpSection({ setSection }: Props) {
       password: "",
       confirmPassword: "",
     },
-    mode: "onSubmit",
+    mode: "onChange",
   });
 
   const { signUp, setError, error } = useUserContext();
-
-  const navigation = useNavigation();
 
   const signUpFields: FormField<SignUpFormValues>[] = [
     {
@@ -77,9 +73,17 @@ export default function SignUpSection({ setSection }: Props) {
     },
   ];
 
-  useLayoutEffect(() => {
+  useEffect(() => {
+    if (!error?.message) return;
+
+    toggleToast({
+      type: "error",
+      text1: "Sign Up Error.",
+      text2: error.message,
+    });
+
     setError(null);
-  }, [navigation]);
+  }, [error?.message]);
 
   const onSubmit = async (data: SignUpFormValues) => {
     if (loading) return;
@@ -120,28 +124,23 @@ export default function SignUpSection({ setSection }: Props) {
                   autoComplete="off"
                   textContentType="oneTimeCode"
                   importantForAutofill="no"
-                  style={[
-                    styles.input,
-                    { marginBottom: errors[field.name] ? 10 : 0 },
-                  ]}
+                  style={[styles.input]}
                 />
-                {errors[field.name] && (
-                  <AppError>{errors[field.name]?.message}</AppError>
-                )}
               </View>
             )}
           />
         );
       })}
-      {error?.message && <AppError>{error.message}</AppError>}
+
       <Pressable
-        disabled={loading}
+        disabled={loading || !isValid}
         style={[
           styles.buttonContainer,
           {
-            backgroundColor: loading
-              ? "rgba(53, 44, 66, 0.8)"
-              : "rgba(40, 25, 60, 0.8)",
+            backgroundColor:
+              loading || !isValid
+                ? "rgba(53, 44, 66, 0.8)"
+                : "rgba(40, 25, 60, 0.8)",
           },
         ]}
         onPress={handleSubmit(onSubmit)}

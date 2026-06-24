@@ -7,7 +7,7 @@ import {
   TextInput,
   View,
 } from "react-native";
-import React, { useLayoutEffect, useMemo, useState } from "react";
+import React, { useEffect, useLayoutEffect, useMemo, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
@@ -15,14 +15,11 @@ import {
   loginSchema,
 } from "../../../utils/validation/authSchema";
 import type { FormField } from "@/types/Global";
-import AppError from "@/components/ui/AppError";
 import { useUserContext } from "@/context/UserContext";
 import { useAppTheme } from "@/hooks/useAppTheme";
 import { Theme } from "@/types/Theme";
-import { router, useNavigation } from "expo-router";
-import { Image } from "expo-image";
 import { SectionType } from "@/app/(auth)";
-import EvilIcons from "@expo/vector-icons/EvilIcons";
+import { toggleToast } from "@/utils/toggleToast";
 
 type Props = {
   setSection: (section: SectionType) => void;
@@ -36,27 +33,34 @@ export default function LoginSection({ setSection }: Props) {
   const {
     control,
     handleSubmit,
-    formState: { errors },
+    formState: { isValid },
   } = useForm<LoginFormValues>({
     resolver: zodResolver(loginSchema),
     defaultValues: {
       email: "",
       password: "",
     },
-    mode: "onSubmit",
+    mode: "onChange",
   });
 
   const { login, error, setError } = useUserContext();
 
-  const navigation = useNavigation();
   const loginFields: FormField<LoginFormValues>[] = [
     { name: "email", placeholder: "Email" },
     { name: "password", placeholder: "Password", secureTextEntry: true },
   ];
 
-  useLayoutEffect(() => {
+  useEffect(() => {
+    if (!error?.message) return;
+
+    toggleToast({
+      type: "error",
+      text1: "Login Error.",
+      text2: error.message,
+    });
+
     setError(null);
-  }, [navigation]);
+  }, [error?.message]);
 
   const onSubmit = async (data: LoginFormValues) => {
     if (loading) return;
@@ -69,79 +73,76 @@ export default function LoginSection({ setSection }: Props) {
   };
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Welcome Back</Text>
-      <Text style={styles.subtitle}>
-        Your progress starts where you left off
-      </Text>
-      {loginFields.map((field) => {
-        return (
-          <Controller
-            name={field.name}
-            control={control}
-            key={field.name}
-            render={({ field: { onChange, value } }) => (
-              <View style={styles.inputContainer}>
-                <TextInput
-                  placeholder={field.placeholder}
-                  placeholderTextColor={"#111827"}
-                  onChangeText={onChange}
-                  value={value}
-                  style={[
-                    styles.input,
-                    { marginBottom: errors[field.name] ? 10 : 0 },
-                  ]}
-                  textAlignVertical="center"
-                  secureTextEntry={field.secureTextEntry}
-                />
-                {errors[field.name] && (
-                  <AppError>{errors[field.name]?.message}</AppError>
-                )}
-              </View>
-            )}
-          />
-        );
-      })}
-      {error?.message && <AppError>{error.message}</AppError>}
-      <Pressable
-        onPress={() => setSection("resetPassword")}
-        style={styles.resetLinkWrapper}
-      >
-        <Text style={styles.forgotPassword}>
-          Forgot Password?<Text style={styles.forgotLink}> Reset it</Text>
+    <>
+      <View style={styles.container}>
+        <Text style={styles.title}>Welcome Back</Text>
+        <Text style={styles.subtitle}>
+          Your progress starts where you left off
         </Text>
-      </Pressable>
-      <Pressable
-        disabled={loading}
-        style={[
-          styles.buttonContainer,
-          {
-            backgroundColor: loading
-              ? "rgba(53, 44, 66, 0.8)"
-              : "rgba(40, 25, 60, 0.8)",
-          },
-        ]}
-        onPress={handleSubmit(onSubmit)}
-      >
-        {loading ? (
-          <ActivityIndicator
-            color={"rgba(255,255,255,0.78)"}
-            style={{ zIndex: 1 }}
-          />
-        ) : (
-          <Text style={styles.buttonText}>Login</Text>
-        )}
-      </Pressable>
+        {loginFields.map((field) => {
+          return (
+            <Controller
+              name={field.name}
+              control={control}
+              key={field.name}
+              render={({ field: { onChange, value } }) => (
+                <View style={styles.inputContainer}>
+                  <TextInput
+                    placeholder={field.placeholder}
+                    placeholderTextColor={"#111827"}
+                    onChangeText={onChange}
+                    value={value}
+                    style={[styles.input]}
+                    textAlignVertical="center"
+                    secureTextEntry={field.secureTextEntry}
+                  />
+                </View>
+              )}
+            />
+          );
+        })}
 
-      <Pressable
-        onPress={() => setSection("signUp")}
-        style={styles.signUpWrapper}
-      >
-        <Text style={styles.switchText}>
-          Don't have an account?<Text style={styles.link}> Sign Up</Text>
-        </Text>
-      </Pressable>
-    </View>
+        <Pressable
+          onPress={() => setSection("resetPassword")}
+          style={styles.resetLinkWrapper}
+        >
+          <Text style={styles.forgotPassword}>
+            Forgot Password?<Text style={styles.forgotLink}> Reset it</Text>
+          </Text>
+        </Pressable>
+        <Pressable
+          disabled={loading || !isValid}
+          style={[
+            styles.buttonContainer,
+            {
+              backgroundColor:
+                loading || !isValid
+                  ? "rgba(53, 44, 66, 0.8)"
+                  : "rgba(40, 25, 60, 0.8)",
+            },
+          ]}
+          onPress={handleSubmit(onSubmit)}
+        >
+          {loading ? (
+            <ActivityIndicator
+              color={"rgba(255,255,255,0.78)"}
+              style={{ zIndex: 1 }}
+            />
+          ) : (
+            <Text style={styles.buttonText}>Login</Text>
+          )}
+        </Pressable>
+
+        <Pressable
+          onPress={() => setSection("signUp")}
+          style={styles.signUpWrapper}
+        >
+          <Text style={styles.switchText}>
+            Don't have an account?<Text style={styles.link}> Sign Up</Text>
+          </Text>
+        </Pressable>
+      </View>
+    </>
   );
 }
 

@@ -6,7 +6,7 @@ import {
   TextInput,
   View,
 } from "react-native";
-import React, { useLayoutEffect, useMemo, useState } from "react";
+import React, { useEffect, useLayoutEffect, useMemo, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
@@ -20,6 +20,7 @@ import { useNavigation } from "expo-router";
 import { Theme } from "@/types/Theme";
 import { useAppTheme } from "@/hooks/useAppTheme";
 import { ResetStep } from "../welcome/ResetSection";
+import { toggleToast } from "@/utils/toggleToast";
 
 type Props = {
   setStep: React.Dispatch<React.SetStateAction<ResetStep>>;
@@ -37,20 +38,26 @@ export default function EmailForm({ setStep, setEmail }: Props) {
   const {
     control,
     handleSubmit,
-    formState: { errors },
+    formState: { isValid },
   } = useForm<ResetEmailFormValues>({
     resolver: zodResolver(resetEmailSchema),
     defaultValues: {
       email: "",
     },
-    mode: "onSubmit",
+    mode: "onChange",
   });
 
-  const navigation = useNavigation();
+  useEffect(() => {
+    if (!error?.message) return;
 
-  useLayoutEffect(() => {
+    toggleToast({
+      type: "error",
+      text1: "Password Reset Error.",
+      text2: error.message,
+    });
+
     setError(null);
-  }, [navigation]);
+  }, [error?.message]);
 
   const onSubmit = async (data: ResetEmailFormValues) => {
     if (loading) return;
@@ -86,21 +93,20 @@ export default function EmailForm({ setStep, setEmail }: Props) {
               autoComplete="off"
               textContentType="oneTimeCode"
               importantForAutofill="no"
-              style={[styles.input, { marginBottom: errors.email ? 10 : 0 }]}
+              style={[styles.input]}
             />
-            {errors.email && <AppError>{errors.email?.message}</AppError>}
           </View>
         )}
       />
-      {error?.message && <AppError>{error.message}</AppError>}
       <Pressable
-        disabled={loading}
+        disabled={loading || !isValid}
         style={[
           styles.buttonContainer,
           {
-            backgroundColor: loading
-              ? "rgba(53, 44, 66, 0.8)"
-              : "rgba(40, 25, 60, 0.8)",
+            backgroundColor:
+              loading || !isValid
+                ? "rgba(53, 44, 66, 0.8)"
+                : "rgba(40, 25, 60, 0.8)",
           },
         ]}
         onPress={handleSubmit(onSubmit)}

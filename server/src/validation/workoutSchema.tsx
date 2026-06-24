@@ -15,10 +15,10 @@ export const workoutExerciseSchema = z.object({
 export const workoutSchema = z.object({
   name: z.string().min(1, "Workout name is required"),
   notes: z.string().optional(),
-  startedAt: z.date("Started date are required."),
-  completedAt: z.date("Completed date is required."),
+  startedAt: z.coerce.date("Started date are required."),
+  completedAt: z.coerce.date("Completed date is required."),
   duration: z.number().int().min(1, "Duration  be at least 1 second"),
-  exercises: z.array(workoutExerciseSchema),
+  exercises: z.array(workoutExerciseSchema).optional(),
 });
 
 export type WorkoutFormValues = z.infer<typeof workoutSchema>;

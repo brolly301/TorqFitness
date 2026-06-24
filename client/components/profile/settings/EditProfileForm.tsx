@@ -1,5 +1,5 @@
 import { Pressable, StyleSheet, Text, TextInput, View } from "react-native";
-import React, { useLayoutEffect, useMemo, useState } from "react";
+import React, { useEffect, useLayoutEffect, useMemo, useState } from "react";
 import { Theme } from "@/types/Theme";
 import { useAppTheme } from "@/hooks/useAppTheme";
 import { useUserContext } from "@/context/UserContext";
@@ -12,6 +12,7 @@ import {
   updateProfileSchema,
 } from "../../../utils/validation/authSchema";
 import { FormField } from "@/types/Global";
+import { toggleToast } from "@/utils/toggleToast";
 
 export type UserInputType = {
   firstName: string;
@@ -25,16 +26,12 @@ export default function EditProfileForm() {
 
   const { user, updateUser, error, setError } = useUserContext();
 
-  const [focused, setFocused] = useState<boolean>(false);
-
   if (!user) return;
-
-  console.log(user);
 
   const {
     control,
     handleSubmit,
-    formState: { errors },
+    formState: { isValid, isDirty },
   } = useForm<UpdateProfileFormValues>({
     resolver: zodResolver(updateProfileSchema),
     defaultValues: {
@@ -42,18 +39,24 @@ export default function EditProfileForm() {
       surname: user.surname,
       email: user.email,
     },
-    mode: "onSubmit",
+    mode: "onChange",
   });
 
   const onSubmit = (data: UpdateProfileFormValues) => {
     updateUser(data);
   };
 
-  const navigation = useNavigation();
+  useEffect(() => {
+    if (!error?.message) return;
 
-  useLayoutEffect(() => {
+    toggleToast({
+      type: "error",
+      text1: "Profile Update Error.",
+      text2: error.message,
+    });
+
     setError(null);
-  }, [navigation]);
+  }, [error?.message]);
 
   const profileFields: FormField<UpdateProfileFormValues>[] = [
     {
@@ -92,27 +95,19 @@ export default function EditProfileForm() {
                   importantForAutofill="no"
                   style={styles.input}
                 />
-                {errors[field.name] && (
-                  <AppError>{errors[field.name]?.message}</AppError>
-                )}
               </View>
             )}
           />
         );
       })}
-      {error?.message && <AppError>{error.message}</AppError>}
       <Pressable
         onPress={handleSubmit(onSubmit)}
-        // disabled={isDisabled}
+        disabled={!isValid || !isDirty}
         style={[
           styles.button,
           {
             backgroundColor:
-              // isDisabled
-              //   ?
-              //    theme.buttonDisabled
-              //   :
-              theme.buttonPrimary,
+              !isValid || !isDirty ? theme.buttonDisabled : theme.buttonPrimary,
           },
         ]}
       >

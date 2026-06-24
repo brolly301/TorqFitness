@@ -7,6 +7,7 @@ import { useAppTheme } from "@/hooks/useAppTheme";
 import { useExerciseContext } from "@/context/ExerciseContext";
 import { capitalizeWords, formatDate, formatTime } from "@/utils/helpers";
 import Feather from "@expo/vector-icons/Feather";
+import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 
 type Props = {
   workout: Workout;
@@ -69,22 +70,33 @@ export default function ActivityTile({ workout }: Props) {
 
         <View style={styles.hr} />
 
-        {exerciseList.map((exercise) => {
-          const setCount = exercise.sets.length;
-          const setLabel = setCount === 1 ? "set" : "sets";
+        {exerciseList.length >= 1 ? (
+          exerciseList.map((exercise) => {
+            const setCount = exercise.sets.length;
+            const setLabel = setCount === 1 ? "set" : "sets";
 
-          return (
-            <View key={exercise.id} style={styles.exerciseRow}>
-              <Text style={styles.exerciseName} numberOfLines={1}>
-                {capitalizeWords(exercise.details?.name ?? "Exercise")}
-              </Text>
+            return (
+              <View key={exercise.id} style={styles.exerciseRow}>
+                <Text style={styles.exerciseName} numberOfLines={1}>
+                  {capitalizeWords(exercise.details?.name ?? "Exercise")}
+                </Text>
 
-              <Text style={styles.exerciseSets}>
-                {setCount} {setLabel}
-              </Text>
-            </View>
-          );
-        })}
+                <Text style={styles.exerciseSets}>
+                  {setCount} {setLabel}
+                </Text>
+              </View>
+            );
+          })
+        ) : (
+          <View style={styles.placeholderContainer}>
+            <MaterialCommunityIcons
+              name="dumbbell"
+              color={theme.text + "CC"}
+              size={17}
+            />
+            <Text style={styles.placeholderText}>No exercises added yet</Text>
+          </View>
+        )}
 
         <View style={styles.hr} />
 
@@ -140,7 +152,7 @@ export const makeStyles = (theme: Theme, scale: number) =>
       flexDirection: "row",
       alignItems: "center",
       justifyContent: "space-between",
-      marginBottom: 4 * scale,
+      marginVertical: 2 * scale,
       gap: 12 * scale,
     },
 
@@ -184,5 +196,14 @@ export const makeStyles = (theme: Theme, scale: number) =>
     titleDuration: {
       flexDirection: "row",
       justifyContent: "space-between",
+    },
+    placeholderContainer: {
+      flexDirection: "row",
+      marginVertical: 5 * scale,
+    },
+    placeholderText: {
+      color: theme.text + "CC",
+      fontSize: 14 * scale,
+      marginLeft: 10,
     },
   });

@@ -7,6 +7,7 @@ import { capitalizeWords, formatDate, formatTime } from "@/utils/helpers";
 import { useExerciseContext } from "@/context/ExerciseContext";
 import WorkoutDetailsModal from "../modals/history/WorkoutDetailsModal";
 import Feather from "@expo/vector-icons/Feather";
+import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 
 type Props = {
   workout: Workout;
@@ -57,22 +58,33 @@ export default function WorkoutTile({ workout }: Props) {
 
         <View style={styles.hr} />
 
-        {previewExercises.map((exercise) => (
-          <View key={exercise.id} style={styles.exerciseContainer}>
-            <View
-              style={{
-                width: 6,
-                height: 6,
-                borderRadius: 3,
-                backgroundColor: theme.buttonPrimary,
-                marginRight: 8,
-              }}
+        {previewExercises.length >= 1 ? (
+          previewExercises.map((exercise) => (
+            <View key={exercise.id} style={styles.exerciseContainer}>
+              <View
+                style={{
+                  width: 6,
+                  height: 6,
+                  borderRadius: 3,
+                  backgroundColor: theme.buttonPrimary,
+                  marginRight: 8,
+                }}
+              />
+              <Text style={styles.exerciseName} numberOfLines={1}>
+                {capitalizeWords(exercise.details?.name ?? "Exercise")}
+              </Text>
+            </View>
+          ))
+        ) : (
+          <View style={styles.placeholderContainer}>
+            <MaterialCommunityIcons
+              name="dumbbell"
+              color={theme.text + "CC"}
+              size={17}
             />
-            <Text style={styles.exerciseName} numberOfLines={1}>
-              {capitalizeWords(exercise.details?.name ?? "Exercise")}
-            </Text>
+            <Text style={styles.placeholderText}>No exercises added yet</Text>
           </View>
-        ))}
+        )}
 
         {remainingCount > 0 && (
           <Text style={styles.moreText}>+{remainingCount} more</Text>
@@ -124,7 +136,7 @@ export const makeStyles = (theme: Theme, scale: number) =>
 
     exerciseContainer: {
       flexDirection: "row",
-      marginBottom: 5 * scale,
+      paddingVertical: 5 * scale,
       alignItems: "center",
     },
 
@@ -156,5 +168,14 @@ export const makeStyles = (theme: Theme, scale: number) =>
     titleDuration: {
       flexDirection: "row",
       justifyContent: "space-between",
+    },
+    placeholderContainer: {
+      flexDirection: "row",
+      paddingVertical: 10,
+    },
+    placeholderText: {
+      color: theme.text + "CC",
+      fontSize: 14 * scale,
+      marginLeft: 10,
     },
   });

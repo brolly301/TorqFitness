@@ -1,5 +1,5 @@
 import { Pressable, StyleSheet, Text, TextInput, View } from "react-native";
-import React, { useLayoutEffect, useMemo, useState } from "react";
+import React, { useEffect, useLayoutEffect, useMemo, useState } from "react";
 import { useAppTheme } from "@/hooks/useAppTheme";
 import { useUserContext } from "@/context/UserContext";
 import { Theme } from "@/types/Theme";
@@ -12,6 +12,7 @@ import {
 import { useNavigation } from "expo-router";
 import { FormField } from "@/types/Global";
 import AppError from "@/components/ui/AppError";
+import { toggleToast } from "@/utils/toggleToast";
 
 export default function ChangePasswordForm() {
   const { theme, scale } = useAppTheme();
@@ -22,7 +23,7 @@ export default function ChangePasswordForm() {
   const {
     control,
     handleSubmit,
-    formState: { errors },
+    formState: { isValid },
   } = useForm<ChangePasswordFormValues>({
     resolver: zodResolver(changePasswordSchema),
     defaultValues: {
@@ -41,11 +42,17 @@ export default function ChangePasswordForm() {
     changePassword(currentPassword, newPassword);
   };
 
-  const navigation = useNavigation();
+  useEffect(() => {
+    if (!error?.message) return;
 
-  useLayoutEffect(() => {
+    toggleToast({
+      type: "error",
+      text1: "Password Change Error.",
+      text2: error.message,
+    });
+
     setError(null);
-  }, [navigation]);
+  }, [error?.message]);
 
   const profileFields: FormField<ChangePasswordFormValues>[] = [
     {
@@ -88,27 +95,20 @@ export default function ChangePasswordForm() {
                   importantForAutofill="no"
                   style={styles.input}
                 />
-                {errors[field.name] && (
-                  <AppError>{errors[field.name]?.message}</AppError>
-                )}
               </View>
             )}
           />
         );
       })}
-      {error?.message && <AppError>{error.message}</AppError>}
       <Pressable
         onPress={handleSubmit(onSubmit)}
-        // disabled={isDisabled}
+        disabled={!isValid}
         style={[
           styles.button,
           {
-            backgroundColor:
-              // isDisabled
-              //   ?
-              //    theme.buttonDisabled
-              //   :
-              theme.buttonPrimary,
+            backgroundColor: !isValid
+              ? theme.buttonDisabled
+              : theme.buttonPrimary,
           },
         ]}
       >
