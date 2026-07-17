@@ -135,7 +135,7 @@ export const updateWorkout = async (req: AuthRequest, res: Response) => {
     };
 
     const workout = await prisma.workout.update({
-      where: { id },
+      where: { id, userId },
       data: {
         name,
         notes,

@@ -83,6 +83,12 @@ export default function ChangePasswordForm() {
             render={({ field: { onChange, value } }) => (
               <View style={{ marginBottom: 10 }}>
                 <Text style={styles.label}>{field.placeholder}</Text>
+                {field.name === "newPassword" ? (
+                  <Text style={styles.helperText}>
+                    Use at least 8 characters with an uppercase letter,
+                    lowercase letter, number, and special character.
+                  </Text>
+                ) : null}
                 <TextInput
                   placeholder={field.placeholder}
                   onChangeText={onChange}
@@ -142,7 +148,12 @@ const makeStyles = (theme: Theme, scale: number) =>
       shadowRadius: 10,
       elevation: 4,
     },
-
+    helperText: {
+      fontSize: 12 * scale,
+      color: theme.textSecondary,
+      marginTop: -2 * scale,
+      marginBottom: 8 * scale,
+    },
     label: {
       fontSize: 14 * scale,
       color: theme.textSecondary,

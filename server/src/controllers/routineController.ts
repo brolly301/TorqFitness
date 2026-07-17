@@ -132,7 +132,7 @@ export const updateRoutine = async (req: AuthRequest, res: Response) => {
     };
 
     const routine = await prisma.routine.update({
-      where: { id },
+      where: { id, userId },
       data: {
         name,
         notes,

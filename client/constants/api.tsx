@@ -1,1 +1,2 @@
-export const baseURL = "http://192.168.0.27:5000/api";
+export const baseURL =
+  process.env.EXPO_PUBLIC_API_URL ?? "http://localhost:5000/api";

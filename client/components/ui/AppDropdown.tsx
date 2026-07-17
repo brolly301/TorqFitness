@@ -87,7 +87,6 @@ export const makeStyles = (theme: Theme, scale: number) =>
     wrapper: {
       marginBottom: 16 * scale,
       position: "relative",
-      zIndex: 100,
     },
 
     container: {
@@ -123,10 +122,12 @@ export const makeStyles = (theme: Theme, scale: number) =>
       borderWidth: 1,
       borderColor: theme.inputBorder,
       borderRadius: 12 * scale,
-      overflow: "hidden",
+      position: "absolute",
+      width: "100%",
+      top: 50,
       backgroundColor: theme.card,
       zIndex: 1000,
-      elevation: 8,
+      elevation: 1000,
       shadowColor: theme.shadow,
       shadowOffset: { width: 0, height: 4 },
       shadowOpacity: 0.08,

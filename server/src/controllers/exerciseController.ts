@@ -103,12 +103,26 @@ export const updateExercise = async (req: AuthRequest, res: Response) => {
     const rawId = req.params.id;
     const id = Array.isArray(rawId) ? rawId[0] : rawId;
 
-    if (!userId) {
+    if (userId === null) {
       res
         .status(401)
         .json({ message: "Cannot update user exercise. Unauthorized." });
       return;
     }
+
+    const exercise = await prisma.exercise.findFirst({ where: { id } });
+
+    if (exercise && exercise?.userId !== userId) {
+      return res.status(403).json({
+        message:
+          "Cannot update user exercise. User does not own this exercise.",
+      });
+    }
+
+    if (!exercise) {
+      return res.status(404).json({ message: "Exercise not found." });
+    }
+
     const {
       name,
       gifUrl,
@@ -120,7 +134,7 @@ export const updateExercise = async (req: AuthRequest, res: Response) => {
       userCreated,
     } = req.body;
 
-    const exercise = await prisma.exercise.update({
+    const updatedExercise = await prisma.exercise.update({
       where: { id },
       data: {
         name,
@@ -136,7 +150,7 @@ export const updateExercise = async (req: AuthRequest, res: Response) => {
 
     res
       .status(201)
-      .json({ message: "Exercise successfully updated.", exercise });
+      .json({ message: "Exercise successfully updated.", updatedExercise });
   } catch (e) {
     res.status(500).json({ message: "Internal server error" });
   }
