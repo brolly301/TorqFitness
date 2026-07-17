@@ -85,6 +85,9 @@ export const getWorkouts = async (req: AuthRequest, res: Response) => {
 
     const workouts = await prisma.workout.findMany({
       where: { userId },
+       orderBy: {
+    completedAt: "desc",
+  },
       include: { exercises: { include: { sets: true } } },
     });
 

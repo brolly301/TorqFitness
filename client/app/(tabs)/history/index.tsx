@@ -1,5 +1,5 @@
 import { Pressable, StyleSheet, Text, View } from "react-native";
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import ActivityList from "@/components/history/ActivityList";
 import RecordsList from "@/components/history/RecordsList";
 import { useWorkoutContext } from "@/context/WorkoutContext";
@@ -7,6 +7,8 @@ import AppWrapper from "@/components/ui/AppWrapper";
 import { useAppTheme } from "@/hooks/useAppTheme";
 import { Theme } from "@/types/Theme";
 import Feather from "@expo/vector-icons/Feather";
+import { getLocalDateKey } from "@/utils/helpers";
+import WorkoutCalendarModal from "@/components/modals/history/WorkoutCalendarModal";
 
 type HistoryTab = "activity" | "records";
 
@@ -14,89 +16,177 @@ export default function HistoryScreen() {
   const [activeTab, setActiveTab] = useState<HistoryTab>("activity");
   const { workouts } = useWorkoutContext();
 
+  const [calendarVisible, setCalendarVisible] = useState(false);
+  const [selectedDate, setSelectedDate] = useState<string | null>(null);
+
   const { theme, scale } = useAppTheme();
   const styles = useMemo(() => makeStyles(theme, scale), [theme, scale]);
 
+  const markedDates = useMemo(() => {
+    const dates: Record<string, object> = {};
+
+    workouts.forEach((workout) => {
+      if (!workout.startedAt) return;
+
+      const dateKey = getLocalDateKey(workout.startedAt);
+
+      dates[dateKey] = {
+        marked: true,
+        dotColor: theme.buttonPrimary,
+      };
+    });
+
+    if (selectedDate) {
+      dates[selectedDate] = {
+        ...dates[selectedDate],
+        selected: true,
+        selectedColor: theme.buttonPrimary,
+      };
+    }
+
+    return dates;
+  }, [workouts, selectedDate, theme.buttonPrimary]);
+
+  useEffect(() => {
+    if (selectedDate) {
+      setActiveTab("activity");
+    }
+  }, [selectedDate]);
+
+  const displayedWorkouts = useMemo(() => {
+    if (!selectedDate) return workouts;
+
+    return workouts.filter(
+      (workout) =>
+        workout.startedAt &&
+        getLocalDateKey(workout.startedAt) === selectedDate,
+    );
+  }, [workouts, selectedDate]);
+
   return (
-    <AppWrapper>
-      <View style={styles.container}>
-        <View style={styles.header}>
-          <Pressable style={styles.calendarButton} hitSlop={10}>
-            <Feather
-              name="calendar"
-              size={20 * scale}
-              color={theme.buttonPrimary}
-            />
-          </Pressable>
-        </View>
+    <>
+      <WorkoutCalendarModal
+        modalVisible={calendarVisible}
+        setModalVisible={setCalendarVisible}
+        selectedDate={selectedDate}
+        setSelectedDate={setSelectedDate}
+        markedDates={markedDates}
+      />
+      <AppWrapper>
+        <View style={styles.container}>
+          <View style={styles.header}>
+            <Pressable
+              style={styles.calendarButton}
+              hitSlop={10}
+              onPress={() => setCalendarVisible(true)}
+              accessibilityRole="button"
+              accessibilityLabel="Filter workouts by date"
+            >
+              <Feather
+                name="calendar"
+                size={20 * scale}
+                color={theme.buttonPrimary}
+              />
+            </Pressable>
+          </View>
 
-        <View style={styles.titleContainer}>
-          <Text style={styles.title}>History</Text>
-          <Text style={styles.description}>
-            Track your sessions. See your progress.
-          </Text>
-        </View>
+          <View style={styles.titleContainer}>
+            <Text style={styles.title}>History</Text>
+            <Text style={styles.description}>
+              Track your sessions. See your progress.
+            </Text>
+          </View>
 
-        <View style={styles.tabContainer}>
-          <Pressable
-            onPress={() => setActiveTab("activity")}
-            style={[
-              styles.tabButton,
-              activeTab === "activity"
-                ? styles.tabButtonActive
-                : styles.tabButtonInactive,
-            ]}
-          >
-            <Text
+          <View style={styles.tabContainer}>
+            <Pressable
+              onPress={() => setActiveTab("activity")}
               style={[
-                styles.tabButtonText,
+                styles.tabButton,
                 activeTab === "activity"
-                  ? styles.tabButtonTextActive
-                  : styles.tabButtonTextInactive,
+                  ? styles.tabButtonActive
+                  : styles.tabButtonInactive,
               ]}
             >
-              Activity
-            </Text>
-          </Pressable>
-
-          <Pressable
-            onPress={() => setActiveTab("records")}
-            style={[
-              styles.tabButton,
-              activeTab === "records"
-                ? styles.tabButtonActive
-                : styles.tabButtonInactive,
-            ]}
-          >
-            <Text
-              style={[
-                styles.tabButtonText,
-                activeTab === "records"
-                  ? styles.tabButtonTextActive
-                  : styles.tabButtonTextInactive,
-              ]}
-            >
-              Records
-            </Text>
-          </Pressable>
-        </View>
-
-        <View style={styles.contentContainer}>
-          {activeTab === "activity" && workouts.length === 0 && (
-            <View style={styles.placeholderContainer}>
-              <Text style={styles.placeholderTitle}>No workouts yet</Text>
-              <Text style={styles.placeholderText}>
-                Start your first workout to see it here
+              <Text
+                style={[
+                  styles.tabButtonText,
+                  activeTab === "activity"
+                    ? styles.tabButtonTextActive
+                    : styles.tabButtonTextInactive,
+                ]}
+              >
+                Activity
               </Text>
+            </Pressable>
+
+            <Pressable
+              onPress={() => setActiveTab("records")}
+              style={[
+                styles.tabButton,
+                activeTab === "records"
+                  ? styles.tabButtonActive
+                  : styles.tabButtonInactive,
+              ]}
+            >
+              <Text
+                style={[
+                  styles.tabButtonText,
+                  activeTab === "records"
+                    ? styles.tabButtonTextActive
+                    : styles.tabButtonTextInactive,
+                ]}
+              >
+                Records
+              </Text>
+            </Pressable>
+          </View>
+          {activeTab === "activity" && selectedDate && (
+            <View style={styles.dateFilter}>
+              <Text style={styles.dateFilterText}>
+                {new Date(`${selectedDate}T00:00:00`).toLocaleDateString(
+                  undefined,
+                  {
+                    day: "numeric",
+                    month: "long",
+                    year: "numeric",
+                  },
+                )}
+              </Text>
+
+              <Pressable
+                onPress={() => setSelectedDate(null)}
+                accessibilityRole="button"
+                accessibilityLabel="Clear date filter"
+                hitSlop={10}
+              >
+                <Feather name="x" size={18 * scale} color={theme.text} />
+              </Pressable>
             </View>
           )}
-          {activeTab === "activity" && workouts.length > 0 && (
-            <ActivityList workouts={workouts} />
-          )}
-          {activeTab === "records" && <RecordsList />}
+          <View style={styles.contentContainer}>
+            {activeTab === "activity" &&
+              (displayedWorkouts.length > 0 ? (
+                <ActivityList workouts={displayedWorkouts} />
+              ) : (
+                <View style={styles.placeholderContainer}>
+                  <Text style={styles.placeholderTitle}>
+                    {selectedDate
+                      ? "No workouts on this date"
+                      : "No workouts yet"}
+                  </Text>
+
+                  <Text style={styles.placeholderText}>
+                    {selectedDate
+                      ? "Choose another date or clear the date filter"
+                      : "Start your first workout to see it here"}
+                  </Text>
+                </View>
+              ))}
+            {activeTab === "records" && <RecordsList workouts={workouts} />}
+          </View>
         </View>
-      </View>
-    </AppWrapper>
+      </AppWrapper>
+    </>
   );
 }
 
@@ -209,5 +299,23 @@ const makeStyles = (theme: Theme, scale: number) =>
       color: theme.textSecondary,
       lineHeight: 20 * scale,
       textAlign: "center",
+    },
+    dateFilter: {
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "space-between",
+      backgroundColor: theme.card,
+      borderWidth: 1,
+      borderColor: theme.border,
+      borderRadius: 12 * scale,
+      paddingHorizontal: 14 * scale,
+      paddingVertical: 10 * scale,
+      marginBottom: 12 * scale,
+    },
+
+    dateFilterText: {
+      fontSize: 14 * scale,
+      fontWeight: "600",
+      color: theme.text,
     },
   });

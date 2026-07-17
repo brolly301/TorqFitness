@@ -72,10 +72,10 @@ export const WorkoutProvider = ({ children }: { children: ReactNode }) => {
 
     const res = await addUserWorkout(payload, authToken.token);
 
-    setWorkouts((prev) => {
-      const updatedWorkouts = [...prev, res.workout];
-      return updatedWorkouts;
-    });
+    setWorkouts((previousWorkouts) => [
+  res.workout,
+  ...previousWorkouts,
+]);
 
     setTimeout(() => {
       toggleToast({
