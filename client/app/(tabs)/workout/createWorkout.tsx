@@ -27,10 +27,12 @@ export default function StartWorkoutScreen() {
 
   const { addWorkout, workouts } = useWorkoutContext();
   const { routines } = useRoutineContext();
-  const { routineId } = useLocalSearchParams();
+  const params = useLocalSearchParams<{ routineId?: string }>();
+  const routineId = params.routineId;
 
   const [workout, setWorkout] = useState<Workout>({
     id: crypto.randomUUID(),
+    routineId: routineId ?? null,
     name: `Workout #${workouts.length + 1}`,
     startedAt: null,
     completedAt: null,

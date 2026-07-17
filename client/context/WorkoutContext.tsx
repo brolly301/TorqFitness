@@ -54,6 +54,7 @@ export const WorkoutProvider = ({ children }: { children: ReactNode }) => {
     const payload = {
       name: workout.name,
       notes: workout.notes,
+      routineId: workout.routineId ?? null,
       startedAt: workout.startedAt,
       completedAt: workout.completedAt,
       duration: workout.duration,

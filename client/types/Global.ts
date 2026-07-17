@@ -45,9 +45,12 @@ export type WorkoutDraft = {
 };
 
 export type Workout = WorkoutDraft & {
+  routineId?: string | null;
   startedAt: string | null;
   completedAt: string | null;
   duration: number;
 };
 
-export type Routine = WorkoutDraft;
+export type Routine = WorkoutDraft & {
+  lastUsedAt: string | null;
+};

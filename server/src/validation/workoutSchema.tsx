@@ -13,6 +13,7 @@ export const workoutExerciseSchema = z.object({
 });
 
 export const workoutSchema = z.object({
+  routineId: z.string().nullable().optional(),
   name: z.string().min(1, "Workout name is required"),
   notes: z.string().optional(),
   startedAt: z.coerce.date("Started date are required."),

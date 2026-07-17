@@ -20,6 +20,8 @@ export default function RoutineScreen() {
         <View style={styles.header}>
           <Pressable
             style={styles.addButton}
+            accessibilityRole="button"
+            accessibilityLabel="Create routine"
             hitSlop={10}
             onPress={() => router.navigate("/(tabs)/routines/createRoutine")}
           >

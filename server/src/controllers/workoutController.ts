@@ -23,7 +23,8 @@ export const addWorkout = async (req: AuthRequest, res: Response) => {
       return;
     }
 
-    const { name, notes, startedAt, completedAt, duration } = req.body;
+    const { name, notes, routineId, startedAt, completedAt, duration } =
+      req.body;
 
     const { exercises } = req.body as {
       exercises: CreateWorkoutExerciseInput[];
@@ -33,6 +34,8 @@ export const addWorkout = async (req: AuthRequest, res: Response) => {
       data: {
         name,
         notes,
+        routineId: routineId ?? null,
+
         startedAt,
         completedAt,
         duration,

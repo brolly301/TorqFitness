@@ -13,6 +13,8 @@ type WorkoutResponse = {
 
 type WorkoutPayloadType = {
   name: string;
+    routineId?: string | null;
+
   notes?: string | null;
   startedAt: string | null;
   completedAt: string | null;

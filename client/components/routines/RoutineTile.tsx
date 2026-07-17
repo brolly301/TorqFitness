@@ -5,6 +5,8 @@ import Feather from "@expo/vector-icons/Feather";
 import RoutineDetailsModal from "../modals/routines/RoutineDetailsModal";
 import { Theme } from "@/types/Theme";
 import { useAppTheme } from "@/hooks/useAppTheme";
+import { useExerciseContext } from "@/context/ExerciseContext";
+import { capitalizeWords } from "@/utils/helpers";
 
 type Props = {
   routine: Routine;
@@ -13,12 +15,25 @@ type Props = {
 export default function RoutineTile({ routine }: Props) {
   const { theme, scale } = useAppTheme();
   const styles = useMemo(() => makeStyles(theme, scale), [theme, scale]);
+  const { exercises } = useExerciseContext();
 
   const [modalVisible, setModalVisible] = useState(false);
 
   const totalSets = useMemo(() => {
     return routine.exercises.reduce((total, ex) => total + ex.sets.length, 0);
   }, [routine.exercises]);
+
+  const muscleGroups = useMemo(() => {
+    const groups = routine.exercises.flatMap((routineExercise) => {
+      const exercise = exercises.find(
+        (item) => item.id === routineExercise.exerciseId,
+      );
+
+      return exercise?.primaryMuscles ?? [];
+    });
+
+    return [...new Set(groups)].slice(0, 3).map(capitalizeWords).join(" • ");
+  }, [routine.exercises, exercises]);
 
   return (
     <>
@@ -39,7 +54,7 @@ export default function RoutineTile({ routine }: Props) {
               </Text>
 
               <Text style={styles.volume} numberOfLines={1}>
-                Chest • Triceps
+                {muscleGroups || "No muscle groups"}
               </Text>
             </View>
 
@@ -57,7 +72,11 @@ export default function RoutineTile({ routine }: Props) {
               {routine.exercises.length} exercises • {totalSets} sets
             </Text>
 
-            <Text style={styles.date}>Last used • Mon 10:39</Text>
+            <Text style={styles.date}>
+              {routine.lastUsedAt
+                ? `Last used • ${new Date(routine.lastUsedAt).toLocaleDateString()}`
+                : "Never used"}
+            </Text>
           </View>
         </View>
       </Pressable>

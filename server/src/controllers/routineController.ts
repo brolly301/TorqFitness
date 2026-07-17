@@ -79,12 +79,32 @@ export const getRoutines = async (req: AuthRequest, res: Response) => {
 
     const routines = await prisma.routine.findMany({
       where: { userId },
-      include: { exercises: { include: { sets: true } } },
+      include: {
+        exercises: {
+          include: {
+            sets: true,
+          },
+        },
+        workouts: {
+          orderBy: {
+            completedAt: "desc",
+          },
+          take: 1,
+          select: {
+            completedAt: true,
+          },
+        },
+      },
     });
+
+    const routinesWithLastUsed = routines.map(({ workouts, ...routine }) => ({
+      ...routine,
+      lastUsedAt: workouts[0]?.completedAt ?? null,
+    }));
 
     res.status(200).json({
       message: "User routines received.",
-      routines,
+      routines: routinesWithLastUsed,
     });
   } catch (e) {
     res.status(500).json({ message: "Internal server error" });
