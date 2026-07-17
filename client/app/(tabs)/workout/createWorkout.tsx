@@ -26,7 +26,7 @@ export default function StartWorkoutScreen() {
   const styles = useMemo(() => makeStyles(theme, scale), [theme, scale]);
 
   const { addWorkout, workouts } = useWorkoutContext();
-  const { routines } = useRoutineContext();
+  const { routines, markRoutineUsed } = useRoutineContext();
   const params = useLocalSearchParams<{ routineId?: string }>();
   const routineId = params.routineId;
 
@@ -93,6 +93,9 @@ export default function StartWorkoutScreen() {
     };
 
     addWorkout(finalWorkout);
+    if (routineId) {
+      markRoutineUsed(routineId, completedAt);
+    }
     router.back();
   }, [workout, addWorkout]);
 

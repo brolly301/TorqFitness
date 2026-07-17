@@ -20,6 +20,7 @@ type RoutineContextType = {
   addRoutine: (routine: Routine) => void;
   deleteRoutine: (id: string) => void;
   updateRoutine: (routine: Routine) => void;
+  markRoutineUsed: (routineId: string, completedAt: string) => void;
 };
 
 const RoutineContext = createContext<RoutineContextType | null>(null);
@@ -118,10 +119,21 @@ export const RoutineProvider = ({ children }: { children: ReactNode }) => {
     }, 800);
   };
 
+  const markRoutineUsed = (routineId: string, completedAt: string) => {
+    setRoutines((currentRoutines) =>
+      currentRoutines.map((routine) =>
+        routine.id === routineId
+          ? { ...routine, lastUsedAt: completedAt }
+          : routine,
+      ),
+    );
+  };
+
   return (
     <RoutineContext.Provider
       value={{
         routines,
+        markRoutineUsed,
         addRoutine,
         deleteRoutine,
         updateRoutine,
