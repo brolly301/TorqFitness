@@ -18,7 +18,7 @@ import { toggleToast } from "@/utils/toggleToast";
 
 type WorkoutContextType = {
   workouts: Workout[];
-  addWorkout: (workout: Workout) => void;
+  addWorkout: (workout: Workout) => Promise<void>;
   deleteWorkout: (id: string) => void;
   updateWorkout: (workout: Workout) => void;
 };

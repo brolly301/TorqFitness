@@ -178,7 +178,7 @@ export default function RoutineDetails({ routine, setModalVisible }: Props) {
           style={styles.startButton}
           onPress={() => {
             setModalVisible(false);
-            router.navigate({
+            router.push({
               pathname: "/workout/createWorkout",
               params: { routineId: routine.id },
             });

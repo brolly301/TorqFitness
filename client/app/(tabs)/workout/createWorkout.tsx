@@ -76,7 +76,7 @@ export default function StartWorkoutScreen() {
     });
   }, [routine]);
 
-  const handleSubmit = useCallback(() => {
+  const handleSubmit = useCallback(async () => {
     if (!workout.startedAt) return;
 
     const completedAt = new Date().toISOString();
@@ -92,12 +92,13 @@ export default function StartWorkoutScreen() {
       duration,
     };
 
-    addWorkout(finalWorkout);
+    await addWorkout(finalWorkout);
     if (routineId) {
       markRoutineUsed(routineId, completedAt);
     }
+    setFinishModalVisible(false);
     router.back();
-  }, [workout, addWorkout]);
+  }, [workout, addWorkout, routineId, markRoutineUsed]);
 
   const handleAddExercise = (exerciseId: string) => {
     const newExercise = {
@@ -120,7 +121,10 @@ export default function StartWorkoutScreen() {
         modalVisible={discardModalVisible}
         setModalVisible={setDiscardModalVisible}
         placeholder="discard your current workout?"
-        onConfirm={() => router.back()}
+        onConfirm={() => {
+          setDiscardModalVisible(false);
+          router.back();
+        }}
       />
 
       <FinishModal
