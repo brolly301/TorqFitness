@@ -2,7 +2,8 @@ import React, { useMemo } from "react";
 import { StyleSheet, Text, View } from "react-native";
 import { useAppTheme } from "@/hooks/useAppTheme";
 import { Theme } from "@/types/Theme";
-import { capitalizeWords } from "@/utils/helpers";
+import { capitalizeWords, formatWeight } from "@/utils/helpers";
+import { useSettingsContext } from "@/context/SettingsContext";
 
 export type ExerciseRecord = {
   exerciseId: string;
@@ -22,6 +23,8 @@ type Props = {
 export default function RecordsTile({ record }: Props) {
   const { theme, scale } = useAppTheme();
   const styles = useMemo(() => makeStyles(theme, scale), [theme, scale]);
+  const { settings } = useSettingsContext();
+  const weightUnit = settings?.weightLabel ?? "kg";
 
   return (
     <View style={styles.container}>
@@ -29,20 +32,23 @@ export default function RecordsTile({ record }: Props) {
 
       <View style={styles.row}>
         <Text style={styles.label}>Heaviest weight</Text>
-        <Text style={styles.value}>{record.heaviestWeight} kg</Text>
+        <Text style={styles.value}>
+          {formatWeight(record.heaviestWeight, weightUnit)}
+        </Text>
       </View>
 
       <View style={styles.row}>
         <Text style={styles.label}>Best set</Text>
         <Text style={styles.value}>
-          {record.bestSetWeight} kg × {record.bestSetReps}
+          {formatWeight(record.bestSetWeight, weightUnit)} ×{" "}
+          {record.bestSetReps}
         </Text>
       </View>
 
       <View style={styles.row}>
         <Text style={styles.label}>Estimated 1RM</Text>
         <Text style={styles.value}>
-          {record.estimatedOneRepMax.toFixed(1)} kg
+          {formatWeight(record.estimatedOneRepMax, weightUnit)}
         </Text>
       </View>
     </View>

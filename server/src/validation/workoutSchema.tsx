@@ -3,7 +3,7 @@ import * as z from "zod/v4";
 export const workoutSetSchema = z.object({
   order: z.number().int(),
   reps: z.number().int().min(0),
-  weight: z.number().int().min(0),
+  weight: z.number().min(0).nullable(),
 });
 export const workoutExerciseSchema = z.object({
   exerciseId: z.string(),

@@ -1,6 +1,6 @@
 import { FlatList, Pressable, StyleSheet, Text, View } from "react-native";
 import React, { useMemo, useState } from "react";
-import { capitalizeWords } from "@/utils/helpers";
+import { capitalizeWords, formatWeight } from "@/utils/helpers";
 import { router } from "expo-router";
 import { Routine } from "@/types/Global";
 import { useRoutineContext } from "@/context/RoutineContext";
@@ -14,6 +14,7 @@ import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import EvilIcons from "@expo/vector-icons/EvilIcons";
 import Feather from "@expo/vector-icons/Feather";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
+import { useSettingsContext } from "@/context/SettingsContext";
 
 type Props = {
   routine: Routine;
@@ -28,6 +29,9 @@ export default function RoutineDetails({ routine, setModalVisible }: Props) {
   const { exercises } = useExerciseContext();
 
   const [deleteModalVisible, setDeleteModalVisible] = useState(false);
+
+const { settings } = useSettingsContext();
+const weightUnit = settings?.weightLabel ?? "kg";
 
   const exerciseList = useMemo(() => {
     return routine.exercises.map((rtEx) => {
@@ -129,6 +133,16 @@ export default function RoutineDetails({ routine, setModalVisible }: Props) {
             const setCount = item.sets.length;
             const setLabel = setCount === 1 ? "set" : "sets";
 
+            const setSummary = item.sets
+              .map((set) => {
+                if (set.weight) {
+                 return `${formatWeight(set.weight, weightUnit)} × ${set.reps}`;
+                }
+
+                return `${set.reps} reps`;
+              })
+              .join(" • ");
+
             return (
               <View style={styles.routineCard}>
                 <View style={styles.routineDetails}>
@@ -155,8 +169,18 @@ export default function RoutineDetails({ routine, setModalVisible }: Props) {
                   <Text style={styles.setDetails}>
                     {setCount} {setLabel}
                   </Text>
-                  <Text style={styles.setDivider}>•</Text>
-                  <Text style={styles.setDetails}>Last 40 × 8</Text>
+
+                  {!!setSummary && (
+                    <>
+                      <Text style={styles.setDivider}>•</Text>
+                      <Text
+                        style={[styles.setDetails, { flex: 1 }]}
+                        numberOfLines={2}
+                      >
+                        {setSummary}
+                      </Text>
+                    </>
+                  )}
                 </View>
               </View>
             );

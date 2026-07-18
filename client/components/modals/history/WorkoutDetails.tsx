@@ -2,7 +2,12 @@ import { FlatList, Pressable, StyleSheet, Text, View } from "react-native";
 import React, { useMemo, useState } from "react";
 import { Workout } from "@/types/Global";
 import { useWorkoutContext } from "@/context/WorkoutContext";
-import { capitalizeWords, formatDate, formatTime } from "@/utils/helpers";
+import {
+  capitalizeWords,
+  formatDate,
+  formatTime,
+  formatWeight,
+} from "@/utils/helpers";
 import { useExerciseContext } from "@/context/ExerciseContext";
 import DeleteModal from "../confirmation/DeleteModal";
 import { useAppTheme } from "@/hooks/useAppTheme";
@@ -11,6 +16,7 @@ import AntDesign from "@expo/vector-icons/AntDesign";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { router } from "expo-router";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
+import { useSettingsContext } from "@/context/SettingsContext";
 
 type Props = {
   workout: Workout;
@@ -26,6 +32,9 @@ export default function WorkoutDetails({ workout, setModalVisible }: Props) {
 
   const [deleteModalVisible, setDeleteModalVisible] = useState(false);
 
+  const { settings } = useSettingsContext();
+  const weightUnit = settings?.weightLabel ?? "kg";
+
   const exerciseList = useMemo(() => {
     return workout.exercises.map((we) => {
       const details = exercises.find((ex) => ex.id === we.exerciseId);
@@ -37,9 +46,10 @@ export default function WorkoutDetails({ workout, setModalVisible }: Props) {
     return workout.exercises.reduce((total, ex) => total + ex.sets.length, 0);
   }, [workout.exercises]);
 
-  const getPreviousSetText = (reps?: number, weight?: number) => {
+  const getPreviousSetText = (reps?: number, weight?: number | null) => {
     if (!reps && !weight) return "—";
-    return `${weight ?? 0} kg × ${reps ?? 0}`;
+
+    return `${formatWeight(weight ?? 0, weightUnit)} × ${reps ?? 0}`;
   };
 
   const workoutDate = workout.startedAt ? formatDate(workout.startedAt) : "—";
@@ -146,14 +156,13 @@ export default function WorkoutDetails({ workout, setModalVisible }: Props) {
 
                 <View style={styles.hr} />
 
-                <View style={styles.columnHeaderRow}>
-                  <Text style={styles.columnHeaderLeft}>Set</Text>
-                  <Text style={styles.columnHeaderRight}>Previous</Text>
-                </View>
+               <View style={styles.columnHeaderRow}>
+  <Text style={styles.columnHeaderLeft}>Set</Text>
+  <Text style={styles.columnHeaderRight}>Result</Text>
+</View>
 
                 {item.sets.map((set, index) => {
-                  const currentText = `${set.weight ?? 0} kg × ${set.reps ?? 0}`;
-                  const previousText = getPreviousSetText(8, 40);
+                  const currentText = `${formatWeight(set.weight ?? 0, weightUnit)} × ${set.reps ?? 0}`;
 
                   return (
                     <View
@@ -169,7 +178,7 @@ export default function WorkoutDetails({ workout, setModalVisible }: Props) {
 
                       <Text style={styles.currentSetText}>{currentText}</Text>
 
-                      <Text style={styles.previousSetText}>{previousText}</Text>
+                     
                     </View>
                   );
                 })}

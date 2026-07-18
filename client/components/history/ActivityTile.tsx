@@ -5,9 +5,15 @@ import WorkoutDetailsModal from "../modals/history/WorkoutDetailsModal";
 import { Theme } from "@/types/Theme";
 import { useAppTheme } from "@/hooks/useAppTheme";
 import { useExerciseContext } from "@/context/ExerciseContext";
-import { capitalizeWords, formatDate, formatTime } from "@/utils/helpers";
+import {
+  capitalizeWords,
+  formatDate,
+  formatTime,
+  toDisplayWeight,
+} from "@/utils/helpers";
 import Feather from "@expo/vector-icons/Feather";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
+import { useSettingsContext } from "@/context/SettingsContext";
 
 type Props = {
   workout: Workout;
@@ -18,6 +24,9 @@ export default function ActivityTile({ workout }: Props) {
   const styles = useMemo(() => makeStyles(theme, scale), [theme, scale]);
   const [modalVisible, setModalVisible] = useState(false);
   const { exercises } = useExerciseContext();
+
+  const { settings } = useSettingsContext();
+  const weightUnit = settings?.weightLabel ?? "kg";
 
   const exerciseList = useMemo(() => {
     return workout.exercises.map((we) => {
@@ -40,12 +49,20 @@ export default function ActivityTile({ workout }: Props) {
     }, 0);
   }, [exerciseList]);
 
+  const displayedTotalVolume = toDisplayWeight(totalVolume, weightUnit);
+
   const workoutDate = workout.startedAt
     ? formatDate(workout.startedAt)
     : "No date";
   const workoutDuration = formatTime(workout.duration);
 
-  console.log(workout.exercises);
+  const exerciseCount = exerciseList.length;
+  const exerciseLabel = exerciseCount === 1 ? "exercise" : "exercises";
+
+  const setLabel = totalSets === 1 ? "set" : "sets";
+
+  const previewExercises = exerciseList.slice(0, 3);
+  const remainingExerciseCount = exerciseList.length - previewExercises.length;
 
   return (
     <>
@@ -71,22 +88,30 @@ export default function ActivityTile({ workout }: Props) {
         <View style={styles.hr} />
 
         {exerciseList.length >= 1 ? (
-          exerciseList.map((exercise) => {
-            const setCount = exercise.sets.length;
-            const setLabel = setCount === 1 ? "set" : "sets";
+          <>
+            {previewExercises.map((exercise) => {
+              const setCount = exercise.sets.length;
+              const setLabel = setCount === 1 ? "set" : "sets";
 
-            return (
-              <View key={exercise.id} style={styles.exerciseRow}>
-                <Text style={styles.exerciseName} numberOfLines={1}>
-                  {capitalizeWords(exercise.details?.name ?? "Exercise")}
-                </Text>
+              return (
+                <View key={exercise.id} style={styles.exerciseRow}>
+                  <Text style={styles.exerciseName} numberOfLines={1}>
+                    {capitalizeWords(exercise.details?.name ?? "Exercise")}
+                  </Text>
 
-                <Text style={styles.exerciseSets}>
-                  {setCount} {setLabel}
-                </Text>
-              </View>
-            );
-          })
+                  <Text style={styles.exerciseSets}>
+                    {setCount} {setLabel}
+                  </Text>
+                </View>
+              );
+            })}
+
+            {remainingExerciseCount > 0 && (
+              <Text style={styles.moreExercises}>
+                +{remainingExerciseCount} more
+              </Text>
+            )}
+          </>
         ) : (
           <View style={styles.placeholderContainer}>
             <MaterialCommunityIcons
@@ -101,12 +126,19 @@ export default function ActivityTile({ workout }: Props) {
         <View style={styles.hr} />
 
         <View style={styles.metaContainer}>
-          <Text style={styles.meta}>{totalVolume} kg</Text>
+          <Text style={styles.meta}>
+            {displayedTotalVolume} {weightUnit}
+          </Text>
+          <Text style={styles.meta}> • </Text>
+          <Text style={styles.meta}>
+            {exerciseCount} {exerciseLabel}
+          </Text>
+
           <Text style={styles.meta}> • </Text>
 
-          <Text style={styles.meta}>{exerciseList.length} exercises</Text>
-          <Text style={styles.meta}> • </Text>
-          <Text style={styles.meta}>{totalSets} sets</Text>
+          <Text style={styles.meta}>
+            {totalSets} {setLabel}
+          </Text>
         </View>
       </Pressable>
     </>
@@ -205,5 +237,10 @@ export const makeStyles = (theme: Theme, scale: number) =>
       color: theme.text + "CC",
       fontSize: 14 * scale,
       marginLeft: 10,
+    },
+    moreExercises: {
+      fontSize: 14 * scale,
+      color: theme.textSecondary,
+      marginTop: 6 * scale,
     },
   });

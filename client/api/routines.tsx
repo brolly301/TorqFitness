@@ -21,7 +21,7 @@ type RoutinePayloadType = {
     sets: {
       order: number;
       reps: number;
-      weight: number;
+      weight: number | null;
     }[];
   }[];
 };

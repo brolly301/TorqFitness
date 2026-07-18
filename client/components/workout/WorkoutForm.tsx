@@ -8,13 +8,20 @@ import {
   View,
 } from "react-native";
 import EvilIcons from "@expo/vector-icons/EvilIcons";
-
+import WeightInput from "./WeightInput";
+import { useSettingsContext } from "@/context/SettingsContext";
+import {
+  capitalizeWords,
+  toDisplayWeight,
+  formatWeight,
+} from "@/utils/helpers";
 import Timer from "./Timer";
 import { useExerciseContext } from "@/context/ExerciseContext";
 import { useAppTheme } from "@/hooks/useAppTheme";
 import { ModalProps, WorkoutDraft } from "@/types/Global";
 import { Theme } from "@/types/Theme";
-import { capitalizeWords } from "@/utils/helpers";
+import { useWorkoutContext } from "@/context/WorkoutContext";
+
 import { addSet, removeExercise, updateSet } from "@/utils/workoutUtil";
 
 type Props<T extends WorkoutDraft> = {
@@ -34,6 +41,9 @@ export default function WorkoutForm<T extends WorkoutDraft>({
   const { theme, scale } = useAppTheme();
   const styles = useMemo(() => makeStyles(theme, scale), [theme, scale]);
   const { exercises } = useExerciseContext();
+  const { workouts } = useWorkoutContext();
+  const { settings } = useSettingsContext();
+  const weightUnit = settings?.weightLabel ?? "kg";
 
   const exerciseList = draft.exercises.map((workoutExercise) => {
     const details = exercises.find(
@@ -61,12 +71,31 @@ export default function WorkoutForm<T extends WorkoutDraft>({
     return workoutTotal + exerciseVolume;
   }, 0);
 
+  const displayedTotalVolume = toDisplayWeight(totalVolume, weightUnit);
+
   const totalSets = exerciseList.reduce((total, exercise) => {
     return total + exercise.sets.length;
   }, 0);
 
-  const weightRefs = useRef<Record<string, TextInput | null>>({});
   const repRefs = useRef<Record<string, TextInput | null>>({});
+
+  const previousSetsByExercise = useMemo(() => {
+    const previousSets = new Map<
+      string,
+      WorkoutDraft["exercises"][number]["sets"]
+    >();
+
+    // Workouts are already ordered newest first.
+    workouts.forEach((workout) => {
+      workout.exercises.forEach((exercise) => {
+        if (!previousSets.has(exercise.exerciseId)) {
+          previousSets.set(exercise.exerciseId, exercise.sets);
+        }
+      });
+    });
+
+    return previousSets;
+  }, [workouts]);
 
   return (
     <>
@@ -87,7 +116,9 @@ export default function WorkoutForm<T extends WorkoutDraft>({
             />
 
             <View style={styles.metaContainer}>
-              <Text style={styles.metaText}>Volume {totalVolume} kg</Text>
+              <Text style={styles.metaText}>
+                Volume {displayedTotalVolume} {weightUnit}
+              </Text>
               <Text style={styles.metaText}> • </Text>
               <Text style={styles.metaText}>{totalSets} sets</Text>
             </View>
@@ -143,8 +174,22 @@ export default function WorkoutForm<T extends WorkoutDraft>({
               </View>
 
               {exercise.sets.map((set, index) => {
-                const previousText = "40 × 8";
-                const totalSetVol = set.weight ? set.reps * set.weight : 0;
+                const previousSet = previousSetsByExercise.get(
+                  exercise.exerciseId,
+                )?.[index];
+
+                const previousText = previousSet
+                  ? `${formatWeight(
+                      previousSet.weight ?? 0,
+                      weightUnit,
+                    )} × ${previousSet.reps}`
+                  : "—";
+                const totalSetVolumeKg = set.weight ? set.reps * set.weight : 0;
+
+                const displayedSetVolume = toDisplayWeight(
+                  totalSetVolumeKg,
+                  weightUnit,
+                );
 
                 return (
                   <View key={set.id} style={styles.exerciseContainer}>
@@ -155,36 +200,25 @@ export default function WorkoutForm<T extends WorkoutDraft>({
                         <Text style={styles.previousText}>{previousText}</Text>
                         <Text style={styles.previousLabel}> (last)</Text>
                       </View>
-                      <Text style={styles.previousLabel}>{totalSetVol} kg</Text>
+                      <Text style={styles.previousLabel}>
+                        {displayedSetVolume} {weightUnit}
+                      </Text>
                     </View>
 
                     <View style={styles.inputsRow}>
-                      <Pressable
-                        style={styles.valueLabelContainer}
-                        onPress={() => weightRefs.current[set.id]?.focus()}
-                      >
-                        <TextInput
-                          ref={(ref) => {
-                            weightRefs.current[set.id] = ref;
-                          }}
-                          value={set.weight ? String(set.weight) : ""}
-                          placeholder="0"
-                          returnKeyType="done"
-                          placeholderTextColor={theme.textSecondary}
-                          keyboardType="numeric"
-                          onChangeText={(text) =>
-                            updateSet(
-                              setDraft,
-                              exercise.id,
-                              set.id,
-                              "weight",
-                              text === "" ? 0 : parseInt(text, 10) || 0,
-                            )
-                          }
-                          style={styles.valueInput}
-                        />
-                        <Text style={styles.labelText}>kg</Text>
-                      </Pressable>
+                      <WeightInput
+                        storedWeight={set.weight}
+                        unit={weightUnit}
+                        onChange={(storedWeight) =>
+                          updateSet(
+                            setDraft,
+                            exercise.id,
+                            set.id,
+                            "weight",
+                            storedWeight,
+                          )
+                        }
+                      />
 
                       <Text style={styles.x}>×</Text>
 

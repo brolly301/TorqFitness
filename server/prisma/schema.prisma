@@ -100,7 +100,7 @@ model WorkoutSet {
   id                String           @id @default(uuid())
   order             Int
   reps              Int
-  weight            Int?
+  weight            Float?
 
   workoutExercise   WorkoutExercise  @relation(fields: [workoutExerciseId], references: [id], onDelete: Cascade)
   workoutExerciseId String
@@ -130,7 +130,7 @@ model RoutineSet {
   id                String           @id @default(uuid())
   order             Int
   reps              Int
-  weight            Int?
+  weight            Float?
 
   routineExercise   RoutineExercise  @relation(fields: [routineExerciseId], references: [id], onDelete: Cascade)
   routineExerciseId String

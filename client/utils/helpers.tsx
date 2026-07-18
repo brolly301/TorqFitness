@@ -44,3 +44,28 @@ export const getLocalDateKey = (dateValue: string) => {
 
   return `${year}-${month}-${day}`;
 };
+
+export type WeightUnit = "kg" | "lb";
+
+const KG_TO_LB = 2.2046226218;
+
+const roundDisplayWeight = (weight: number) => Math.round(weight * 100) / 100;
+
+const roundStoredWeight = (weight: number) =>
+  Math.round(weight * 10000) / 10000;
+
+export const toDisplayWeight = (weightInKg: number, unit: WeightUnit) => {
+  const converted = unit === "lb" ? weightInKg * KG_TO_LB : weightInKg;
+
+  return roundDisplayWeight(converted);
+};
+
+export const toStoredWeight = (enteredWeight: number, unit: WeightUnit) => {
+  const converted = unit === "lb" ? enteredWeight / KG_TO_LB : enteredWeight;
+
+  return roundStoredWeight(converted);
+};
+
+export const formatWeight = (weightInKg: number, unit: WeightUnit) => {
+  return `${toDisplayWeight(weightInKg, unit)} ${unit}`;
+};

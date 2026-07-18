@@ -4,7 +4,8 @@ import { Exercise } from "@/types/Global";
 import { Theme } from "@/types/Theme";
 import { useAppTheme } from "@/hooks/useAppTheme";
 import { useWorkoutContext } from "@/context/WorkoutContext";
-import { formatDate } from "@/utils/helpers";
+import { formatDate, formatWeight } from "@/utils/helpers";
+import { useSettingsContext } from "@/context/SettingsContext";
 
 type Props = {
   exercise: Exercise | null;
@@ -14,6 +15,9 @@ export default function HistoryTab({ exercise }: Props) {
   const { theme, scale } = useAppTheme();
   const styles = useMemo(() => makeStyles(theme, scale), [theme, scale]);
   const { workouts } = useWorkoutContext();
+  
+  const { settings } = useSettingsContext();
+const weightUnit = settings?.weightLabel ?? "kg";
 
   const history = useMemo(() => {
     if (!exercise) return [];
@@ -93,7 +97,7 @@ export default function HistoryTab({ exercise }: Props) {
                 {set.reps ?? 0}
               </Text>
               <Text style={[styles.rowCell, styles.weightColumn]}>
-                {set.weight ?? 0} kg
+             {formatWeight(set.weight ?? 0, weightUnit)}
               </Text>
             </View>
           ))}

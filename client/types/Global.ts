@@ -26,7 +26,7 @@ export type WorkoutSet = {
   id: string;
   order: number;
   reps: number;
-  weight: number;
+  weight: number | null;
 };
 
 export type WorkoutExercise = {
