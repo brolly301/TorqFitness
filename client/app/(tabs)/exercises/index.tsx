@@ -18,12 +18,24 @@ export default function ExerciseScreen() {
   const { exercises } = useExerciseContext();
 
   const filteredExercises = useMemo(() => {
-    return exercises.filter(
-      (exercise) =>
-        normalize(exercise.name).includes(normalize(search)) &&
-        !exercise.archived,
+  const query = normalize(search);
+
+  return exercises.filter((exercise) => {
+    if (exercise.archived) return false;
+
+    const searchableValues = [
+      exercise.name,
+      ...exercise.bodyParts,
+      ...exercise.primaryMuscles,
+      ...exercise.secondaryMuscles,
+      ...exercise.equipment,
+    ];
+
+    return searchableValues.some((value) =>
+      normalize(value).includes(query),
     );
-  }, [exercises, search]);
+  });
+}, [exercises, search]);
 
   return (
     <AppWrapper>
@@ -32,7 +44,9 @@ export default function ExerciseScreen() {
           <Pressable
             style={styles.addButton}
             hitSlop={10}
-            onPress={() => router.navigate("/(tabs)/exercises/createExercise")}
+            accessibilityRole="button"
+accessibilityLabel="Create exercise"
+            onPress={() => router.push("/(tabs)/exercises/createExercise")}
           >
             <Feather
               name="plus"
@@ -53,9 +67,28 @@ export default function ExerciseScreen() {
           <AppSearchBar setSearch={setSearch} />
         </View>
 
-        <View style={styles.listContainer}>
-          <ExerciseList showAddButton={false} exercises={filteredExercises} />
-        </View>
+       <View style={styles.listContainer}>
+  {filteredExercises.length > 0 ? (
+    <ExerciseList
+      showAddButton={false}
+      exercises={filteredExercises}
+    />
+  ) : (
+    <View style={styles.placeholderContainer}>
+      <Text style={styles.placeholderTitle}>
+        {search.trim()
+          ? "No exercises found"
+          : "No exercises available"}
+      </Text>
+
+      <Text style={styles.placeholderText}>
+        {search.trim()
+          ? `No exercises match "${search.trim()}"`
+          : "Create an exercise to get started"}
+      </Text>
+    </View>
+  )}
+</View>
       </View>
     </AppWrapper>
   );
@@ -111,5 +144,27 @@ const makeStyles = (theme: Theme, scale: number) =>
 
     listContainer: {
       flex: 1,
-    },
+    },placeholderContainer: {
+  marginTop: 8 * scale,
+  backgroundColor: theme.card,
+  borderRadius: 16 * scale,
+  borderWidth: 1,
+  borderColor: theme.border,
+  paddingVertical: 24 * scale,
+  paddingHorizontal: 18 * scale,
+  alignItems: "center",
+},
+
+placeholderTitle: {
+  fontSize: 16 * scale,
+  fontWeight: "700",
+  color: theme.text,
+  marginBottom: 6 * scale,
+},
+
+placeholderText: {
+  fontSize: 14 * scale,
+  color: theme.textSecondary,
+  textAlign: "center",
+},
   });

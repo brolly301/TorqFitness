@@ -18,9 +18,9 @@ import { toggleToast } from "@/utils/toggleToast";
 
 type ExerciseContextType = {
   exercises: Exercise[];
-  addExercise: (exercise: Exercise) => void;
-  updateExercise: (updatedExercise: Exercise) => void;
-  archiveExercise: (exerciseId: string) => void;
+ addExercise: (exercise: Exercise) => Promise<void>;
+updateExercise: (updatedExercise: Exercise) => Promise<void>;
+archiveExercise: (exerciseId: string) => Promise<void>;
 };
 
 const ExerciseContext = createContext<ExerciseContextType | null>(null);

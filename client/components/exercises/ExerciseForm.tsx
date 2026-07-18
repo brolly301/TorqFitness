@@ -30,11 +30,15 @@ export default function ExerciseForm({ exercise, setExercise }: Props) {
     exercise.bodyParts.length === 0 ||
     exercise.equipment.length === 0;
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (isDisabled) return;
 
-    addExercise(exercise);
-    router.back();
+    try {
+      await addExercise(exercise);
+      router.back();
+    } catch {
+      //toDo with error handling phase
+    }
   };
 
   return (

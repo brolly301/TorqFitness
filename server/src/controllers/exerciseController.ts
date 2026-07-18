@@ -148,9 +148,10 @@ export const updateExercise = async (req: AuthRequest, res: Response) => {
       },
     });
 
-    res
-      .status(201)
-      .json({ message: "Exercise successfully updated.", updatedExercise });
+   res.status(200).json({
+  message: "Exercise successfully updated.",
+  exercise: updatedExercise,
+});
   } catch (e) {
     res.status(500).json({ message: "Internal server error" });
   }
