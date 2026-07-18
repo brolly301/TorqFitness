@@ -20,6 +20,11 @@ import {
   useEffect,
   useState,
 } from "react";
+import {
+  createUserWeightEntry,
+  UpdateProfilePayload,
+  updateUserProfile,
+} from "@/api/profile";
 
 type AuthToken = {
   token: string;
@@ -46,6 +51,13 @@ type UserContextType = {
   logout: () => void;
   error: ApiError | null;
   setError: (msg: ApiError | null) => void;
+  updateProfile: (
+  profile: UpdateProfilePayload,
+) => Promise<void>;
+recordWeight: (
+  weightKg: number,
+  measuredAt?: string,
+) => Promise<void>;
 };
 
 const UserContext = createContext<UserContextType | null>(null);
@@ -246,6 +258,82 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
       return false;
     }
   };
+  
+  const updateProfile = async (
+  profileData: UpdateProfilePayload,
+) => {
+  try {
+    if (!authToken.token) return;
+
+    const res = await updateUserProfile(
+      profileData,
+      authToken.token,
+    );
+
+    setUser((currentUser) => {
+      if (!currentUser) return currentUser;
+
+      return {
+        ...currentUser,
+        profile: res.profile,
+      };
+    });
+
+    toggleToast({
+      type: "success",
+      text1: "Profile updated.",
+      text2: "Your profile details have been saved.",
+    });
+  } catch (error) {
+    const message =
+      error instanceof Error
+        ? error.message
+        : "Something went wrong";
+
+    setError({ message, status: "" });
+    throw error;
+  }
+};
+
+const recordWeight = async (
+  weightKg: number,
+  measuredAt?: string,
+) => {
+  try {
+    if (!authToken.token) return;
+
+    const res = await createUserWeightEntry(
+      {
+        weightKg,
+        measuredAt,
+      },
+      authToken.token,
+    );
+
+    setUser((currentUser) => {
+      if (!currentUser) return currentUser;
+
+      return {
+        ...currentUser,
+        currentWeightKg: res.currentWeightKg,
+      };
+    });
+
+    toggleToast({
+      type: "success",
+      text1: "Weight recorded.",
+      text2: "Your weight history has been updated.",
+    });
+  } catch (error) {
+    const message =
+      error instanceof Error
+        ? error.message
+        : "Something went wrong";
+
+    setError({ message, status: "" });
+    throw error;
+  }
+};
 
   return (
     <UserContext.Provider
@@ -256,6 +344,8 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
         updateUser,
         deleteAccount,
         authToken,
+         updateProfile,
+    recordWeight,
         login,
         logout,
         signUp,

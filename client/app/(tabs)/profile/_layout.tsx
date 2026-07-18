@@ -23,6 +23,7 @@ export default function _layout() {
       <Stack.Screen name="settings" />
       <Stack.Screen name="editProfile" />
       <Stack.Screen name="changePassword" />
+      <Stack.Screen name="editDetails" />
     </Stack>
   );
 }

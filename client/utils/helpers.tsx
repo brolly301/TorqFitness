@@ -35,7 +35,7 @@ export const formatTime = (duration: number) => {
   }`;
 };
 
-export const getLocalDateKey = (dateValue: string) => {
+export const getLocalDateKey = (dateValue: Date | string) => {
   const date = new Date(dateValue);
 
   const year = date.getFullYear();
@@ -68,4 +68,19 @@ export const toStoredWeight = (enteredWeight: number, unit: WeightUnit) => {
 
 export const formatWeight = (weightInKg: number, unit: WeightUnit) => {
   return `${toDisplayWeight(weightInKg, unit)} ${unit}`;
+};
+
+export const formatHeight = (
+  heightCm: number,
+  unit: WeightUnit,
+) => {
+  if (unit === "kg") {
+    return `${Math.round(heightCm * 10) / 10} cm`;
+  }
+
+  const totalInches = Math.round(heightCm / 2.54);
+  const feet = Math.floor(totalInches / 12);
+  const inches = totalInches % 12;
+
+  return `${feet}'${inches}"`;
 };
