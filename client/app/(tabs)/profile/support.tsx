@@ -7,6 +7,7 @@ import { useAppTheme } from "@/hooks/useAppTheme";
 import { Theme } from "@/types/Theme";
 import { submitUserContactForm } from "@/api/settings";
 import { useUserContext } from "@/context/UserContext";
+import { toggleToast } from "@/utils/toggleToast";
 
 export type SupportFormType = "contact" | "report" | "feedback";
 export type SupportField = "name" | "email" | "subject" | "message" | "issue";
@@ -34,7 +35,7 @@ const supportContent: Record<
 export default function SupportScreen() {
   const { theme, scale } = useAppTheme();
   const styles = useMemo(() => makeStyles(theme, scale), [theme, scale]);
-  const { authToken } = useUserContext();
+  const { authToken, user } = useUserContext();
 
   const params = useLocalSearchParams<{ formType?: SupportFormType }>();
   const formType = params.formType ?? "contact";
@@ -42,11 +43,19 @@ export default function SupportScreen() {
   const content = supportContent[formType] ?? supportContent.contact;
   const [formData, setFormData] = useState<Record<SupportField, string>>({
     name: "",
-    email: "",
+    email: user?.email ?? "",
     subject: "",
     message: "",
     issue: "",
   });
+
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const isFormValid = content.fields.every(
+    (field) => formData[field].trim().length > 0,
+  );
+
+  const isDisabled = !isFormValid || isSubmitting;
 
   const handleChange = (field: SupportField, value: string) => {
     setFormData((prev) => ({
@@ -64,14 +73,40 @@ export default function SupportScreen() {
   };
 
   const handleSubmit = async () => {
+    if (isDisabled || !authToken.token) return;
+
     const payload = content.fields.reduce(
       (acc, field) => {
-        acc[field] = formData[field];
+        acc[field] = formData[field].trim();
         return acc;
       },
       {} as Partial<Record<SupportField, string>>,
     );
-    await submitUserContactForm(formType, payload, authToken.token);
+
+    try {
+      setIsSubmitting(true);
+
+      await submitUserContactForm(formType, payload, authToken.token);
+
+      toggleToast({
+        type: "success",
+        text1: "Submitted",
+        text2: "Thanks—we’ve received your message.",
+      });
+
+      router.back();
+    } catch (error) {
+      toggleToast({
+        type: "error",
+        text1: "Submission failed",
+        text2:
+          error instanceof Error
+            ? error.message
+            : "Something went wrong. Please try again.",
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const renderFields = (field: SupportField) => (
@@ -110,8 +145,21 @@ export default function SupportScreen() {
         </View>
         <View style={{ flex: 1 }}>
           {content.fields.map(renderFields)}
-          <Pressable style={[styles.button]} onPress={handleSubmit}>
-            <Text style={[styles.buttonText]}>Submit</Text>
+          <Pressable
+            style={[
+              styles.button,
+              {
+                backgroundColor: isDisabled
+                  ? theme.buttonDisabled
+                  : theme.buttonPrimary,
+              },
+            ]}
+            onPress={handleSubmit}
+            disabled={isDisabled}
+          >
+            <Text style={styles.buttonText}>
+              {isSubmitting ? "Submitting..." : "Submit"}
+            </Text>
           </Pressable>
         </View>
       </View>

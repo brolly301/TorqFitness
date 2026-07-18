@@ -9,9 +9,8 @@ import {
   changePasswordSchema,
   ChangePasswordFormValues,
 } from "../../../utils/validation/authSchema";
-import { useNavigation } from "expo-router";
+import { router } from "expo-router";
 import { FormField } from "@/types/Global";
-import AppError from "@/components/ui/AppError";
 import { toggleToast } from "@/utils/toggleToast";
 
 export default function ChangePasswordForm() {
@@ -23,7 +22,7 @@ export default function ChangePasswordForm() {
   const {
     control,
     handleSubmit,
-    formState: { isValid },
+    formState: { isValid, isSubmitting },
   } = useForm<ChangePasswordFormValues>({
     resolver: zodResolver(changePasswordSchema),
     defaultValues: {
@@ -31,15 +30,16 @@ export default function ChangePasswordForm() {
       newPassword: "",
       confirmPassword: "",
     },
-    mode: "onSubmit",
+    mode: "onChange",
   });
 
-  const onSubmit = (data: ChangePasswordFormValues) => {
-    const { currentPassword, newPassword, confirmPassword } = data;
-
-    if (newPassword !== confirmPassword) return;
-
-    changePassword(currentPassword, newPassword);
+  const onSubmit = async (data: ChangePasswordFormValues) => {
+    try {
+      await changePassword(data.currentPassword, data.newPassword);
+      router.back();
+    } catch {
+      // UserContext displays the API error toast.
+    }
   };
 
   useEffect(() => {
@@ -71,6 +71,8 @@ export default function ChangePasswordForm() {
       secureTextEntry: true,
     },
   ];
+
+  const isDisabled = !isValid || isSubmitting;
 
   return (
     <View style={styles.container}>
@@ -108,11 +110,11 @@ export default function ChangePasswordForm() {
       })}
       <Pressable
         onPress={handleSubmit(onSubmit)}
-        disabled={!isValid}
+        disabled={isDisabled}
         style={[
           styles.button,
           {
-            backgroundColor: !isValid
+            backgroundColor: isDisabled
               ? theme.buttonDisabled
               : theme.buttonPrimary,
           },
@@ -126,7 +128,7 @@ export default function ChangePasswordForm() {
             },
           ]}
         >
-          Update Password
+          {isSubmitting ? "Updating..." : "Update Password"}
         </Text>
       </Pressable>
     </View>

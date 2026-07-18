@@ -10,7 +10,8 @@ import { validate } from "../../middleware/validate";
 import {
   contactSchema,
   feedbackSchema,
-  issueSchmea,
+  issueSchema,
+  ratingSchema,
 } from "../validation/settingsSchema";
 
 const router = express.Router();
@@ -36,13 +37,13 @@ router.post(
 router.post(
   "/contact/report",
   requireAuth,
-  validate({ body: issueSchmea }),
+  validate({ body: issueSchema }),
   submitContactForm("issue"),
 );
 router.post(
   "/contact/rating",
   requireAuth,
-  // validate({ body: issueSchmea }),
+  validate({ body: ratingSchema }),
   submitRating,
 );
 

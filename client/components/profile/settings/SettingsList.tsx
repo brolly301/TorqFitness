@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View } from "react-native";
+import { StyleSheet, Text, View, Alert } from "react-native";
 import React, { useMemo, useState } from "react";
 import { Theme } from "@/types/Theme";
 import { useAppTheme } from "@/hooks/useAppTheme";
@@ -81,6 +81,22 @@ export default function SettingsList() {
   const [unitsVisible, setUnitsVisible] = useState<boolean>(false);
   const [rateVisible, setRateVisible] = useState<boolean>(false);
 
+  const handleLogout = () => {
+    Alert.alert("Log out?", "Are you sure you want to log out?", [
+      {
+        text: "Cancel",
+        style: "cancel",
+      },
+      {
+        text: "Log Out",
+        style: "destructive",
+        onPress: () => {
+          void logout();
+        },
+      },
+    ]);
+  };
+
   const OTHER_ITEMS: SettingsItem[] = [
     {
       label: "Rate App",
@@ -93,7 +109,7 @@ export default function SettingsList() {
       icon: "log-out",
       iconType: "feather",
       danger: true,
-      onPress: () => logout(),
+      onPress: () => handleLogout(),
     },
   ];
 

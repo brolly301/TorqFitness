@@ -1,10 +1,8 @@
 import { Pressable, StyleSheet, Text, TextInput, View } from "react-native";
-import React, { useEffect, useLayoutEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo } from "react";
 import { Theme } from "@/types/Theme";
 import { useAppTheme } from "@/hooks/useAppTheme";
 import { useUserContext } from "@/context/UserContext";
-import AppError from "@/components/ui/AppError";
-import { useNavigation } from "expo-router";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Controller, useForm } from "react-hook-form";
 import {
@@ -13,6 +11,7 @@ import {
 } from "../../../utils/validation/authSchema";
 import { FormField } from "@/types/Global";
 import { toggleToast } from "@/utils/toggleToast";
+import { router } from "expo-router";
 
 export type UserInputType = {
   firstName: string;
@@ -26,24 +25,39 @@ export default function EditProfileForm() {
 
   const { user, updateUser, error, setError } = useUserContext();
 
-  if (!user) return;
-
   const {
     control,
     handleSubmit,
-    formState: { isValid, isDirty },
+    reset,
+    formState: { isValid, isDirty, isSubmitting },
   } = useForm<UpdateProfileFormValues>({
     resolver: zodResolver(updateProfileSchema),
     defaultValues: {
-      firstName: user.firstName,
-      surname: user.surname,
-      email: user.email,
+      firstName: user?.firstName ?? "",
+      surname: user?.surname ?? "",
+      email: user?.email ?? "",
     },
     mode: "onChange",
   });
 
-  const onSubmit = (data: UpdateProfileFormValues) => {
-    updateUser(data);
+  useEffect(() => {
+    if (!user) return;
+
+    reset({
+      firstName: user.firstName,
+      surname: user.surname,
+      email: user.email,
+    });
+  }, [user, reset]);
+
+  const onSubmit = async (data: UpdateProfileFormValues) => {
+    try {
+      await updateUser(data);
+      router.back();
+    } catch {
+      // UserContext sets the error and the existing effect shows it.
+      // Keep the form open.
+    }
   };
 
   useEffect(() => {
@@ -72,6 +86,8 @@ export default function EditProfileForm() {
       placeholder: "Email",
     },
   ];
+
+  const isDisabled = !isValid || !isDirty || isSubmitting;
 
   return (
     <View style={styles.container}>
@@ -102,12 +118,13 @@ export default function EditProfileForm() {
       })}
       <Pressable
         onPress={handleSubmit(onSubmit)}
-        disabled={!isValid || !isDirty}
+        disabled={isDisabled}
         style={[
           styles.button,
           {
-            backgroundColor:
-              !isValid || !isDirty ? theme.buttonDisabled : theme.buttonPrimary,
+            backgroundColor: isDisabled
+              ? theme.buttonDisabled
+              : theme.buttonPrimary,
           },
         ]}
       >
@@ -119,7 +136,7 @@ export default function EditProfileForm() {
             },
           ]}
         >
-          Update Details
+          {isSubmitting ? "Saving..." : "Update Details"}
         </Text>
       </Pressable>
     </View>

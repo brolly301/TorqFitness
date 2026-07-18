@@ -6,6 +6,8 @@ import { router } from "expo-router";
 import { useAppTheme } from "@/hooks/useAppTheme";
 import { Theme } from "@/types/Theme";
 import RoutineDetailsModal from "../modals/routines/RoutineDetailsModal";
+import { useExerciseContext } from "@/context/ExerciseContext";
+import { capitalizeWords, formatDate } from "@/utils/helpers";
 
 type Props = {
   routine: Routine;
@@ -16,9 +18,25 @@ export default function RoutineTile({ routine }: Props) {
   const styles = useMemo(() => makeStyles(theme, scale), [theme, scale]);
 
   const [modalVisible, setModalVisible] = useState<boolean>(false);
-
+  const { exercises } = useExerciseContext();
   const exerciseCount = routine.exercises.length;
   const exerciseLabel = exerciseCount === 1 ? "exercise" : "exercises";
+
+  const lastUsedText = routine.lastUsedAt
+    ? `Last used • ${formatDate(routine.lastUsedAt)}`
+    : "Not used yet";
+
+  const muscleGroups = useMemo(() => {
+    const groups = routine.exercises.flatMap((routineExercise) => {
+      const exercise = exercises.find(
+        (item) => item.id === routineExercise.exerciseId,
+      );
+
+      return exercise?.primaryMuscles ?? [];
+    });
+
+    return [...new Set(groups)].slice(0, 2).map(capitalizeWords).join(" • ");
+  }, [routine.exercises, exercises]);
 
   return (
     <>
@@ -35,7 +53,7 @@ export default function RoutineTile({ routine }: Props) {
           </Text>
 
           <Text style={styles.subText} numberOfLines={1}>
-            Last used • Monday, 10:39
+            {lastUsedText}
           </Text>
         </View>
 
@@ -45,7 +63,12 @@ export default function RoutineTile({ routine }: Props) {
           </Text>
 
           <View style={styles.tagPill}>
-            <Text style={styles.tagText}>Chest • Triceps</Text>
+            <Text style={styles.tagText}>
+              <Text style={styles.tagText} numberOfLines={1}>
+                {muscleGroups || "No muscle groups"}
+              </Text>
+              s
+            </Text>
           </View>
         </View>
 

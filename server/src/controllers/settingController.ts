@@ -118,13 +118,24 @@ export const submitRating = async (req: AuthRequest, res: Response) => {
   try {
     const userId = req.user?.userId;
     if (!userId) {
-      res.status(400).json({ message: "Unauthorized." });
-      return;
+      return res.status(401).json({ message: "Unauthorized." });
     }
-    console.log(req.body);
 
-    res.status(201).json({ message: `Rating successfully submitted.` });
-  } catch (e) {
-    res.status(500).json({ message: "Something went wrong." });
+    const { rating } = req.body;
+
+    await transporter.sendMail({
+      from: process.env.APP_EM,
+      to: process.env.APP_EM,
+      subject: `Torq - ${rating} Star App Rating`,
+      text: `User ID: ${userId}\nRating: ${rating}/5`,
+    });
+
+    return res.status(201).json({
+      message: "Rating successfully submitted.",
+    });
+  } catch {
+    return res.status(500).json({
+      message: "Something went wrong.",
+    });
   }
 };

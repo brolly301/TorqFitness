@@ -7,6 +7,7 @@ import AntDesign from "@expo/vector-icons/AntDesign";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 import { submitRating } from "@/api/settings";
 import { useUserContext } from "@/context/UserContext";
+import { toggleToast } from "@/utils/toggleToast";
 
 type Props = ModalProps;
 
@@ -14,25 +15,65 @@ export default function RateModal({ modalVisible, setModalVisible }: Props) {
   const { theme, scale } = useAppTheme();
   const styles = useMemo(() => makeStyles(theme, scale), [theme, scale]);
   const [rating, setRating] = useState<number | null>(null);
+
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const isDisabled = rating === null || isSubmitting;
   const { authToken } = useUserContext();
 
   const handleSubmit = async () => {
-    if (!rating) return;
-    await submitRating(rating, authToken.token);
+    if (rating === null || isSubmitting || !authToken.token) return;
+
+    try {
+      setIsSubmitting(true);
+
+      await submitRating(rating, authToken.token);
+
+      toggleToast({
+        type: "success",
+        text1: "Rating submitted",
+        text2: "Thanks for your feedback!",
+      });
+
+      setRating(null);
+      setModalVisible(false);
+    } catch (error) {
+      toggleToast({
+        type: "error",
+        text1: "Rating failed",
+        text2:
+          error instanceof Error
+            ? error.message
+            : "Something went wrong. Please try again.",
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleClose = () => {
+    if (isSubmitting) return;
+
+    setRating(null);
+    setModalVisible(false);
   };
 
   return (
-    <Modal visible={modalVisible} transparent animationType="fade">
+    <Modal
+      visible={modalVisible}
+      transparent
+      animationType="fade"
+      onRequestClose={handleClose}
+    >
       <View style={styles.centeredView}>
         <Pressable
-          onPress={() => setModalVisible(!modalVisible)}
+          onPress={() => handleClose()}
           style={StyleSheet.absoluteFill}
         />
         <View style={styles.modalView}>
           <View style={styles.container}>
             <View style={styles.header}>
               <Pressable
-                onPress={() => setModalVisible(false)}
+                onPress={() => handleClose()}
                 style={styles.iconButton}
               >
                 <AntDesign name="close" size={20 * scale} color={theme.text} />
@@ -57,10 +98,19 @@ export default function RateModal({ modalVisible, setModalVisible }: Props) {
             </View>
             <Pressable
               onPress={handleSubmit}
-              // disabled={isDisabled}
-              style={[styles.button]}
+              disabled={isDisabled}
+              style={[
+                styles.button,
+                {
+                  backgroundColor: isDisabled
+                    ? theme.buttonDisabled
+                    : theme.buttonPrimary,
+                },
+              ]}
             >
-              <Text style={[styles.buttonText]}>Submit Rating</Text>
+              <Text style={styles.buttonText}>
+                {isSubmitting ? "Submitting..." : "Submit Rating"}
+              </Text>
             </Pressable>
           </View>
         </View>

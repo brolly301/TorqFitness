@@ -69,7 +69,14 @@ export const submitUserContactForm = async (
   const data = await res.json();
 
   if (!res.ok) {
-    throw new Error(data.message || "Failed to retrieve send contact form.");
+    const validationMessage =
+      Array.isArray(data.errors) && data.errors.length > 0
+        ? data.errors[0].message
+        : null;
+
+    throw new Error(
+      validationMessage || data.message || "Failed to submit the form.",
+    );
   }
 
   return data;

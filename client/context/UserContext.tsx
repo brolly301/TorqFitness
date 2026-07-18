@@ -41,8 +41,11 @@ type UserContextType = {
   setUser: (user: User | null) => void;
   login: (data: Login) => Promise<void>;
   signUp: (data: SignUp) => Promise<void>;
-  updateUser: (data: UserInputType) => void;
-  changePassword: (currentPassword: string, newPassword: string) => void;
+  updateUser: (data: UserInputType) => Promise<void>;
+  changePassword: (
+    currentPassword: string,
+    newPassword: string,
+  ) => Promise<void>;
   deleteAccount: () => void;
   requestResetCode: (email: string) => Promise<boolean>;
   verifyResetCode: (code: string, email: string) => Promise<boolean>;
@@ -51,13 +54,9 @@ type UserContextType = {
   logout: () => void;
   error: ApiError | null;
   setError: (msg: ApiError | null) => void;
-  updateProfile: (
-  profile: UpdateProfilePayload,
-) => Promise<void>;
-recordWeight: (
-  weightKg: number,
-  measuredAt?: string,
-) => Promise<void>;
+  updateProfile: (profile: UpdateProfilePayload) => Promise<void>;
+
+  recordWeight: (weightKg: number, measuredAt?: string) => Promise<void>;
 };
 
 const UserContext = createContext<UserContextType | null>(null);
@@ -178,9 +177,12 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
         text1: "Account updated.",
         text2: `Your new details have been saved. `,
       });
-    } catch (e) {
-      const message = e instanceof Error ? e.message : "Something went wrong";
+    } catch (error) {
+      const message =
+        error instanceof Error ? error.message : "Something went wrong";
+
       setError({ message, status: "" });
+      throw error;
     }
   };
 
@@ -204,6 +206,7 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
     } catch (e) {
       const message = e instanceof Error ? e.message : "Something went wrong";
       setError({ message, status: "" });
+      throw e;
     }
   };
 
@@ -258,82 +261,70 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
       return false;
     }
   };
-  
-  const updateProfile = async (
-  profileData: UpdateProfilePayload,
-) => {
-  try {
-    if (!authToken.token) return;
 
-    const res = await updateUserProfile(
-      profileData,
-      authToken.token,
-    );
+  const updateProfile = async (profileData: UpdateProfilePayload) => {
+    try {
+      if (!authToken.token) return;
 
-    setUser((currentUser) => {
-      if (!currentUser) return currentUser;
+      const res = await updateUserProfile(profileData, authToken.token);
 
-      return {
-        ...currentUser,
-        profile: res.profile,
-      };
-    });
+      setUser((currentUser) => {
+        if (!currentUser) return currentUser;
 
-    toggleToast({
-      type: "success",
-      text1: "Profile updated.",
-      text2: "Your profile details have been saved.",
-    });
-  } catch (error) {
-    const message =
-      error instanceof Error
-        ? error.message
-        : "Something went wrong";
+        return {
+          ...currentUser,
+          profile: res.profile,
+        };
+      });
 
-    setError({ message, status: "" });
-    throw error;
-  }
-};
+      toggleToast({
+        type: "success",
+        text1: "Profile updated.",
+        text2: "Your profile details have been saved.",
+      });
+    } catch (error) {
+      const message =
+        error instanceof Error ? error.message : "Something went wrong";
 
-const recordWeight = async (
-  weightKg: number,
-  measuredAt?: string,
-) => {
-  try {
-    if (!authToken.token) return;
+      setError({ message, status: "" });
+      throw error;
+    }
+  };
 
-    const res = await createUserWeightEntry(
-      {
-        weightKg,
-        measuredAt,
-      },
-      authToken.token,
-    );
+  const recordWeight = async (weightKg: number, measuredAt?: string) => {
+    try {
+      if (!authToken.token) return;
 
-    setUser((currentUser) => {
-      if (!currentUser) return currentUser;
+      const res = await createUserWeightEntry(
+        {
+          weightKg,
+          measuredAt,
+        },
+        authToken.token,
+      );
 
-      return {
-        ...currentUser,
-        currentWeightKg: res.currentWeightKg,
-      };
-    });
+      setUser((currentUser) => {
+        if (!currentUser) return currentUser;
 
-    toggleToast({
-      type: "success",
-      text1: "Weight recorded.",
-      text2: "Your weight history has been updated.",
-    });
-  } catch (error) {
-    const message =
-      error instanceof Error
-        ? error.message
-        : "Something went wrong";
+        return {
+          ...currentUser,
+          currentWeightKg: res.currentWeightKg,
+        };
+      });
 
-    setError({ message, status: "" });
-    throw error;
-  }
-};
+      toggleToast({
+        type: "success",
+        text1: "Weight recorded.",
+        text2: "Your weight history has been updated.",
+      });
+    } catch (error) {
+      const message =
+        error instanceof Error ? error.message : "Something went wrong";
+
+      setError({ message, status: "" });
+      throw error;
+    }
+  };
 
   return (
     <UserContext.Provider
@@ -344,8 +335,8 @@ const recordWeight = async (
         updateUser,
         deleteAccount,
         authToken,
-         updateProfile,
-    recordWeight,
+        updateProfile,
+        recordWeight,
         login,
         logout,
         signUp,
