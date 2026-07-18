@@ -14,7 +14,16 @@ export const login = async (req: Request, res: Response) => {
 
     const user = await prisma.user.findFirst({
       where: { email },
-      include: { settings: true },
+      include: {
+        settings: true,
+        profile: true,
+        weightEntries: {
+          orderBy: {
+            measuredAt: "desc",
+          },
+          take: 1,
+        },
+      },
     });
 
     if (!user || !(await bcrypt.compare(password, user.password))) {
@@ -33,6 +42,8 @@ export const login = async (req: Request, res: Response) => {
       surname: user.surname,
       email: user.email,
       settings: user.settings,
+      profile: user.profile,
+      currentWeightKg: user.weightEntries[0]?.weightKg ?? null,
     };
 
     res
@@ -78,6 +89,8 @@ export const signUp = async (req: Request, res: Response) => {
       firstName: user.firstName,
       surname: user.surname,
       email: user.email,
+      profile: null,
+      currentWeightKg: null,
     };
 
     res.status(201).json({
@@ -214,7 +227,16 @@ export const getUser = async (req: Request, res: Response) => {
   try {
     const user = await prisma.user.findFirst({
       where: { id: userId },
-      include: { settings: true },
+      include: {
+        settings: true,
+        profile: true,
+        weightEntries: {
+          orderBy: {
+            measuredAt: "desc",
+          },
+          take: 1,
+        },
+      },
     });
 
     if (!user) {
@@ -229,6 +251,8 @@ export const getUser = async (req: Request, res: Response) => {
       surname: user.surname,
       email: user.email,
       settings: user.settings,
+      profile: user.profile,
+      currentWeightKg: user.weightEntries[0]?.weightKg ?? null,
     };
 
     res.status(200).json({

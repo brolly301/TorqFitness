@@ -8,6 +8,12 @@ datasource db {
 }
 
 
+enum ExperienceLevel {
+  BEGINNER
+  INTERMEDIATE
+  ADVANCED
+}
+
 model User {
   id            String     @id @default(uuid())
   firstName     String
@@ -16,6 +22,11 @@ model User {
   password      String
   resetToken    String?
   resetTokenExp DateTime?
+  
+  profile       Profile?
+  weightEntries WeightEntry[]
+
+
 
   exercises     Exercise[]
   workouts      Workout[]
@@ -24,6 +35,33 @@ model User {
 
   createdAt     DateTime   @default(now())
   updatedAt     DateTime   @updatedAt
+}
+
+model Profile {
+  id              String           @id @default(uuid())
+  heightCm        Float?
+  goalWeightKg    Float?
+  experienceLevel ExperienceLevel?
+
+  user            User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId          String           @unique
+
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+}
+
+model WeightEntry {
+  id         String   @id @default(uuid())
+  weightKg   Float
+  measuredAt DateTime @default(now())
+
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId     String
+
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@index([userId, measuredAt])
 }
 
 

@@ -1,8 +1,24 @@
+export type ExperienceLevel =
+  | "BEGINNER"
+  | "INTERMEDIATE"
+  | "ADVANCED";
+
+export type UserProfile = {
+  id: string;
+  heightCm: number | null;
+  goalWeightKg: number | null;
+  experienceLevel: ExperienceLevel | null;
+  createdAt: string;
+  updatedAt: string;
+};
+
 export type User = {
   userId: string;
   email: string;
   firstName: string;
   surname: string;
+  profile: UserProfile | null;
+  currentWeightKg: number | null;
 };
 
 export type AuthResponse = {
