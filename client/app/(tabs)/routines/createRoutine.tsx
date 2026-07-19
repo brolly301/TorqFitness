@@ -19,6 +19,7 @@ import { useAppTheme } from "@/hooks/useAppTheme";
 import AppWrapper from "@/components/ui/AppWrapper";
 import Feather from "@expo/vector-icons/Feather";
 import { Theme } from "@/types/Theme";
+import { toggleToast } from "@/utils/toggleToast";
 
 export default function CreateRoutineScreen() {
   const { theme, scale } = useAppTheme();
@@ -37,10 +38,28 @@ export default function CreateRoutineScreen() {
   const [modalVisible, setModalVisible] = useState(false);
   const [finishModalVisible, setFinishModalVisible] = useState(false);
   const [discardModalVisible, setDiscardModalVisible] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
 
-  const handleSubmit = useCallback(() => {
-    addRoutine(routine);
-    router.back();
+  const handleSubmit = useCallback(async () => {
+    try {
+      setIsSaving(true);
+
+      await addRoutine(routine);
+
+      setFinishModalVisible(false);
+      router.back();
+    } catch (error) {
+      toggleToast({
+        type: "error",
+        text1: "Routine not saved",
+        text2:
+          error instanceof Error
+            ? error.message
+            : "Something went wrong. Please try again.",
+      });
+    } finally {
+      setIsSaving(false);
+    }
   }, [routine, addRoutine]);
 
   const handleAddExercise = (exerciseId: string) => {
@@ -58,6 +77,11 @@ export default function CreateRoutineScreen() {
     }));
   };
 
+  const canSave =
+    routine.name.trim().length > 0 &&
+    routine.exercises.length > 0 &&
+    routine.exercises.every((exercise) => exercise.sets.length > 0);
+
   return (
     <>
       <DiscardModal
@@ -71,6 +95,7 @@ export default function CreateRoutineScreen() {
         modalVisible={finishModalVisible}
         setModalVisible={setFinishModalVisible}
         onConfirm={handleSubmit}
+        isConfirming={isSaving}
         placeholder="with this routine?"
       />
 
@@ -96,14 +121,30 @@ export default function CreateRoutineScreen() {
             </Pressable>
 
             <Pressable
-              style={styles.saveButton}
+              style={[
+                styles.saveButton,
+                !canSave && {
+                  backgroundColor: theme.buttonDisabled,
+                  borderColor: theme.buttonDisabled,
+                },
+              ]}
               onPress={() => setFinishModalVisible(true)}
+              disabled={!canSave}
               hitSlop={10}
             >
-              <Text style={styles.saveText}>Save</Text>
+              <Text
+                style={[
+                  styles.saveText,
+                  {
+                    color: canSave ? theme.buttonPrimary : theme.textSecondary,
+                  },
+                ]}
+              >
+                Save
+              </Text>
               <Feather
                 name="check"
-                color={theme.buttonPrimary}
+                color={canSave ? theme.buttonPrimary : theme.textSecondary}
                 size={20 * scale}
               />
             </Pressable>

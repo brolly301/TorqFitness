@@ -17,7 +17,7 @@ import { toggleToast } from "@/utils/toggleToast";
 
 type RoutineContextType = {
   routines: Routine[];
-  addRoutine: (routine: Routine) => void;
+  addRoutine: (routine: Routine) => Promise<void>;
   deleteRoutine: (id: string) => void;
   updateRoutine: (routine: Routine) => Promise<void>;
   markRoutineUsed: (routineId: string, completedAt: string) => void;
