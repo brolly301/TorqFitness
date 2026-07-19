@@ -17,6 +17,11 @@ router.get("/", requireAuth, getExercises);
 
 router.patch("/:id", requireAuth, archiveExercise);
 
-router.put("/:id", requireAuth, updateExercise);
+router.put(
+  "/:id",
+  requireAuth,
+  validate({ body: exerciseSchema }),
+  updateExercise,
+);
 
 export default router;

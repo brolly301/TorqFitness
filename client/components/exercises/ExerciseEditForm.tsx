@@ -11,6 +11,7 @@ import {
 import { Exercise, ModalProps } from "@/types/Global";
 import { Theme } from "@/types/Theme";
 import { useAppTheme } from "@/hooks/useAppTheme";
+import { toggleToast } from "@/utils/toggleToast";
 
 type Props = {
   exercise: Exercise | null;
@@ -28,12 +29,16 @@ export default function ExerciseEditForm({
 
   const [exerciseData, setExerciseData] = useState<Exercise | null>(exercise);
   const [deleteModalVisible, setDeleteModalVisible] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
+  const [isArchiving, setIsArchiving] = useState(false);
 
   useEffect(() => {
     setExerciseData(exercise);
   }, [exercise]);
 
   const handleCloseAll = () => {
+    if (isSaving || isArchiving) return;
+
     setEditModalVisible(false);
     setModalVisible(false);
   };
@@ -42,19 +47,53 @@ export default function ExerciseEditForm({
     setEditModalVisible(false);
   };
 
-  const handleSave = () => {
-    if (!exerciseData || isDisabled) return;
+  const handleSave = async () => {
+    if (!exerciseData || isDisabled || isSaving) return;
 
-    updateExercise(exerciseData);
-    setModalVisible(false);
+    try {
+      setIsSaving(true);
+
+      await updateExercise(exerciseData);
+
+      setEditModalVisible(false);
+      setModalVisible(false);
+    } catch (error) {
+      toggleToast({
+        type: "error",
+        text1: "Exercise not saved",
+        text2:
+          error instanceof Error
+            ? error.message
+            : "Something went wrong. Please try again.",
+      });
+    } finally {
+      setIsSaving(false);
+    }
   };
 
-  const handleArchive = () => {
-    if (!exerciseData) return;
+  const handleArchive = async () => {
+    if (!exerciseData || isArchiving) return;
 
-    archiveExercise(exerciseData.id);
-    setEditModalVisible(false);
-    setModalVisible(false);
+    try {
+      setIsArchiving(true);
+
+      await archiveExercise(exerciseData.id);
+
+      setDeleteModalVisible(false);
+      setEditModalVisible(false);
+      setModalVisible(false);
+    } catch (error) {
+      toggleToast({
+        type: "error",
+        text1: "Exercise not archived",
+        text2:
+          error instanceof Error
+            ? error.message
+            : "Something went wrong. Please try again.",
+      });
+    } finally {
+      setIsArchiving(false);
+    }
   };
 
   if (!exerciseData) return null;
@@ -79,15 +118,17 @@ export default function ExerciseEditForm({
         <View style={styles.buttonContainer}>
           <Pressable
             style={[styles.actionButton, styles.dangerButton]}
+            disabled={isArchiving}
             onPress={handleArchive}
           >
             <Text style={[styles.actionButtonText, styles.dangerButtonText]}>
-              Archive
+              {isArchiving ? "Archiving..." : "Archive"}
             </Text>
           </Pressable>
 
           <Pressable
             style={[styles.actionButton, styles.cancelButton]}
+            disabled={isArchiving}
             onPress={() => setDeleteModalVisible(false)}
           >
             <Text style={styles.cancelButtonText}>Cancel</Text>
@@ -107,7 +148,7 @@ export default function ExerciseEditForm({
 
           <Pressable
             style={styles.iconButton}
-            onPress={() => setModalVisible(false)}
+            onPress={handleCloseAll}
             hitSlop={8}
           >
             <AntDesign name="close" size={18 * scale} color={theme.text} />
@@ -181,21 +222,23 @@ export default function ExerciseEditForm({
         />
 
         <Pressable
-          disabled={isDisabled}
+          disabled={isDisabled || isSaving}
           onPress={handleSave}
           style={[
             styles.button,
             styles.saveButton,
-            isDisabled && styles.disabledButton,
+            (isDisabled || isSaving) && styles.disabledButton,
           ]}
         >
           <Text
             style={[
               styles.buttonText,
-              isDisabled ? styles.disabledButtonText : styles.saveButtonText,
+              isDisabled || isSaving
+                ? styles.disabledButtonText
+                : styles.saveButtonText,
             ]}
           >
-            Save Exercise
+            {isSaving ? "Saving..." : "Save Exercise"}
           </Text>
         </Pressable>
 
