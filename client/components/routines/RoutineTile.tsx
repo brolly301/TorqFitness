@@ -7,6 +7,7 @@ import { Theme } from "@/types/Theme";
 import { useAppTheme } from "@/hooks/useAppTheme";
 import { useExerciseContext } from "@/context/ExerciseContext";
 import { capitalizeWords } from "@/utils/helpers";
+import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 
 type Props = {
   routine: Routine;
@@ -43,111 +44,152 @@ export default function RoutineTile({ routine }: Props) {
         routine={routine}
         returnTo="/(tabs)/routines"
       />
+<Pressable
+  style={({ pressed }) => [
+    styles.container,
+    pressed && styles.containerPressed,
+  ]}
+  onPress={() => setModalVisible(true)}
+>
+  <View style={styles.topRow}>
+    <View style={styles.iconContainer}>
+      <Text style={styles.initial}>
+  {routine.name.trim().charAt(0).toUpperCase() || "R"}
+</Text>
+    </View>
 
-      <Pressable style={styles.container} onPress={() => setModalVisible(true)}>
-        <View style={styles.highlight} />
+    <View style={styles.mainContent}>
+      <Text style={styles.name} numberOfLines={1}>
+        {routine.name}
+      </Text>
 
-        <View style={styles.contentContainer}>
-          <View style={styles.routineTopDetails}>
-            <View style={styles.nameContainer}>
-              <Text style={styles.name} numberOfLines={1}>
-                {routine.name}
-              </Text>
+      <Text style={styles.muscles} numberOfLines={1}>
+        {muscleGroups || "No muscle groups"}
+      </Text>
+    </View>
 
-              <Text style={styles.volume} numberOfLines={1}>
-                {muscleGroups || "No muscle groups"}
-              </Text>
-            </View>
+    <Feather
+      name="chevron-right"
+      size={20 * scale}
+      color={theme.textSecondary}
+    />
+  </View>
 
-            <Feather
-              name="arrow-right"
-              size={18 * scale}
-              color={theme.textSecondary}
-            />
-          </View>
+  <View style={styles.bottomRow}>
+    <View style={styles.statsContainer}>
+      <View style={styles.statPill}>
+        <Text style={styles.statText}>
+          {routine.exercises.length}{" "}
+          {routine.exercises.length === 1 ? "exercise" : "exercises"}
+        </Text>
+      </View>
 
-          <View style={styles.hr} />
+      <View style={styles.statPill}>
+        <Text style={styles.statText}>
+          {totalSets} {totalSets === 1 ? "set" : "sets"}
+        </Text>
+      </View>
+    </View>
 
-          <View style={styles.routineBottomDetails}>
-            <Text style={styles.meta}>
-              {routine.exercises.length} exercises • {totalSets} sets
-            </Text>
-
-            <Text style={styles.date}>
-              {routine.lastUsedAt
-                ? `Last used • ${new Date(routine.lastUsedAt).toLocaleDateString()}`
-                : "Never used"}
-            </Text>
-          </View>
-        </View>
-      </Pressable>
+    <Text style={styles.date} numberOfLines={1}>
+      {routine.lastUsedAt
+        ? `Used ${new Date(routine.lastUsedAt).toLocaleDateString()}`
+        : "Never used"}
+    </Text>
+  </View>
+</Pressable>
+     
     </>
   );
 }
 
 export const makeStyles = (theme: Theme, scale: number) =>
   StyleSheet.create({
-    container: {
-      flexDirection: "row",
-      backgroundColor: theme.card,
-      borderRadius: 14 * scale,
-      marginBottom: 12 * scale,
-      overflow: "hidden",
-      borderWidth: 1,
-      borderColor: theme.border,
-    },
+  container: {
+  backgroundColor: theme.card,
+  borderRadius: 16 * scale,
+  padding: 15 * scale,
+  marginBottom: 12 * scale,
+  borderWidth: 1,
+  borderColor: theme.border,
+},
 
-    highlight: {
-      backgroundColor: theme.buttonPrimary,
-      width: 5 * scale,
-    },
+containerPressed: {
+  opacity: 0.78,
+},
 
-    contentContainer: {
-      flex: 1,
-      padding: 14 * scale,
-    },
+topRow: {
+  flexDirection: "row",
+  alignItems: "center",
+},
 
-    routineTopDetails: {
-      flexDirection: "row",
-      alignItems: "center",
-      justifyContent: "space-between",
-    },
+iconContainer: {
+  width: 44 * scale,
+  height: 44 * scale,
+  borderRadius: 13 * scale,
+  alignItems: "center",
+  justifyContent: "center",
+  marginRight: 12 * scale,
+  backgroundColor: theme.buttonPrimary + "14",
+},
 
-    nameContainer: {
-      flex: 1,
-      marginRight: 12 * scale,
-    },
+mainContent: {
+  flex: 1,
+  marginRight: 10 * scale,
+},
 
-    name: {
-      fontSize: 18 * scale,
-      fontWeight: "700",
-      color: theme.text,
-      marginBottom: 2 * scale,
-    },
+name: {
+  fontSize: 18 * scale,
+  fontWeight: "700",
+  color: theme.text,
+  marginBottom: 3 * scale,
+},
 
-    volume: {
-      fontSize: 14 * scale,
-      color: theme.textSecondary,
-    },
+muscles: {
+  fontSize: 14 * scale,
+  color: theme.textSecondary,
+},
 
-    hr: {
-      height: 1,
-      width: "100%",
-      backgroundColor: theme.border,
-      marginVertical: 8 * scale,
-    },
+bottomRow: {
+  flexDirection: "row",
+  alignItems: "center",
+  justifyContent: "space-between",
+  marginTop: 14 * scale,
+  gap: 10 * scale,
+},
 
-    routineBottomDetails: {
-      gap: 2 * scale,
-    },
+statsContainer: {
+  flexDirection: "row",
+  alignItems: "center",
+  gap: 7 * scale,
+  flexShrink: 1,
+},
 
-    meta: {
-      fontSize: 14 * scale,
-      color: theme.textSecondary,
-    },
+statPill: {
+  paddingHorizontal: 9 * scale,
+  paddingVertical: 5 * scale,
+  borderRadius: 999,
+  backgroundColor: theme.buttonSecondary,
+  borderWidth: 1,
+  borderColor: theme.border,
+},
 
-    date: {
-      fontSize: 13 * scale,
-      color: theme.textSecondary,
-    },
+statText: {
+  fontSize: 12 * scale,
+  fontWeight: "600",
+  color: theme.textSecondary,
+},
+
+date: {
+  flexShrink: 1,
+  fontSize: 12 * scale,
+  color: theme.textSecondary,
+  textAlign: "right",
+},
+
+initial: {
+  fontSize: 17 * scale,
+  fontWeight: "800",
+  color: theme.buttonPrimary,
+},
   });

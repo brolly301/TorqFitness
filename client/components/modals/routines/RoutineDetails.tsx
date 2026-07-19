@@ -32,6 +32,9 @@ export default function RoutineDetails({
   const { exercises } = useExerciseContext();
 
   const [deleteModalVisible, setDeleteModalVisible] = useState(false);
+const [expandedExerciseId, setExpandedExerciseId] = useState<string | null>(
+  null,
+);
 
   const { settings } = useSettingsContext();
   const weightUnit = settings?.weightLabel ?? "kg";
@@ -77,121 +80,134 @@ export default function RoutineDetails({
       />
 
       <View style={styles.container}>
-        <View style={styles.header}>
-          <Pressable
-            onPress={() => setModalVisible(false)}
-            style={styles.iconButton}
-          >
-            <AntDesign name="close" size={20 * scale} color={theme.text} />
-          </Pressable>
+       <View style={styles.header}>
+  <View style={styles.headerText}>
+    <Text style={styles.name} numberOfLines={2}>
+      {routine.name}
+    </Text>
 
-          <Text style={styles.name} numberOfLines={1}>
-            {routine.name}
-          </Text>
+    <Text style={styles.headerMeta}>
+      {routine.exercises.length}{" "}
+      {routine.exercises.length === 1 ? "exercise" : "exercises"}
+      {" • "}
+      {totalSets} {totalSets === 1 ? "set" : "sets"}
+    </Text>
+  </View>
 
-          <View style={styles.headerActions}>
-            <Pressable
-              style={[styles.secondaryAction, { marginRight: 8 * scale }]}
-              onPress={() => setDeleteModalVisible(true)}
-            >
-              <MaterialIcons
-                name="delete-outline"
-                size={18 * scale}
-                color={theme.text}
-              />
-            </Pressable>
+  <Pressable
+    onPress={() => setModalVisible(false)}
+    style={styles.iconButton}
+    hitSlop={8}
+  >
+    <AntDesign name="close" size={20 * scale} color={theme.text} />
+  </Pressable>
+</View>
 
-            <Pressable style={styles.primaryAction} onPress={handleEditRoutine}>
-              <Text style={styles.editText}>Edit</Text>
-            </Pressable>
-          </View>
-        </View>
+<View style={styles.actionRow}>
+  <Pressable style={styles.editAction} onPress={handleEditRoutine}>
+    <MaterialIcons
+      name="edit"
+      size={17 * scale}
+      color={theme.buttonPrimary}
+    />
+    <Text style={styles.editText}>Edit Routine</Text>
+  </Pressable>
+
+  <Pressable
+    style={styles.deleteAction}
+    onPress={() => setDeleteModalVisible(true)}
+    accessibilityRole="button"
+    accessibilityLabel="Delete routine"
+  >
+    <MaterialIcons
+      name="delete-outline"
+      size={19 * scale}
+      color={theme.error}
+    />
+  </Pressable>
+</View>
         <FlatList
           data={exerciseList}
           keyExtractor={(item) => item.id}
           contentContainerStyle={styles.listContent}
           showsVerticalScrollIndicator={false}
-          ListHeaderComponent={
-            <View style={styles.overviewContainer}>
-              {!!routine.notes && (
-                <Text style={styles.notes} numberOfLines={2}>
-                  {routine.notes}
-                </Text>
-              )}
+        
+         renderItem={({ item }) => {
+  const primary = capitalizeWords(
+    item.details?.primaryMuscles?.[0] ?? "",
+  );
 
-              <Text style={styles.metaText}>
-                {routine.exercises.length} exercises • {totalSets} sets
+  const secondary = capitalizeWords(
+    item.details?.secondaryMuscles?.[0] ?? "",
+  );
+
+  const muscleText =
+    primary && secondary
+      ? `${primary} & ${secondary}`
+      : primary || secondary || "Exercise";
+
+  const isExpanded = expandedExerciseId === item.id;
+  const visibleSets = isExpanded ? item.sets : item.sets.slice(0, 2);
+  const remainingSets = item.sets.length - visibleSets.length;
+
+  return (
+    <Pressable
+      style={({ pressed }) => [
+        styles.routineCard,
+        pressed && styles.routineCardPressed,
+      ]}
+      onPress={() =>
+        setExpandedExerciseId((currentId) =>
+          currentId === item.id ? null : item.id,
+        )
+      }
+      accessibilityRole="button"
+      accessibilityState={{ expanded: isExpanded }}
+    >
+      <View style={styles.routineDetails}>
+        <View style={styles.nameButtonContainer}>
+          <View style={styles.exerciseTextContainer}>
+            <Text style={styles.exerciseName} numberOfLines={1}>
+              {capitalizeWords(item.details?.name ?? "Exercise")}
+            </Text>
+
+            <Text style={styles.exerciseMuscle} numberOfLines={1}>
+              {muscleText}
+            </Text>
+          </View>
+
+          <Entypo
+            name={isExpanded ? "chevron-up" : "chevron-down"}
+            size={20 * scale}
+            color={theme.textSecondary}
+          />
+        </View>
+      </View>
+
+      <View style={styles.setPreview}>
+        {visibleSets.map((set, index) => {
+          const setText = set.weight
+            ? `${formatWeight(set.weight, weightUnit)} ${weightUnit} × ${set.reps}`
+            : `${set.reps} reps`;
+
+          return (
+            <View key={set.id} style={styles.setPill}>
+              <Text style={styles.setText}>
+                {index + 1}. {setText}
               </Text>
             </View>
-          }
-          renderItem={({ item }) => {
-            const primary = capitalizeWords(
-              item.details?.primaryMuscles?.[0] ?? "",
-            );
-            const secondary = capitalizeWords(
-              item.details?.secondaryMuscles?.[0] ?? "",
-            );
+          );
+        })}
 
-            const muscleText =
-              primary && secondary
-                ? `${primary} & ${secondary}`
-                : primary || secondary || "Exercise";
-
-            const setCount = item.sets.length;
-            const setLabel = setCount === 1 ? "set" : "sets";
-
-            const setSummary = item.sets
-              .map((set) => {
-                if (set.weight) {
-                  return `${formatWeight(set.weight, weightUnit)} × ${set.reps}`;
-                }
-
-                return `${set.reps} reps`;
-              })
-              .join(" • ");
-
-            return (
-              <View style={styles.routineCard}>
-                <View style={styles.routineDetails}>
-                  <View style={styles.nameButtonContainer}>
-                    <View style={styles.exerciseTextContainer}>
-                      <Text style={styles.exerciseName} numberOfLines={1}>
-                        {capitalizeWords(item.details?.name ?? "Exercise")}
-                      </Text>
-
-                      <Text style={styles.exerciseMuscle} numberOfLines={1}>
-                        {muscleText}
-                      </Text>
-                    </View>
-
-                    <Entypo
-                      name="chevron-right"
-                      size={20 * scale}
-                      color={theme.textSecondary}
-                    />
-                  </View>
-                </View>
-
-                <View style={styles.setCard}>
-                  <Text style={styles.setDetails}>
-                    {setCount} {setLabel}
-                  </Text>
-
-                  {!!setSummary && (
-                    <>
-                      <Text style={styles.setDivider}>•</Text>
-                      <Text
-                        style={[styles.setDetails, { flex: 1 }]}
-                        numberOfLines={2}
-                      >
-                        {setSummary}
-                      </Text>
-                    </>
-                  )}
-                </View>
-              </View>
-            );
-          }}
+        {remainingSets > 0 ? (
+          <View style={styles.morePill}>
+            <Text style={styles.moreText}>+{remainingSets} more</Text>
+          </View>
+        ) : null}
+      </View>
+    </Pressable>
+  );
+}}
           ListFooterComponent={<View style={styles.footerSpacer} />}
         />
         {exerciseList.length < 1 ? (
@@ -205,18 +221,27 @@ export default function RoutineDetails({
           </View>
         ) : null}
 
-        <Pressable
-          style={styles.startButton}
-          onPress={() => {
-            setModalVisible(false);
-            router.push({
-              pathname: "/workout/createWorkout",
-              params: { routineId: routine.id },
-            });
-          }}
-        >
-          <Text style={styles.startText}>Start Workout</Text>
-        </Pressable>
+       <Pressable
+  style={({ pressed }) => [
+    styles.startButton,
+    pressed && styles.startButtonPressed,
+  ]}
+  onPress={() => {
+    setModalVisible(false);
+
+    router.push({
+      pathname: "/workout/createWorkout",
+      params: { routineId: routine.id },
+    });
+  }}
+>
+  <Entypo
+    name="controller-play"
+    size={17 * scale}
+    color={theme.buttonPrimary}
+  />
+  <Text style={styles.startText}>Start Workout</Text>
+</Pressable>
       </View>
     </>
   );
@@ -229,15 +254,31 @@ export const makeStyles = (theme: Theme, scale: number) =>
     },
 
     header: {
-      height: 44 * scale,
-      justifyContent: "center",
-      marginBottom: 10 * scale,
-      position: "relative",
+      flexDirection: "row",
+      alignItems: "flex-start",
+      justifyContent: "space-between",
+      marginBottom: 14 * scale,
+    },
+
+    headerText: {
+      flex: 1,
+      marginRight: 14 * scale,
+    },
+
+    name: {
+      fontSize: 24 * scale,
+      lineHeight: 29 * scale,
+      fontWeight: "700",
+      color: theme.text,
+      marginBottom: 5 * scale,
+    },
+
+    headerMeta: {
+      fontSize: 14 * scale,
+      color: theme.textSecondary,
     },
 
     iconButton: {
-      position: "absolute",
-      left: 0,
       width: 36 * scale,
       height: 36 * scale,
       alignItems: "center",
@@ -248,25 +289,45 @@ export const makeStyles = (theme: Theme, scale: number) =>
       borderColor: theme.border,
     },
 
-    headerActions: {
-      position: "absolute",
-      right: 0,
+    actionRow: {
       flexDirection: "row",
       alignItems: "center",
+      marginBottom: 12 * scale,
+      gap: 8 * scale,
     },
 
-    name: {
-      position: "absolute",
-      left: 60 * scale,
-      right: 60 * scale,
-      fontSize: 22 * scale,
-      fontWeight: "700",
-      textAlign: "center",
-      color: theme.text,
+    editAction: {
+      flex: 1,
+      minHeight: 40 * scale,
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "center",
+      gap: 7 * scale,
+      borderRadius: 11 * scale,
+      backgroundColor: theme.buttonPrimary + "12",
+      borderWidth: 1,
+      borderColor: theme.buttonPrimary + "35",
+    },
+
+    editText: {
+      fontSize: 14 * scale,
+      fontWeight: "600",
+      color: theme.buttonPrimary,
+    },
+
+    deleteAction: {
+      width: 42 * scale,
+      height: 40 * scale,
+      alignItems: "center",
+      justifyContent: "center",
+      borderRadius: 11 * scale,
+      backgroundColor: theme.error + "12",
+      borderWidth: 1,
+      borderColor: theme.error + "30",
     },
 
     listContent: {
-      paddingTop: 8 * scale,
+      paddingTop: 4 * scale,
     },
 
     overviewContainer: {
@@ -274,13 +335,8 @@ export const makeStyles = (theme: Theme, scale: number) =>
     },
 
     notes: {
-      fontSize: 15 * scale,
-      color: theme.textSecondary,
-      marginBottom: 6 * scale,
-    },
-
-    metaText: {
-      fontSize: 15 * scale,
+      fontSize: 14 * scale,
+      lineHeight: 20 * scale,
       color: theme.textSecondary,
     },
 
@@ -293,9 +349,14 @@ export const makeStyles = (theme: Theme, scale: number) =>
       overflow: "hidden",
     },
 
+    routineCardPressed: {
+      opacity: 0.8,
+    },
+
     routineDetails: {
       paddingHorizontal: 14 * scale,
-      paddingVertical: 12 * scale,
+      paddingTop: 13 * scale,
+      paddingBottom: 11 * scale,
     },
 
     nameButtonContainer: {
@@ -321,74 +382,80 @@ export const makeStyles = (theme: Theme, scale: number) =>
       color: theme.textSecondary,
     },
 
-    setCard: {
+    setPreview: {
       flexDirection: "row",
-      alignItems: "center",
+      flexWrap: "wrap",
+      gap: 7 * scale,
       paddingHorizontal: 14 * scale,
-      paddingVertical: 10 * scale,
+      paddingBottom: 13 * scale,
+    },
+
+    setPill: {
+      paddingHorizontal: 9 * scale,
+      paddingVertical: 5 * scale,
+      borderRadius: 999,
       backgroundColor: theme.buttonSecondary,
+      borderWidth: 1,
+      borderColor: theme.border,
     },
 
-    setDetails: {
-      fontSize: 14 * scale,
-      color: theme.textSecondary,
-    },
-
-    setDivider: {
-      fontSize: 14 * scale,
-      color: theme.textSecondary,
-      marginHorizontal: 6 * scale,
-    },
-
-    secondaryAction: {
-      paddingVertical: 7.5 * scale,
-      paddingHorizontal: 10 * scale,
-      justifyContent: "center",
-      alignItems: "center",
-      backgroundColor: theme.border,
-      borderRadius: 10 * scale,
-    },
-
-    primaryAction: {
-      paddingVertical: 7.5 * scale,
-      paddingHorizontal: 12 * scale,
-      justifyContent: "center",
-      alignItems: "center",
-      backgroundColor: theme.buttonPrimary,
-      borderRadius: 10 * scale,
-    },
-
-    editText: {
-      fontSize: 15 * scale,
+    setText: {
+      fontSize: 12 * scale,
       fontWeight: "600",
-      color: theme.buttonPrimaryText,
+      color: theme.textSecondary,
+    },
+
+    morePill: {
+      paddingHorizontal: 9 * scale,
+      paddingVertical: 5 * scale,
+      borderRadius: 999,
+      backgroundColor: theme.buttonPrimary + "12",
+      borderWidth: 1,
+      borderColor: theme.buttonPrimary + "25",
+    },
+
+    moreText: {
+      fontSize: 12 * scale,
+      fontWeight: "600",
+      color: theme.buttonPrimary,
     },
 
     footerSpacer: {
       height: 8 * scale,
     },
 
-    startButton: {
-      justifyContent: "center",
+    placeholderContainer: {
+      flexDirection: "row",
       alignItems: "center",
-      borderRadius: 12 * scale,
-      backgroundColor: theme.buttonPrimary,
       paddingVertical: 12 * scale,
+    },
+
+    placeholderText: {
+      color: theme.textSecondary,
+      fontSize: 14 * scale,
+      marginLeft: 10 * scale,
+    },
+
+    startButton: {
+      minHeight: 46 * scale,
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "center",
+      gap: 8 * scale,
+      borderRadius: 13 * scale,
       marginTop: 15 * scale,
+      backgroundColor: theme.buttonPrimary + "14",
+      borderWidth: 1,
+      borderColor: theme.buttonPrimary + "40",
+    },
+
+    startButtonPressed: {
+      backgroundColor: theme.buttonPrimary + "24",
     },
 
     startText: {
       fontSize: 15 * scale,
-      color: theme.buttonPrimaryText,
       fontWeight: "700",
-    },
-    placeholderContainer: {
-      flexDirection: "row",
-      paddingVertical: 10,
-    },
-    placeholderText: {
-      color: theme.text + "CC",
-      fontSize: 14 * scale,
-      marginLeft: 10,
+      color: theme.buttonPrimary,
     },
   });

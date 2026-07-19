@@ -41,19 +41,25 @@ export default function RoutineDetailsModal({
 export const makeStyles = (theme: Theme, scale: number) =>
   StyleSheet.create({
     centeredView: {
-      justifyContent: "center",
-      alignItems: "center",
       flex: 1,
+      alignItems: "center",
+      justifyContent: "center",
+      paddingHorizontal: 16 * scale,
       backgroundColor: theme.shadow,
     },
+
     modalView: {
-      width: "89%",
-      maxHeight: "60%",
-      minHeight: 200,
-      borderRadius: 12,
+      width: "100%",
+      maxWidth: 460,
+      maxHeight: "82%",
+      minHeight: 240 * scale,
+      borderRadius: 22 * scale,
+      paddingTop: 20 * scale,
+      paddingHorizontal: 18 * scale,
+      paddingBottom: 18 * scale,
       backgroundColor: theme.background,
-      paddingTop: 15,
-      paddingHorizontal: 15,
-      paddingBottom: 20,
+      borderWidth: 1,
+      borderColor: theme.border,
+      overflow: "hidden",
     },
   });
