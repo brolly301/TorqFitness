@@ -20,7 +20,7 @@ type WorkoutContextType = {
   workouts: Workout[];
   addWorkout: (workout: Workout) => Promise<void>;
   deleteWorkout: (id: string) => void;
-  updateWorkout: (workout: Workout) => void;
+ updateWorkout: (workout: Workout) => Promise<void>;
 };
 
 const WorkoutContext = createContext<WorkoutContextType | null>(null);

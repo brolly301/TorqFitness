@@ -5,12 +5,16 @@ import WorkoutDetails from "./WorkoutDetails";
 import { Theme } from "@/types/Theme";
 import { useAppTheme } from "@/hooks/useAppTheme";
 
-type Props = ModalProps & { workout: Workout };
+type Props = ModalProps & {
+  workout: Workout;
+  returnTo: "/(tabs)/workout" | "/(tabs)/history";
+};
 
 export default function WorkoutDetailsModal({
   modalVisible,
   setModalVisible,
   workout,
+  returnTo,
 }: Props) {
   const { theme, scale } = useAppTheme();
   const styles = useMemo(() => makeStyles(theme, scale), [theme, scale]);
@@ -25,7 +29,11 @@ export default function WorkoutDetailsModal({
           style={StyleSheet.absoluteFill}
         />
         <View style={styles.modalView}>
-          <WorkoutDetails workout={workout} setModalVisible={setModalVisible} />
+          <WorkoutDetails
+            returnTo={returnTo}
+            workout={workout}
+            setModalVisible={setModalVisible}
+          />
         </View>
       </View>
     </Modal>

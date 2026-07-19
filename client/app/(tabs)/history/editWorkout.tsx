@@ -19,16 +19,28 @@ import { Theme } from "@/types/Theme";
 import AppWrapper from "@/components/ui/AppWrapper";
 import Feather from "@expo/vector-icons/Feather";
 import { useAppTheme } from "@/hooks/useAppTheme";
+import { toggleToast } from "@/utils/toggleToast";
 
 export default function EditWorkoutScreen() {
   const { theme, scale } = useAppTheme();
   const styles = useMemo(() => makeStyles(theme, scale), [theme, scale]);
 
-  const { workoutId } = useLocalSearchParams();
-  const resolvedWorkoutId = Array.isArray(workoutId) ? workoutId[0] : workoutId;
+  const params = useLocalSearchParams<{
+    workoutId?: string;
+    returnTo?: string;
+  }>();
+
+  const resolvedWorkoutId = Array.isArray(params.workoutId)
+    ? params.workoutId[0]
+    : params.workoutId;
+
+  const returnTo =
+    params.returnTo === "/(tabs)/workout"
+      ? "/(tabs)/workout"
+      : "/(tabs)/history";
 
   const { workouts, updateWorkout } = useWorkoutContext();
-
+  const [isSaving, setIsSaving] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
   const [finishModalVisible, setFinishModalVisible] = useState(false);
   const [discardModalVisible, setDiscardModalVisible] = useState(false);
@@ -47,6 +59,16 @@ export default function EditWorkoutScreen() {
     notes: "",
   });
 
+  const exitEditScreen = () => {
+    router.dismissTo("/(tabs)/history");
+
+    if (returnTo === "/(tabs)/workout") {
+      requestAnimationFrame(() => {
+        router.navigate("/(tabs)/workout");
+      });
+    }
+  };
+
   useEffect(() => {
     if (!workoutDetails) return;
 
@@ -59,12 +81,27 @@ export default function EditWorkoutScreen() {
     });
   }, [workoutDetails]);
 
-  const handleSubmit = useCallback(() => {
-    if (!formData) return;
+  const handleSubmit = useCallback(async () => {
+    try {
+      setIsSaving(true);
 
-    updateWorkout(formData);
-    router.back();
-  }, [formData, updateWorkout]);
+      await updateWorkout(formData);
+
+      setFinishModalVisible(false);
+      exitEditScreen();
+    } catch (error) {
+      toggleToast({
+        type: "error",
+        text1: "Workout not saved",
+        text2:
+          error instanceof Error
+            ? error.message
+            : "Something went wrong. Please try again.",
+      });
+    } finally {
+      setIsSaving(false);
+    }
+  }, [formData, updateWorkout, returnTo]);
 
   const handleAddExercise = (exerciseId: string) => {
     if (!formData) return;
@@ -97,13 +134,21 @@ export default function EditWorkoutScreen() {
     );
   }
 
+  const canSave =
+    formData.name.trim().length > 0 &&
+    formData.exercises.length > 0 &&
+    formData.exercises.every(
+      (exercise) =>
+        exercise.sets.length > 0 && exercise.sets.every((set) => set.reps > 0),
+    );
+
   return (
     <>
       <DiscardModal
         modalVisible={discardModalVisible}
         setModalVisible={setDiscardModalVisible}
         placeholder="discard your changes?"
-        onConfirm={() => router.back()}
+        onConfirm={exitEditScreen}
       />
 
       <FinishModal
@@ -111,6 +156,7 @@ export default function EditWorkoutScreen() {
         setModalVisible={setFinishModalVisible}
         onConfirm={handleSubmit}
         placeholder="editing this workout?"
+        isConfirming={isSaving}
       />
 
       <ExerciseModal
@@ -135,14 +181,30 @@ export default function EditWorkoutScreen() {
             </Pressable>
 
             <Pressable
-              style={styles.saveButton}
+              style={[
+                styles.saveButton,
+                !canSave && {
+                  backgroundColor: theme.buttonDisabled,
+                  borderColor: theme.buttonDisabled,
+                },
+              ]}
               onPress={() => setFinishModalVisible(true)}
+              disabled={!canSave}
               hitSlop={10}
             >
-              <Text style={styles.saveText}>Save</Text>
+              <Text
+                style={[
+                  styles.saveText,
+                  {
+                    color: canSave ? theme.buttonPrimary : theme.textSecondary,
+                  },
+                ]}
+              >
+                Save
+              </Text>
               <Feather
                 name="check"
-                color={theme.buttonPrimary}
+                color={canSave ? theme.buttonPrimary : theme.textSecondary}
                 size={20 * scale}
               />
             </Pressable>
@@ -154,6 +216,7 @@ export default function EditWorkoutScreen() {
               mode="workout"
               draft={formData}
               setModalVisible={setModalVisible}
+              excludeWorkoutId={formData.id}
             />
           </View>
         </KeyboardAvoidingView>

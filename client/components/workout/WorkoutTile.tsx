@@ -39,6 +39,7 @@ export default function WorkoutTile({ workout }: Props) {
         modalVisible={modalVisible}
         setModalVisible={setModalVisible}
         workout={workout}
+          returnTo="/(tabs)/workout"
       />
 
       <Pressable style={styles.container} onPress={() => setModalVisible(true)}>

@@ -21,9 +21,14 @@ import { useSettingsContext } from "@/context/SettingsContext";
 type Props = {
   workout: Workout;
   setModalVisible: React.Dispatch<React.SetStateAction<boolean>>;
+  returnTo: "/(tabs)/workout" | "/(tabs)/history";
 };
 
-export default function WorkoutDetails({ workout, setModalVisible }: Props) {
+export default function WorkoutDetails({
+  workout,
+  setModalVisible,
+  returnTo,
+}: Props) {
   const { theme, scale } = useAppTheme();
   const styles = useMemo(() => makeStyles(theme, scale), [theme, scale]);
 
@@ -62,11 +67,15 @@ export default function WorkoutDetails({ workout, setModalVisible }: Props) {
   };
 
   const handleEditWorkout = () => {
+    setModalVisible(false);
+
     router.push({
       pathname: "/(tabs)/history/editWorkout",
-      params: { workoutId: workout.id },
+      params: {
+        workoutId: workout.id,
+        returnTo,
+      },
     });
-    setModalVisible(false);
   };
 
   return (
@@ -156,10 +165,10 @@ export default function WorkoutDetails({ workout, setModalVisible }: Props) {
 
                 <View style={styles.hr} />
 
-               <View style={styles.columnHeaderRow}>
-  <Text style={styles.columnHeaderLeft}>Set</Text>
-  <Text style={styles.columnHeaderRight}>Result</Text>
-</View>
+                <View style={styles.columnHeaderRow}>
+                  <Text style={styles.columnHeaderLeft}>Set</Text>
+                  <Text style={styles.columnHeaderRight}>Result</Text>
+                </View>
 
                 {item.sets.map((set, index) => {
                   const currentText = `${formatWeight(set.weight ?? 0, weightUnit)} × ${set.reps ?? 0}`;
@@ -177,8 +186,6 @@ export default function WorkoutDetails({ workout, setModalVisible }: Props) {
                       </View>
 
                       <Text style={styles.currentSetText}>{currentText}</Text>
-
-                     
                     </View>
                   );
                 })}

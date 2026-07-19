@@ -34,6 +34,7 @@ type Props<T extends WorkoutDraft> = {
   setDraft: React.Dispatch<React.SetStateAction<T>>;
   mode: "workout" | "routine";
   showTimer?: boolean;
+  excludeWorkoutId?: string;
 } & Pick<ModalProps, "setModalVisible">;
 
 export default function WorkoutForm<T extends WorkoutDraft>({
@@ -42,6 +43,7 @@ export default function WorkoutForm<T extends WorkoutDraft>({
   mode,
   showTimer = false,
   setModalVisible,
+  excludeWorkoutId,
 }: Props<T>) {
   const { theme, scale } = useAppTheme();
   const styles = useMemo(() => makeStyles(theme, scale), [theme, scale]);
@@ -92,6 +94,8 @@ export default function WorkoutForm<T extends WorkoutDraft>({
 
     // Workouts are already ordered newest first.
     workouts.forEach((workout) => {
+      if (workout.id === excludeWorkoutId) return;
+
       workout.exercises.forEach((exercise) => {
         if (!previousSets.has(exercise.exerciseId)) {
           previousSets.set(exercise.exerciseId, exercise.sets);
@@ -100,7 +104,7 @@ export default function WorkoutForm<T extends WorkoutDraft>({
     });
 
     return previousSets;
-  }, [workouts]);
+  }, [workouts, excludeWorkoutId]);
 
   return (
     <>
