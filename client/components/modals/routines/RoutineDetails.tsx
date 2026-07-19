@@ -11,17 +11,20 @@ import { Theme } from "@/types/Theme";
 import AntDesign from "@expo/vector-icons/AntDesign";
 import Entypo from "@expo/vector-icons/Entypo";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
-import EvilIcons from "@expo/vector-icons/EvilIcons";
-import Feather from "@expo/vector-icons/Feather";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import { useSettingsContext } from "@/context/SettingsContext";
 
 type Props = {
   routine: Routine;
   setModalVisible: React.Dispatch<React.SetStateAction<boolean>>;
+  returnTo: "/(tabs)/workout" | "/(tabs)/routines";
 };
 
-export default function RoutineDetails({ routine, setModalVisible }: Props) {
+export default function RoutineDetails({
+  routine,
+  setModalVisible,
+  returnTo,
+}: Props) {
   const { theme, scale } = useAppTheme();
   const styles = useMemo(() => makeStyles(theme, scale), [theme, scale]);
 
@@ -30,8 +33,8 @@ export default function RoutineDetails({ routine, setModalVisible }: Props) {
 
   const [deleteModalVisible, setDeleteModalVisible] = useState(false);
 
-const { settings } = useSettingsContext();
-const weightUnit = settings?.weightLabel ?? "kg";
+  const { settings } = useSettingsContext();
+  const weightUnit = settings?.weightLabel ?? "kg";
 
   const exerciseList = useMemo(() => {
     return routine.exercises.map((rtEx) => {
@@ -47,11 +50,15 @@ const weightUnit = settings?.weightLabel ?? "kg";
   }, [routine.exercises]);
 
   const handleEditRoutine = () => {
+    setModalVisible(false);
+
     router.push({
       pathname: "/(tabs)/routines/editRoutine",
-      params: { routineId: routine.id },
+      params: {
+        routineId: routine.id,
+        returnTo,
+      },
     });
-    setModalVisible(false);
   };
 
   const handleDeleteRoutine = () => {
@@ -136,7 +143,7 @@ const weightUnit = settings?.weightLabel ?? "kg";
             const setSummary = item.sets
               .map((set) => {
                 if (set.weight) {
-                 return `${formatWeight(set.weight, weightUnit)} × ${set.reps}`;
+                  return `${formatWeight(set.weight, weightUnit)} × ${set.reps}`;
                 }
 
                 return `${set.reps} reps`;

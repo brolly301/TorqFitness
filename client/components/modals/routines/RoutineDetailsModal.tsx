@@ -5,12 +5,16 @@ import RoutineDetails from "./RoutineDetails";
 import { Theme } from "@/types/Theme";
 import { useAppTheme } from "@/hooks/useAppTheme";
 
-type Props = ModalProps & { routine: Routine };
+type Props = ModalProps & {
+  routine: Routine;
+  returnTo: "/(tabs)/workout" | "/(tabs)/routines";
+};
 
 export default function RoutineDetailsModal({
   modalVisible,
   setModalVisible,
   routine,
+  returnTo,
 }: Props) {
   const { theme, scale } = useAppTheme();
   const styles = useMemo(() => makeStyles(theme, scale), [theme, scale]);
@@ -23,7 +27,11 @@ export default function RoutineDetailsModal({
           style={StyleSheet.absoluteFill}
         />
         <View style={styles.modalView}>
-          <RoutineDetails routine={routine} setModalVisible={setModalVisible} />
+          <RoutineDetails
+            routine={routine}
+            setModalVisible={setModalVisible}
+            returnTo={returnTo}
+          />
         </View>
       </View>
     </Modal>

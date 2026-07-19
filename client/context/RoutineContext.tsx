@@ -19,7 +19,7 @@ type RoutineContextType = {
   routines: Routine[];
   addRoutine: (routine: Routine) => void;
   deleteRoutine: (id: string) => void;
-  updateRoutine: (routine: Routine) => void;
+  updateRoutine: (routine: Routine) => Promise<void>;
   markRoutineUsed: (routineId: string, completedAt: string) => void;
 };
 

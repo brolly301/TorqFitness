@@ -44,6 +44,7 @@ export default function RoutineTile({ routine }: Props) {
         modalVisible={modalVisible}
         setModalVisible={setModalVisible}
         routine={routine}
+        returnTo="/(tabs)/workout"
       />
 
       <Pressable style={styles.container} onPress={() => setModalVisible(true)}>

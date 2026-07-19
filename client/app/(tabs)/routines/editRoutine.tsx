@@ -19,19 +19,42 @@ import AppWrapper from "@/components/ui/AppWrapper";
 import Feather from "@expo/vector-icons/Feather";
 import { Theme } from "@/types/Theme";
 import { useAppTheme } from "@/hooks/useAppTheme";
+import { toggleToast } from "@/utils/toggleToast";
 
 export default function EditRoutineScreen() {
   const { theme, scale } = useAppTheme();
   const styles = useMemo(() => makeStyles(theme, scale), [theme, scale]);
 
-  const { routineId } = useLocalSearchParams();
-  const resolvedRoutineId = Array.isArray(routineId) ? routineId[0] : routineId;
+  const params = useLocalSearchParams<{
+    routineId?: string;
+    returnTo?: string;
+  }>();
+
+  const resolvedRoutineId = Array.isArray(params.routineId)
+    ? params.routineId[0]
+    : params.routineId;
+
+  const returnTo =
+    params.returnTo === "/(tabs)/workout"
+      ? "/(tabs)/workout"
+      : "/(tabs)/routines";
+
+  const exitEditScreen = () => {
+    router.dismissTo("/(tabs)/routines");
+
+    if (returnTo === "/(tabs)/workout") {
+      requestAnimationFrame(() => {
+        router.navigate("/(tabs)/workout");
+      });
+    }
+  };
 
   const { routines, updateRoutine } = useRoutineContext();
 
   const [modalVisible, setModalVisible] = useState(false);
   const [finishModalVisible, setFinishModalVisible] = useState(false);
   const [discardModalVisible, setDiscardModalVisible] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
 
   const routineDetails = useMemo(() => {
     return routines.find((routine) => routine.id === resolvedRoutineId);
@@ -42,6 +65,7 @@ export default function EditRoutineScreen() {
     name: "",
     exercises: [],
     notes: "",
+    lastUsedAt: null,
   });
 
   useEffect(() => {
@@ -56,16 +80,29 @@ export default function EditRoutineScreen() {
     });
   }, [routineDetails]);
 
-  const handleSubmit = useCallback(() => {
-    if (!formData) return;
+  const handleSubmit = useCallback(async () => {
+    try {
+      setIsSaving(true);
 
-    updateRoutine(formData);
-    router.back();
+      await updateRoutine(formData);
+
+      setFinishModalVisible(false);
+      exitEditScreen();
+    } catch (error) {
+      toggleToast({
+        type: "error",
+        text1: "Routine not saved",
+        text2:
+          error instanceof Error
+            ? error.message
+            : "Something went wrong. Please try again.",
+      });
+    } finally {
+      setIsSaving(false);
+    }
   }, [formData, updateRoutine]);
 
   const handleAddExercise = (exerciseId: string) => {
-    if (!formData) return;
-
     const newExercise = {
       id: crypto.randomUUID(),
       exerciseId,
@@ -74,17 +111,13 @@ export default function EditRoutineScreen() {
       notes: "",
     };
 
-    setFormData((prev) => {
-      if (!prev) return prev;
-
-      return {
-        ...prev,
-        exercises: [...prev.exercises, newExercise],
-      };
-    });
+    setFormData((prev) => ({
+      ...prev,
+      exercises: [...prev.exercises, newExercise],
+    }));
   };
 
-  if (!formData) {
+  if (!routineDetails) {
     return (
       <AppWrapper>
         <View style={styles.container}>
@@ -94,13 +127,18 @@ export default function EditRoutineScreen() {
     );
   }
 
+  const canSave =
+    formData.name.trim().length > 0 &&
+    formData.exercises.length > 0 &&
+    formData.exercises.every((exercise) => exercise.sets.length > 0);
+
   return (
     <>
       <DiscardModal
         modalVisible={discardModalVisible}
         setModalVisible={setDiscardModalVisible}
         placeholder="discard your changes?"
-        onConfirm={() => router.back()}
+        onConfirm={exitEditScreen}
       />
 
       <FinishModal
@@ -108,6 +146,7 @@ export default function EditRoutineScreen() {
         setModalVisible={setFinishModalVisible}
         onConfirm={handleSubmit}
         placeholder="editing this routine?"
+        isConfirming={isSaving}
       />
 
       <ExerciseModal
@@ -132,14 +171,30 @@ export default function EditRoutineScreen() {
             </Pressable>
 
             <Pressable
-              style={styles.saveButton}
+              style={[
+                styles.saveButton,
+                !canSave && {
+                  backgroundColor: theme.buttonDisabled,
+                  borderColor: theme.buttonDisabled,
+                },
+              ]}
               onPress={() => setFinishModalVisible(true)}
+              disabled={!canSave}
               hitSlop={10}
             >
-              <Text style={styles.saveText}>Save</Text>
+              <Text
+                style={[
+                  styles.saveText,
+                  {
+                    color: canSave ? theme.buttonPrimary : theme.textSecondary,
+                  },
+                ]}
+              >
+                Save
+              </Text>
               <Feather
                 name="check"
-                color={theme.buttonPrimary}
+                color={canSave ? theme.buttonPrimary : theme.textSecondary}
                 size={20 * scale}
               />
             </Pressable>

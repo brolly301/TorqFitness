@@ -31,6 +31,7 @@ export default function CreateRoutineScreen() {
     name: `Routine #${routines.length + 1}`,
     exercises: [],
     notes: "",
+    lastUsedAt: null,
   });
 
   const [modalVisible, setModalVisible] = useState(false);
