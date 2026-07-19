@@ -5,12 +5,14 @@ import ConfirmationModal from "./ConfirmationModal";
 type Props = ModalProps & {
   onConfirm: () => void;
   placeholder: string;
+  isConfirming?: boolean;
 };
 
 export default function FinishModal({
   modalVisible,
   setModalVisible,
   onConfirm,
+  isConfirming = false,
   placeholder,
 }: Props) {
   return (
@@ -21,6 +23,7 @@ export default function FinishModal({
       description={`Are you sure you are finished ${placeholder}`}
       confirmText="Finish & Save"
       confirmVariant="primary"
+      isConfirming={isConfirming}
       onConfirm={onConfirm}
     />
   );

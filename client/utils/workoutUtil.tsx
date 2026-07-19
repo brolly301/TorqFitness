@@ -26,6 +26,29 @@ export const addSet = <T extends WorkoutDraft>(
   }));
 };
 
+export const removeSet = <T extends WorkoutDraft>(
+  setFormData: React.Dispatch<React.SetStateAction<T>>,
+  exerciseId: string,
+  setId: string,
+) => {
+  setFormData((prev) => ({
+    ...prev,
+    exercises: prev.exercises.map((exercise) => {
+      if (exercise.id !== exerciseId) return exercise;
+
+      return {
+        ...exercise,
+        sets: exercise.sets
+          .filter((set) => set.id !== setId)
+          .map((set, index) => ({
+            ...set,
+            order: index + 1,
+          })),
+      };
+    }),
+  }));
+};
+
 export const updateSet = <T extends WorkoutDraft>(
   setFormData: React.Dispatch<React.SetStateAction<T>>,
   exerciseId: string,

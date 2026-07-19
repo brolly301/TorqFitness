@@ -20,6 +20,7 @@ import { Theme } from "@/types/Theme";
 import { useAppTheme } from "@/hooks/useAppTheme";
 import Feather from "@expo/vector-icons/Feather";
 import { useRoutineContext } from "@/context/RoutineContext";
+import { toggleToast } from "@/utils/toggleToast";
 
 export default function StartWorkoutScreen() {
   const { theme, scale } = useAppTheme();
@@ -40,7 +41,7 @@ export default function StartWorkoutScreen() {
     exercises: [],
     notes: "",
   });
-
+  const [isSaving, setIsSaving] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
   const [finishModalVisible, setFinishModalVisible] = useState(false);
   const [discardModalVisible, setDiscardModalVisible] = useState(false);
@@ -64,6 +65,7 @@ export default function StartWorkoutScreen() {
 
       return {
         ...prev,
+        name: routine.name,
         exercises: routine.exercises.map((exercise) => ({
           ...exercise,
           id: crypto.randomUUID(),
@@ -79,25 +81,45 @@ export default function StartWorkoutScreen() {
   const handleSubmit = useCallback(async () => {
     if (!workout.startedAt) return;
 
-    const completedAt = new Date().toISOString();
-    const duration = Math.floor(
-      (new Date(completedAt).getTime() -
-        new Date(workout.startedAt).getTime()) /
-        1000,
-    );
+    try {
+      setIsSaving(true);
 
-    const finalWorkout = {
-      ...workout,
-      completedAt,
-      duration,
-    };
+      const completedAt = new Date().toISOString();
+      const duration = Math.max(
+        1,
+        Math.floor(
+          (new Date(completedAt).getTime() -
+            new Date(workout.startedAt).getTime()) /
+            1000,
+        ),
+      );
 
-    await addWorkout(finalWorkout);
-    if (routineId) {
-      markRoutineUsed(routineId, completedAt);
+      const finalWorkout = {
+        ...workout,
+        completedAt,
+        duration,
+      };
+
+      await addWorkout(finalWorkout);
+
+      if (routineId) {
+        markRoutineUsed(routineId, completedAt);
+      }
+
+      setFinishModalVisible(false);
+      router.back();
+    } catch (error) {
+      toggleToast({
+        type: "error",
+        text1: "Workout not saved",
+        text2:
+          error instanceof Error
+            ? error.message
+            : "Something went wrong. Please try again.",
+      });
+    } finally {
+      setIsSaving(false);
     }
-    setFinishModalVisible(false);
-    router.back();
   }, [workout, addWorkout, routineId, markRoutineUsed]);
 
   const handleAddExercise = (exerciseId: string) => {
@@ -114,6 +136,14 @@ export default function StartWorkoutScreen() {
       exercises: [...prev.exercises, newExercise],
     }));
   };
+
+  const canFinish =
+    workout.name.trim().length > 0 &&
+    workout.exercises.length > 0 &&
+    workout.exercises.every(
+      (exercise) =>
+        exercise.sets.length > 0 && exercise.sets.every((set) => set.reps > 0),
+    );
 
   return (
     <>
@@ -132,8 +162,8 @@ export default function StartWorkoutScreen() {
         setModalVisible={setFinishModalVisible}
         onConfirm={handleSubmit}
         placeholder="with this workout?"
+        isConfirming={isSaving}
       />
-
       <ExerciseModal
         modalVisible={modalVisible}
         setModalVisible={setModalVisible}
@@ -156,14 +186,32 @@ export default function StartWorkoutScreen() {
             </Pressable>
 
             <Pressable
-              style={styles.finishButton}
+              style={[
+                styles.finishButton,
+                !canFinish && {
+                  backgroundColor: theme.buttonDisabled,
+                  borderColor: theme.buttonDisabled,
+                },
+              ]}
               onPress={() => setFinishModalVisible(true)}
+              disabled={!canFinish}
               hitSlop={10}
             >
-              <Text style={styles.finishText}>Finish</Text>
+              <Text
+                style={[
+                  styles.finishText,
+                  {
+                    color: canFinish
+                      ? theme.buttonPrimary
+                      : theme.textSecondary,
+                  },
+                ]}
+              >
+                Finish
+              </Text>
               <Feather
                 name="check"
-                color={theme.buttonPrimary}
+                color={canFinish ? theme.buttonPrimary : theme.textSecondary}
                 size={20 * scale}
               />
             </Pressable>

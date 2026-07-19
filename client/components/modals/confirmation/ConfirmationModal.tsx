@@ -9,6 +9,7 @@ type Props = ModalProps & {
   title: string;
   description?: string;
   confirmText: string;
+  isConfirming?: boolean;
   confirmVariant?: "primary" | "danger";
   onConfirm: () => void;
 };
@@ -20,13 +21,18 @@ export default function ConfirmationModal({
   description,
   confirmText,
   confirmVariant = "primary",
+  isConfirming = false,
   onConfirm,
 }: Props) {
   const { theme, scale } = useAppTheme();
   const styles = useMemo(() => makeStyles(theme, scale), [theme, scale]);
 
   return (
-    <AppModal modalVisible={modalVisible} setModalVisible={setModalVisible}>
+    <AppModal
+      modalVisible={modalVisible}
+      dismissDisabled={isConfirming}
+      setModalVisible={setModalVisible}
+    >
       <View style={styles.container}>
         <Text style={styles.title}>{title}</Text>
 
@@ -34,11 +40,13 @@ export default function ConfirmationModal({
 
         <View style={styles.buttonContainer}>
           <Pressable
+            disabled={isConfirming}
             style={[
               styles.confirmButton,
               confirmVariant === "danger"
                 ? styles.dangerButton
                 : styles.primaryButton,
+              isConfirming && { opacity: 0.6 },
             ]}
             onPress={onConfirm}
           >
@@ -50,13 +58,14 @@ export default function ConfirmationModal({
                   : styles.primaryButtonText,
               ]}
             >
-              {confirmText}
+              {isConfirming ? "Saving..." : confirmText}
             </Text>
           </Pressable>
 
           <Pressable
             style={styles.cancelButton}
             onPress={() => setModalVisible(false)}
+            disabled={isConfirming}
           >
             <Text style={styles.cancelButtonText}>Cancel</Text>
           </Pressable>

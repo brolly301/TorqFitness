@@ -22,7 +22,12 @@ import { ModalProps, WorkoutDraft } from "@/types/Global";
 import { Theme } from "@/types/Theme";
 import { useWorkoutContext } from "@/context/WorkoutContext";
 
-import { addSet, removeExercise, updateSet } from "@/utils/workoutUtil";
+import {
+  addSet,
+  removeExercise,
+  updateSet,
+  removeSet,
+} from "@/utils/workoutUtil";
 
 type Props<T extends WorkoutDraft> = {
   draft: T;
@@ -200,9 +205,28 @@ export default function WorkoutForm<T extends WorkoutDraft>({
                         <Text style={styles.previousText}>{previousText}</Text>
                         <Text style={styles.previousLabel}> (last)</Text>
                       </View>
-                      <Text style={styles.previousLabel}>
-                        {displayedSetVolume} {weightUnit}
-                      </Text>
+                      <View style={styles.setActions}>
+                        <Text style={styles.previousLabel}>
+                          {displayedSetVolume} {weightUnit}
+                        </Text>
+
+                        {exercise.sets.length > 1 ? (
+                          <Pressable
+                            onPress={() =>
+                              removeSet(setDraft, exercise.id, set.id)
+                            }
+                            hitSlop={8}
+                            accessibilityRole="button"
+                            accessibilityLabel={`Remove set ${index + 1}`}
+                          >
+                            <EvilIcons
+                              name="trash"
+                              size={24 * scale}
+                              color={theme.error ?? "red"}
+                            />
+                          </Pressable>
+                        ) : null}
+                      </View>
                     </View>
 
                     <View style={styles.inputsRow}>
@@ -378,6 +402,11 @@ export const makeStyles = (theme: Theme, scale: number) =>
     previousLabel: {
       fontSize: 16 * scale,
       color: theme.textSecondary,
+    },
+    setActions: {
+      flexDirection: "row",
+      alignItems: "center",
+      gap: 6 * scale,
     },
     inputsRow: {
       flexDirection: "row",

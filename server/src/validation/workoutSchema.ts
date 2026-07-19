@@ -2,13 +2,13 @@ import * as z from "zod/v4";
 
 export const workoutSetSchema = z.object({
   order: z.number().int(),
-  reps: z.number().int().min(0),
+  reps: z.number().int().min(1, "Completed sets require at least one rep"),
   weight: z.number().min(0).nullable(),
 });
 export const workoutExerciseSchema = z.object({
   exerciseId: z.string(),
   order: z.number().int(),
-  sets: z.array(workoutSetSchema),
+  sets: z.array(workoutSetSchema).min(1, "At least one set is required"),
   notes: z.string().optional(),
 });
 
@@ -19,7 +19,9 @@ export const workoutSchema = z.object({
   startedAt: z.coerce.date("Started date are required."),
   completedAt: z.coerce.date("Completed date is required."),
   duration: z.number().int().min(1, "Duration  be at least 1 second"),
-  exercises: z.array(workoutExerciseSchema).optional(),
+  exercises: z
+    .array(workoutExerciseSchema)
+    .min(1, "At least one exercise is required"),
 });
 
 export type WorkoutFormValues = z.infer<typeof workoutSchema>;

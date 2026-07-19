@@ -18,7 +18,17 @@ export default function WorkoutScreen() {
   const { routines } = useRoutineContext();
 
   const recentWorkouts = workouts.slice(0, 3);
-  const recentRoutines = routines.slice(0, 3);
+
+  const recentRoutines = useMemo(() => {
+    return [...routines]
+      .sort((a, b) => {
+        const aTime = a.lastUsedAt ? new Date(a.lastUsedAt).getTime() : 0;
+        const bTime = b.lastUsedAt ? new Date(b.lastUsedAt).getTime() : 0;
+
+        return bTime - aTime;
+      })
+      .slice(0, 3);
+  }, [routines]);
 
   return (
     <AppWrapper>
@@ -39,7 +49,7 @@ export default function WorkoutScreen() {
             styles.button,
             pressed && styles.buttonPressed,
           ]}
-          onPress={() => router.navigate("/(tabs)/workout/createWorkout")}
+          onPress={() => router.push("/(tabs)/workout/createWorkout")}
         >
           <View style={styles.buttonContent}>
             <Text style={styles.buttonText}>Start New Workout</Text>

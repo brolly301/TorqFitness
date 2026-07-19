@@ -6,22 +6,32 @@ import { Theme } from "@/types/Theme";
 
 type Props = ModalProps & {
   children: ReactNode;
+  dismissDisabled?: boolean;
 };
 
 export default function AppModal({
   children,
   modalVisible,
+  dismissDisabled = false,
   setModalVisible,
 }: Props) {
   const { theme, scale } = useAppTheme();
   const styles = useMemo(() => makeStyles(theme, scale), [theme, scale]);
+
+  const handleClose = () => {
+    if (dismissDisabled) return;
+    setModalVisible(false);
+  };
+
   return (
-    <Modal visible={modalVisible} transparent animationType="fade">
+    <Modal
+      visible={modalVisible}
+      transparent
+      animationType="fade"
+      onRequestClose={handleClose}
+    >
       <View style={styles.centeredView}>
-        <Pressable
-          style={StyleSheet.absoluteFill}
-          onPress={() => setModalVisible(false)}
-        />
+        <Pressable style={StyleSheet.absoluteFill} onPress={handleClose} />
         <View style={styles.modalView}>{children}</View>
       </View>
     </Modal>

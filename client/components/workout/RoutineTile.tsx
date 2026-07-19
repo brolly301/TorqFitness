@@ -62,14 +62,13 @@ export default function RoutineTile({ routine }: Props) {
             {exerciseCount} {exerciseLabel}
           </Text>
 
-          <View style={styles.tagPill}>
-            <Text style={styles.tagText}>
+          {muscleGroups ? (
+            <View style={styles.tagPill}>
               <Text style={styles.tagText} numberOfLines={1}>
-                {muscleGroups || "No muscle groups"}
+                {muscleGroups}
               </Text>
-              s
-            </Text>
-          </View>
+            </View>
+          ) : null}
         </View>
 
         <View style={styles.iconContainer}>
@@ -111,7 +110,7 @@ export const makeStyles = (theme: Theme, scale: number) =>
     rightContent: {
       alignItems: "flex-end",
       marginRight: 10 * scale,
-      maxWidth: "35%",
+      flexShrink: 1,
     },
 
     iconContainer: {
@@ -149,5 +148,6 @@ export const makeStyles = (theme: Theme, scale: number) =>
     tagText: {
       fontSize: 13 * scale,
       color: theme.buttonPrimary,
+      maxWidth: 120 * scale,
     },
   });

@@ -31,11 +31,21 @@ export default function ExerciseModal({
   }, [modalVisible]);
 
   const filteredExercises = useMemo(() => {
-    return exercises.filter(
-      (exercise) =>
-        normalize(exercise.name).includes(normalize(search)) &&
-        !exercise.archived,
-    );
+    const query = normalize(search);
+
+    return exercises.filter((exercise) => {
+      if (exercise.archived) return false;
+
+      const searchableValues = [
+        exercise.name,
+        ...exercise.bodyParts,
+        ...exercise.primaryMuscles,
+        ...exercise.secondaryMuscles,
+        ...exercise.equipment,
+      ];
+
+      return searchableValues.some((value) => normalize(value).includes(query));
+    });
   }, [exercises, search]);
 
   return (
@@ -73,10 +83,21 @@ export default function ExerciseModal({
           </View>
 
           <View style={styles.listContainer}>
-            <ExerciseList
-              exercises={filteredExercises}
-              handleAddExercise={handleAddExercise}
-            />
+            {filteredExercises.length > 0 ? (
+              <ExerciseList
+                exercises={filteredExercises}
+                handleAddExercise={handleAddExercise}
+              />
+            ) : (
+              <View style={styles.emptyContainer}>
+                <Text style={styles.emptyTitle}>No exercises found</Text>
+                <Text style={styles.emptyText}>
+                  {search.trim()
+                    ? `No exercises match "${search.trim()}"`
+                    : "No exercises are available"}
+                </Text>
+              </View>
+            )}
           </View>
         </View>
       </View>
@@ -144,5 +165,23 @@ export const makeStyles = (theme: Theme, scale: number) =>
 
     listContainer: {
       flex: 1,
+    },
+    emptyContainer: {
+      alignItems: "center",
+      justifyContent: "center",
+      paddingVertical: 32 * scale,
+    },
+
+    emptyTitle: {
+      fontSize: 16 * scale,
+      fontWeight: "600",
+      color: theme.text,
+      marginBottom: 4 * scale,
+    },
+
+    emptyText: {
+      fontSize: 14 * scale,
+      color: theme.textSecondary,
+      textAlign: "center",
     },
   });
