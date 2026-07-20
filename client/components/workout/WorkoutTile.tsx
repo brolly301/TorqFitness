@@ -26,8 +26,17 @@ export default function WorkoutTile({ workout }: Props) {
     });
   }, [workout.exercises, exercises]);
 
-  const previewExercises = exerciseList.slice(0, 3);
+  const previewExercises = exerciseList.slice(0, 2);
   const remainingCount = exerciseList.length - previewExercises.length;
+const totalSets = workout.exercises.reduce(
+  (total, exercise) => total + exercise.sets.length,
+  0,
+);
+
+const exerciseLabel =
+  workout.exercises.length === 1 ? "exercise" : "exercises";
+
+const setLabel = totalSets === 1 ? "set" : "sets";
 
   const workoutDate = workout.startedAt
     ? formatDate(workout.startedAt)
@@ -42,55 +51,88 @@ export default function WorkoutTile({ workout }: Props) {
           returnTo="/(tabs)/workout"
       />
 
-      <Pressable style={styles.container} onPress={() => setModalVisible(true)}>
-        <View style={styles.titleDuration}>
-          <Text style={styles.name} numberOfLines={1}>
-            {workout.name}
+    <Pressable
+  style={({ pressed }) => [
+    styles.container,
+    pressed && styles.containerPressed,
+  ]}
+  onPress={() => setModalVisible(true)}
+>
+  <View style={styles.header}>
+    <View style={styles.titleContainer}>
+      <Text style={styles.name} numberOfLines={1}>
+        {workout.name}
+      </Text>
+
+      <Text style={styles.date}>{workoutDate}</Text>
+    </View>
+
+    <Feather
+      name="chevron-right"
+      size={18 * scale}
+      color={theme.textSecondary}
+    />
+  </View>
+
+  <View style={styles.statsContainer}>
+    <View style={styles.stat}>
+      <Feather
+        name="clock"
+        size={13 * scale}
+        color={theme.buttonPrimary}
+      />
+      <Text style={styles.statText}>
+        {formatTime(workout.duration)}
+      </Text>
+    </View>
+
+    <View style={styles.stat}>
+      <MaterialCommunityIcons
+        name="dumbbell"
+        size={14 * scale}
+        color={theme.buttonPrimary}
+      />
+      <Text style={styles.statText}>
+        <Text style={styles.statText}>
+  {workout.exercises.length} {exerciseLabel}
+</Text>
+      </Text>
+    </View>
+
+    <View style={styles.stat}>
+      <Feather
+        name="layers"
+        size={13 * scale}
+        color={theme.buttonPrimary}
+      />
+    <Text style={styles.statText}>
+  {totalSets} {setLabel}
+</Text>
+    </View>
+  </View>
+
+  {previewExercises.length > 0 ? (
+    <View style={styles.exerciseList}>
+      {previewExercises.map((exercise) => (
+        <View key={exercise.id} style={styles.exerciseRow}>
+          <View style={styles.exerciseDot} />
+
+          <Text style={styles.exerciseName} numberOfLines={1}>
+            {capitalizeWords(exercise.details?.name ?? "Exercise")}
           </Text>
-
-          <View style={styles.durationContainer}>
-            <Feather name="clock" size={14} color={theme.buttonPrimary} />
-            <Text style={styles.duration}>{formatTime(workout.duration)}</Text>
-          </View>
         </View>
-        <View style={styles.dateTimeContainer}>
-          <Text style={styles.dateTime}>{workoutDate}</Text>
-        </View>
+      ))}
 
-        <View style={styles.hr} />
-
-        {previewExercises.length >= 1 ? (
-          previewExercises.map((exercise) => (
-            <View key={exercise.id} style={styles.exerciseContainer}>
-              <View
-                style={{
-                  width: 6,
-                  height: 6,
-                  borderRadius: 3,
-                  backgroundColor: theme.buttonPrimary,
-                  marginRight: 8,
-                }}
-              />
-              <Text style={styles.exerciseName} numberOfLines={1}>
-                {capitalizeWords(exercise.details?.name ?? "Exercise")}
-              </Text>
-            </View>
-          ))
-        ) : (
-          <View style={styles.placeholderContainer}>
-            <MaterialCommunityIcons
-              name="dumbbell"
-              color={theme.text + "CC"}
-              size={17}
-            />
-            <Text style={styles.placeholderText}>No exercises added yet</Text>
-          </View>
-        )}
-
-        {remainingCount > 0 && (
-          <Text style={styles.moreText}>+{remainingCount} more</Text>
-        )}
-      </Pressable>
+      {remainingCount > 0 && (
+        <Text style={styles.moreText}>+{remainingCount} more</Text>
+      )}
+    </View>
+  ) : (
+    <View style={styles.placeholderContainer}>
+      <Text style={styles.placeholderText}>No exercises added</Text>
+    </View>
+  )}
+</Pressable>
     </>
   );
 }
@@ -98,85 +140,116 @@ export default function WorkoutTile({ workout }: Props) {
 export const makeStyles = (theme: Theme, scale: number) =>
   StyleSheet.create({
     container: {
-      backgroundColor: theme.card,
-      borderRadius: 14 * scale,
-      padding: 16 * scale,
       marginBottom: 12 * scale,
+      padding: 15 * scale,
+      backgroundColor: theme.card,
       borderWidth: 1,
       borderColor: theme.border,
+      borderRadius: 16 * scale,
+      elevation: 2,
       shadowColor: "#000",
+      shadowOffset: {
+        width: 0,
+        height: 2,
+      },
       shadowOpacity: 0.05,
       shadowRadius: 8,
-      shadowOffset: { width: 0, height: 2 },
-      elevation: 2,
+    },
+
+    containerPressed: {
+      opacity: 0.75,
+    },
+
+    header: {
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "space-between",
+    },
+
+    titleContainer: {
+      flex: 1,
+      marginRight: 12 * scale,
     },
 
     name: {
+      marginBottom: 3 * scale,
       color: theme.text,
-      fontSize: 18 * scale,
+      fontSize: 17 * scale,
       fontWeight: "700",
-      marginBottom: 4 * scale,
     },
 
-    dateTimeContainer: {
-      flexDirection: "row",
-      marginBottom: 2 * scale,
-    },
-
-    dateTime: {
-      fontSize: 14 * scale,
+    date: {
       color: theme.textSecondary,
+      fontSize: 13 * scale,
     },
 
-    hr: {
-      height: 1,
-      width: "100%",
-      backgroundColor: theme.border,
-      marginVertical: 10 * scale,
-    },
-
-    exerciseContainer: {
+    statsContainer: {
       flexDirection: "row",
-      paddingVertical: 5 * scale,
+      flexWrap: "wrap",
+      gap: 7 * scale,
+      marginTop: 12 * scale,
+    },
+
+    stat: {
+      flexDirection: "row",
       alignItems: "center",
+      gap: 5 * scale,
+      paddingHorizontal: 8 * scale,
+      paddingVertical: 5 * scale,
+      backgroundColor: theme.buttonPrimary + "10",
+      borderRadius: 9 * scale,
+    },
+
+    statText: {
+      color: theme.textSecondary,
+      fontSize: 12 * scale,
+      fontWeight: "500",
+    },
+
+    exerciseList: {
+      gap: 7 * scale,
+      marginTop: 13 * scale,
+      paddingTop: 12 * scale,
+      borderTopWidth: 1,
+      borderTopColor: theme.border,
+    },
+
+    exerciseRow: {
+      flexDirection: "row",
+      alignItems: "center",
+    },
+
+    exerciseDot: {
+      width: 5 * scale,
+      height: 5 * scale,
+      marginRight: 9 * scale,
+      backgroundColor: theme.buttonPrimary,
+      borderRadius: 3 * scale,
     },
 
     exerciseName: {
-      fontSize: 16 * scale,
+      flex: 1,
       color: theme.text,
+      fontSize: 14 * scale,
+      fontWeight: "500",
     },
 
     moreText: {
-      marginTop: 4 * scale,
-      fontSize: 15 * scale,
+      marginLeft: 14 * scale,
       color: theme.textSecondary,
+      fontSize: 13 * scale,
       fontWeight: "500",
     },
-    durationContainer: {
-      paddingHorizontal: 5,
-      paddingVertical: 3,
-      borderRadius: 10,
-      backgroundColor: theme.buttonPrimary + "15",
-      flexDirection: "row",
-      alignItems: "center",
-    },
-    duration: {
-      fontSize: 12,
-      fontWeight: "400",
-      color: theme.textSecondary,
-      marginLeft: 5,
-    },
-    titleDuration: {
-      flexDirection: "row",
-      justifyContent: "space-between",
-    },
+
     placeholderContainer: {
-      flexDirection: "row",
-      paddingVertical: 10,
+      marginTop: 12 * scale,
+      paddingTop: 12 * scale,
+      borderTopWidth: 1,
+      borderTopColor: theme.border,
     },
+
     placeholderText: {
-      color: theme.text + "CC",
-      fontSize: 14 * scale,
-      marginLeft: 10,
+      color: theme.textSecondary,
+      fontSize: 13 * scale,
     },
   });

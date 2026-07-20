@@ -23,8 +23,8 @@ export default function RoutineTile({ routine }: Props) {
   const exerciseLabel = exerciseCount === 1 ? "exercise" : "exercises";
 
   const lastUsedText = routine.lastUsedAt
-    ? `Last used • ${formatDate(routine.lastUsedAt)}`
-    : "Not used yet";
+  ? `Last used ${formatDate(routine.lastUsedAt)}`
+  : "Not used yet";
 
   const muscleGroups = useMemo(() => {
     const groups = routine.exercises.flatMap((routineExercise) => {
@@ -47,39 +47,51 @@ export default function RoutineTile({ routine }: Props) {
         returnTo="/(tabs)/workout"
       />
 
-      <Pressable style={styles.container} onPress={() => setModalVisible(true)}>
-        <View style={styles.leftContent}>
-          <Text style={styles.name} numberOfLines={1}>
-            {routine.name}
-          </Text>
+     <Pressable
+  style={({ pressed }) => [
+    styles.container,
+    pressed && styles.containerPressed,
+  ]}
+  onPress={() => setModalVisible(true)}
+>
 
-          <Text style={styles.subText} numberOfLines={1}>
-            {lastUsedText}
+
+  <View style={styles.content}>
+    <View style={styles.header}>
+      <View style={styles.titleContainer}>
+        <Text style={styles.name} numberOfLines={1}>
+          {routine.name}
+        </Text>
+
+        <Text style={styles.subText} numberOfLines={1}>
+          {lastUsedText}
+        </Text>
+      </View>
+
+      <Feather
+        name="chevron-right"
+        size={18 * scale}
+        color={theme.textSecondary}
+      />
+    </View>
+
+    <View style={styles.metaContainer}>
+      <View style={styles.metaPill}>
+        <Text style={styles.metaText}>
+          {exerciseCount} {exerciseLabel}
+        </Text>
+      </View>
+
+      {muscleGroups ? (
+        <View style={styles.musclePill}>
+          <Text style={styles.muscleText} numberOfLines={1}>
+            {muscleGroups}
           </Text>
         </View>
-
-        <View style={styles.rightContent}>
-          <Text style={styles.meta} numberOfLines={1}>
-            {exerciseCount} {exerciseLabel}
-          </Text>
-
-          {muscleGroups ? (
-            <View style={styles.tagPill}>
-              <Text style={styles.tagText} numberOfLines={1}>
-                {muscleGroups}
-              </Text>
-            </View>
-          ) : null}
-        </View>
-
-        <View style={styles.iconContainer}>
-          <Feather
-            name="arrow-right"
-            size={18 * scale}
-            color={theme.textSecondary}
-          />
-        </View>
-      </Pressable>
+      ) : null}
+    </View>
+  </View>
+</Pressable>
     </>
   );
 }
@@ -89,66 +101,86 @@ export const makeStyles = (theme: Theme, scale: number) =>
     container: {
       flexDirection: "row",
       alignItems: "center",
-      backgroundColor: theme.card,
-      borderRadius: 14 * scale,
-      paddingVertical: 14 * scale,
-      paddingHorizontal: 14 * scale,
       marginBottom: 12 * scale,
+      padding: 14 * scale,
+      backgroundColor: theme.card,
       borderWidth: 1,
       borderColor: theme.border,
+      borderRadius: 16 * scale,
+      elevation: 2,
       shadowColor: "#000",
+      shadowOffset: {
+        width: 0,
+        height: 2,
+      },
       shadowOpacity: 0.05,
       shadowRadius: 8,
-      shadowOffset: { width: 0, height: 2 },
-      elevation: 2,
     },
 
-    leftContent: {
+    containerPressed: {
+      opacity: 0.75,
+    },
+
+    content: {
       flex: 1,
-      marginRight: 12 * scale,
+      minWidth: 0,
     },
 
-    rightContent: {
-      alignItems: "flex-end",
+    header: {
+      flexDirection: "row",
+      alignItems: "center",
+    },
+
+    titleContainer: {
+      flex: 1,
       marginRight: 10 * scale,
-      flexShrink: 1,
-    },
-
-    iconContainer: {
-      width: 26 * scale,
-      alignItems: "flex-end",
-      justifyContent: "center",
     },
 
     name: {
-      fontSize: 18 * scale,
-      fontWeight: "700",
+      marginBottom: 3 * scale,
       color: theme.text,
-      marginBottom: 4 * scale,
+      fontSize: 17 * scale,
+      fontWeight: "700",
     },
 
     subText: {
-      fontSize: 14 * scale,
       color: theme.textSecondary,
-    },
-
-    meta: {
-      fontSize: 15 * scale,
-      fontWeight: "600",
-      color: theme.text,
-      marginBottom: 4 * scale,
-    },
-
-    tagPill: {
-      paddingHorizontal: 8 * scale,
-      paddingVertical: 4 * scale,
-      borderRadius: 999,
-      backgroundColor: theme.buttonPrimary + "15",
-    },
-
-    tagText: {
       fontSize: 13 * scale,
+    },
+
+    metaContainer: {
+      flexDirection: "row",
+      flexWrap: "wrap",
+      gap: 7 * scale,
+      marginTop: 11 * scale,
+    },
+
+   metaPill: {
+  paddingHorizontal: 8 * scale,
+  paddingVertical: 5 * scale,
+  backgroundColor: theme.text + "08",
+  borderWidth: 1,
+  borderColor: theme.border,
+  borderRadius: 9 * scale,
+},
+
+    metaText: {
+      color: theme.textSecondary,
+      fontSize: 12 * scale,
+      fontWeight: "500",
+    },
+
+    musclePill: {
+      flexShrink: 1,
+      paddingHorizontal: 8 * scale,
+      paddingVertical: 5 * scale,
+      backgroundColor: theme.buttonPrimary + "10",
+      borderRadius: 9 * scale,
+    },
+
+    muscleText: {
       color: theme.buttonPrimary,
-      maxWidth: 120 * scale,
+      fontSize: 12 * scale,
+      fontWeight: "500",
     },
   });

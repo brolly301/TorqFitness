@@ -44,23 +44,34 @@ export default function WorkoutScreen() {
           </Text>
         </View>
 
-        <Pressable
-          style={({ pressed }) => [
-            styles.button,
-            pressed && styles.buttonPressed,
-          ]}
-          onPress={() => router.push("/(tabs)/workout/createWorkout")}
-        >
-          <View style={styles.buttonContent}>
-            <Text style={styles.buttonText}>Start New Workout</Text>
-            <FontAwesome
-              name="play-circle"
-              size={16 * scale}
-              color={theme.buttonPrimaryText}
-              style={styles.buttonIcon}
-            />
-          </View>
-        </Pressable>
+       <Pressable
+  style={({ pressed }) => [
+    styles.startCard,
+    pressed && styles.buttonPressed,
+  ]}
+  onPress={() => router.push("/(tabs)/workout/createWorkout")}
+>
+  <View style={styles.startIconContainer}>
+    <FontAwesome
+      name="play"
+      size={15 * scale}
+      color={theme.buttonPrimary}
+    />
+  </View>
+
+  <View style={styles.startTextContainer}>
+    <Text style={styles.startTitle}>Start New Workout</Text>
+    <Text style={styles.startDescription}>
+      Begin an empty workout session
+    </Text>
+  </View>
+
+  <FontAwesome
+    name="chevron-right"
+    size={13 * scale}
+    color={theme.textSecondary}
+  />
+</Pressable>
 
         <View style={styles.sectionContainer}>
           <View style={styles.sectionHeader}>
@@ -129,14 +140,14 @@ export default function WorkoutScreen() {
 const makeStyles = (theme: Theme, scale: number) =>
   StyleSheet.create({
     container: {
-      backgroundColor: theme.background,
       flex: 1,
       marginTop: 20,
+      backgroundColor: theme.background,
     },
 
     contentContainer: {
-      padding: 16 * scale,
       flexGrow: 1,
+      padding: 16 * scale,
     },
 
     titleContainer: {
@@ -144,55 +155,63 @@ const makeStyles = (theme: Theme, scale: number) =>
     },
 
     title: {
-      fontSize: 34 * scale,
-      fontWeight: "700",
       marginBottom: 4 * scale,
       color: theme.text,
+      fontSize: 34 * scale,
+      fontWeight: "700",
     },
 
     description: {
+      color: theme.textSecondary,
       fontSize: 16 * scale,
       fontWeight: "400",
-      color: theme.textSecondary,
       lineHeight: 22 * scale,
     },
 
-    button: {
-      backgroundColor: theme.buttonPrimary,
-      paddingVertical: 15 * scale,
-      borderRadius: 16 * scale,
-      marginBottom: 24 * scale,
+    startCard: {
+      flexDirection: "row",
       alignItems: "center",
+      marginBottom: 28 * scale,
+      padding: 14 * scale,
+      backgroundColor: theme.buttonPrimary + "12",
+      borderWidth: 1,
+      borderColor: theme.buttonPrimary + "35",
+      borderRadius: 16 * scale,
     },
 
     buttonPressed: {
-      opacity: 0.92,
+      opacity: 0.75,
     },
 
-    buttonContent: {
-      flexDirection: "row",
+    startIconContainer: {
+      width: 42 * scale,
+      height: 42 * scale,
+      marginRight: 12 * scale,
       alignItems: "center",
-      gap: 8 * scale,
+      justifyContent: "center",
+      backgroundColor: theme.buttonPrimary + "18",
+      borderRadius: 13 * scale,
     },
 
-    buttonIcon: {
-      opacity: 0.95,
+    startTextContainer: {
+      flex: 1,
     },
 
-    buttonText: {
-      color: theme.buttonPrimaryText,
-      fontSize: 17 * scale,
+    startTitle: {
+      marginBottom: 3 * scale,
+      color: theme.text,
+      fontSize: 16 * scale,
       fontWeight: "600",
     },
 
+    startDescription: {
+      color: theme.textSecondary,
+      fontSize: 13 * scale,
+      lineHeight: 18 * scale,
+    },
+
     sectionContainer: {
-      marginBottom: 20 * scale,
-      backgroundColor: theme.card,
-      padding: 14 * scale,
-      borderRadius: 16 * scale,
-      borderWidth: 1,
-      borderColor: theme.border,
-      elevation: 2,
+      marginBottom: 26 * scale,
     },
 
     sectionHeader: {
@@ -200,6 +219,7 @@ const makeStyles = (theme: Theme, scale: number) =>
       alignItems: "center",
       justifyContent: "space-between",
       marginBottom: 12 * scale,
+      paddingHorizontal: 2 * scale,
     },
 
     titleIcon: {
@@ -209,32 +229,36 @@ const makeStyles = (theme: Theme, scale: number) =>
     },
 
     subTitle: {
+      color: theme.text,
       fontSize: 19 * scale,
       fontWeight: "600",
-      color: theme.text,
     },
 
     sectionLink: {
+      color: theme.buttonPrimary,
       fontSize: 14 * scale,
       fontWeight: "600",
-      color: theme.buttonPrimary,
     },
 
     placeholderContainer: {
-      paddingVertical: 8 * scale,
+      padding: 18 * scale,
+      backgroundColor: theme.card,
+      borderWidth: 1,
+      borderColor: theme.border,
+      borderRadius: 16 * scale,
     },
 
     placeholderTitle: {
+      marginBottom: 4 * scale,
+      color: theme.text,
       fontSize: 15 * scale,
       fontWeight: "600",
-      color: theme.text,
-      marginBottom: 4 * scale,
     },
 
     placeholderText: {
+      color: theme.textSecondary,
       fontSize: 14 * scale,
       fontWeight: "400",
-      color: theme.textSecondary,
       lineHeight: 20 * scale,
     },
   });
