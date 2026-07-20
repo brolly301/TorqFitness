@@ -1,6 +1,11 @@
-import { StyleSheet, TextInput, View } from "react-native";
+import {
+  Pressable,
+  StyleSheet,
+  TextInput,
+  View,
+} from "react-native";
 import React, { useMemo, useState } from "react";
-import FontAwesome6 from "@expo/vector-icons/FontAwesome6";
+import Feather from "@expo/vector-icons/Feather";
 import { useAppTheme } from "@/hooks/useAppTheme";
 import { Theme } from "@/types/Theme";
 
@@ -10,31 +15,64 @@ type Props = {
 
 export default function AppSearchBar({ setSearch }: Props) {
   const { theme, scale } = useAppTheme();
-  const [active, setActive] = useState(false);
   const styles = useMemo(() => makeStyles(theme, scale), [theme, scale]);
+
+  const [active, setActive] = useState(false);
+  const [value, setValue] = useState("");
+
+  const handleChange = (text: string) => {
+    setValue(text);
+    setSearch(text);
+  };
+
+  const handleClear = () => {
+    setValue("");
+    setSearch("");
+  };
 
   return (
     <View
       style={[
         styles.container,
-        { borderColor: !active ? theme.inputBorder : theme.buttonPrimary },
+        active && styles.containerActive,
       ]}
     >
-      <FontAwesome6
-        name="magnifying-glass"
-        size={16 * scale}
-        color={theme.buttonPrimary}
+      <Feather
+        name="search"
+        size={18 * scale}
+        color={active ? theme.buttonPrimary : theme.textMuted}
       />
 
       <TextInput
-        style={[styles.input]}
+        style={styles.input}
+        value={value}
+        onChangeText={handleChange}
         onFocus={() => setActive(true)}
-        returnKeyType="search"
         onBlur={() => setActive(false)}
-        placeholder="Search exercises..."
-        placeholderTextColor={theme.textSecondary}
-        onChangeText={setSearch}
+        returnKeyType="search"
+        placeholder="Search by name, muscle, or equipment"
+        placeholderTextColor={theme.textMuted}
+        accessibilityLabel="Search exercises"
       />
+
+      {value.length > 0 && (
+        <Pressable
+          style={({ pressed }) => [
+            styles.clearButton,
+            pressed && styles.clearButtonPressed,
+          ]}
+          onPress={handleClear}
+          hitSlop={8}
+          accessibilityRole="button"
+          accessibilityLabel="Clear search"
+        >
+          <Feather
+            name="x"
+            size={16 * scale}
+            color={theme.textSecondary}
+          />
+        </Pressable>
+      )}
     </View>
   );
 }
@@ -42,23 +80,40 @@ export default function AppSearchBar({ setSearch }: Props) {
 export const makeStyles = (theme: Theme, scale: number) =>
   StyleSheet.create({
     container: {
+      minHeight: 48 * scale,
       flexDirection: "row",
       alignItems: "center",
-
-      height: 46 * scale,
-      borderRadius: 14 * scale,
+      paddingLeft: 14 * scale,
+      paddingRight: 10 * scale,
+      backgroundColor: theme.card,
       borderWidth: 1,
-      borderColor: theme.inputBorder,
-      backgroundColor: theme.buttonSecondary,
+      borderColor: theme.border,
+      borderRadius: 14 * scale,
+    },
 
-      paddingHorizontal: 12 * scale,
+    containerActive: {
+      backgroundColor: theme.buttonPrimary + "08",
+      borderColor: theme.buttonPrimary + "60",
     },
 
     input: {
       flex: 1,
       marginLeft: 10 * scale,
-      fontSize: 15 * scale,
+      paddingVertical: 0,
       color: theme.text,
-      padding: 0,
+      fontSize: 14 * scale,
+    },
+
+    clearButton: {
+      width: 32 * scale,
+      height: 32 * scale,
+      alignItems: "center",
+      justifyContent: "center",
+      backgroundColor: theme.text + "08",
+      borderRadius: 10 * scale,
+    },
+
+    clearButtonPressed: {
+      opacity: 0.6,
     },
   });
