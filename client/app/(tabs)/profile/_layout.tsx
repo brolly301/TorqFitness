@@ -1,9 +1,18 @@
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import { router, Stack } from "expo-router";
+import { useAppTheme } from "@/hooks/useAppTheme";
 
 export default function _layout() {
+  const { theme } = useAppTheme();
   return (
-    <Stack screenOptions={{ headerShown: false }}>
+    <Stack
+      screenOptions={{
+        headerShown: false,
+        contentStyle: {
+          backgroundColor: theme.background,
+        },
+      }}
+    >
       <Stack.Screen
         name="index"
         options={{
