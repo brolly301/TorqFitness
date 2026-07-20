@@ -98,14 +98,14 @@ export default function EditProfileForm() {
             control={control}
             key={field.name}
             render={({ field: { onChange, value } }) => (
-              <View style={{ marginBottom: 10 }}>
+              <View style={styles.fieldContainer}>
                 <Text style={styles.label}>{field.placeholder}</Text>
                 <TextInput
                   placeholder={field.placeholder}
                   onChangeText={onChange}
                   textAlignVertical="center"
                   value={value}
-                  placeholderTextColor={theme.text}
+                  placeholderTextColor={theme.textSecondary}
                   autoComplete="off"
                   textContentType="oneTimeCode"
                   importantForAutofill="no"
@@ -116,29 +116,26 @@ export default function EditProfileForm() {
           />
         );
       })}
-      <Pressable
-        onPress={handleSubmit(onSubmit)}
-        disabled={isDisabled}
-        style={[
-          styles.button,
-          {
-            backgroundColor: isDisabled
-              ? theme.buttonDisabled
-              : theme.buttonPrimary,
-          },
-        ]}
-      >
-        <Text
-          style={[
-            styles.buttonText,
-            {
-              color: theme.buttonPrimaryText,
-            },
-          ]}
-        >
-          {isSubmitting ? "Saving..." : "Update Details"}
-        </Text>
-      </Pressable>
+    <Pressable
+  onPress={handleSubmit(onSubmit)}
+  disabled={isDisabled}
+  style={({ pressed }) => [
+    styles.button,
+    isDisabled ? styles.buttonDisabled : styles.buttonEnabled,
+    pressed && !isDisabled && styles.buttonPressed,
+  ]}
+>
+  <Text
+    style={[
+      styles.buttonText,
+      isDisabled
+        ? styles.buttonDisabledText
+        : styles.buttonEnabledText,
+    ]}
+  >
+    {isSubmitting ? "Saving..." : "Update Details"}
+  </Text>
+</Pressable>
     </View>
   );
 }
@@ -147,48 +144,69 @@ const makeStyles = (theme: Theme, scale: number) =>
   StyleSheet.create({
     container: {
       padding: 16 * scale,
-      paddingVertical: 20,
-
-      backgroundColor: theme.surface,
-      borderRadius: 14 * scale,
+      backgroundColor: theme.card,
       borderWidth: 1,
       borderColor: theme.border,
-      shadowColor: theme.shadow,
-      shadowOffset: { width: 0, height: 4 },
-      shadowOpacity: 0.06,
-      shadowRadius: 10,
-      elevation: 4,
+      borderRadius: 14 * scale,
+    },
+
+    fieldContainer: {
+      marginBottom: 14 * scale,
     },
 
     label: {
-      fontSize: 13 * scale,
-      color: theme.textSecondary,
       marginBottom: 6 * scale,
+      color: theme.textSecondary,
+      fontSize: 13 * scale,
+      fontWeight: "500",
     },
 
     input: {
-      borderRadius: 12 * scale,
-      borderWidth: 1,
-      borderColor: theme.inputBorder,
+      minHeight: 46 * scale,
       paddingHorizontal: 12 * scale,
       paddingVertical: 12 * scale,
       backgroundColor: theme.buttonSecondary,
-      marginBottom: 5 * scale,
-      fontSize: 15 * scale,
+      borderWidth: 1,
+      borderColor: theme.inputBorder,
+      borderRadius: 12 * scale,
       color: theme.text,
+      fontSize: 15 * scale,
     },
 
     button: {
-      flexDirection: "row",
-      justifyContent: "center",
       alignItems: "center",
+      justifyContent: "center",
+      minHeight: 46 * scale,
+      marginTop: 4 * scale,
+      paddingHorizontal: 16 * scale,
+      borderWidth: 1,
       borderRadius: 12 * scale,
-      paddingVertical: 12 * scale,
-      marginTop: 10 * scale,
+    },
+
+    buttonEnabled: {
+      backgroundColor: theme.buttonPrimary + "14",
+      borderColor: theme.buttonPrimary + "40",
+    },
+
+    buttonDisabled: {
+      backgroundColor: theme.buttonDisabled,
+      borderColor: theme.border,
+    },
+
+    buttonPressed: {
+      opacity: 0.7,
     },
 
     buttonText: {
       fontSize: 15 * scale,
       fontWeight: "700",
+    },
+
+    buttonEnabledText: {
+      color: theme.buttonPrimary,
+    },
+
+    buttonDisabledText: {
+      color: theme.buttonDisabledText,
     },
   });

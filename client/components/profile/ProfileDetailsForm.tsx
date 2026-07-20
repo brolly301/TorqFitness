@@ -188,15 +188,24 @@ export default function ProfileDetailsForm() {
         placeholder="Select your experience"
       />
 
-      <Pressable
-        style={[styles.saveButton, isSaving && styles.saveButtonDisabled]}
-        onPress={handleSave}
-        disabled={isSaving}
-      >
-        <Text style={styles.saveButtonText}>
-          {isSaving ? "Saving..." : "Save Details"}
-        </Text>
-      </Pressable>
+    <Pressable
+  onPress={handleSave}
+  disabled={isSaving}
+  style={({ pressed }) => [
+    styles.saveButton,
+    isSaving && styles.saveButtonDisabled,
+    pressed && !isSaving && styles.saveButtonPressed,
+  ]}
+>
+  <Text
+    style={[
+      styles.saveButtonText,
+      isSaving && styles.saveButtonDisabledText,
+    ]}
+  >
+    {isSaving ? "Saving..." : "Save Details"}
+  </Text>
+</Pressable>
     </View>
   );
 }
@@ -204,18 +213,18 @@ export default function ProfileDetailsForm() {
 const makeStyles = (theme: Theme, scale: number) =>
   StyleSheet.create({
     container: {
+      padding: 16 * scale,
       backgroundColor: theme.card,
-      borderRadius: 14 * scale,
       borderWidth: 1,
       borderColor: theme.border,
-      padding: 16 * scale,
+      borderRadius: 14 * scale,
     },
 
     label: {
-      fontSize: 14 * scale,
-      fontWeight: "600",
-      color: theme.text,
       marginBottom: 6 * scale,
+      color: theme.textSecondary,
+      fontSize: 13 * scale,
+      fontWeight: "500",
     },
 
     heightRow: {
@@ -229,53 +238,66 @@ const makeStyles = (theme: Theme, scale: number) =>
       flexDirection: "row",
       alignItems: "center",
       justifyContent: "center",
+      marginBottom: 16 * scale,
+      paddingHorizontal: 12 * scale,
+      backgroundColor: theme.buttonSecondary,
       borderWidth: 1,
       borderColor: theme.inputBorder,
       borderRadius: 12 * scale,
-      backgroundColor: theme.buttonSecondary,
-      paddingHorizontal: 12 * scale,
-      marginBottom: 16 * scale,
     },
 
     input: {
       flex: 1,
-      fontSize: 16 * scale,
-      color: theme.text,
-      textAlign: "center",
       padding: 0,
+      color: theme.text,
+      fontSize: 16 * scale,
+      textAlign: "center",
     },
 
     inputUnit: {
-      fontSize: 14 * scale,
-      color: theme.textSecondary,
       marginLeft: 4 * scale,
+      color: theme.textSecondary,
+      fontSize: 14 * scale,
     },
 
     weightInputContainer: {
       minHeight: 46 * scale,
       flexDirection: "row",
       marginBottom: 16 * scale,
+      overflow: "hidden",
+      backgroundColor: theme.buttonSecondary,
       borderWidth: 1,
       borderColor: theme.inputBorder,
       borderRadius: 12 * scale,
-      overflow: "hidden",
     },
 
     saveButton: {
       alignItems: "center",
       justifyContent: "center",
+      minHeight: 46 * scale,
+      paddingHorizontal: 16 * scale,
+      backgroundColor: theme.buttonPrimary + "14",
+      borderWidth: 1,
+      borderColor: theme.buttonPrimary + "40",
       borderRadius: 12 * scale,
-      paddingVertical: 13 * scale,
-      backgroundColor: theme.buttonPrimary,
     },
 
     saveButtonDisabled: {
-      opacity: 0.6,
+      backgroundColor: theme.buttonDisabled,
+      borderColor: theme.border,
+    },
+
+    saveButtonPressed: {
+      opacity: 0.7,
     },
 
     saveButtonText: {
+      color: theme.buttonPrimary,
       fontSize: 15 * scale,
       fontWeight: "700",
-      color: theme.buttonPrimaryText,
+    },
+
+    saveButtonDisabledText: {
+      color: theme.buttonDisabledText,
     },
   });

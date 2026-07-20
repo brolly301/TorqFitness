@@ -26,15 +26,23 @@ export default function AppearanceModal({
         />
         <View style={styles.modalView}>
           <View style={styles.container}>
-            <View style={styles.header}>
-              <Pressable
-                onPress={() => setModalVisible(false)}
-                style={styles.iconButton}
-              >
-                <AntDesign name="close" size={20 * scale} color={theme.text} />
-              </Pressable>
-              <Text style={styles.name}>Appearance</Text>
-            </View>
+          <View style={styles.header}>
+  <Text style={styles.name}>Appearance</Text>
+
+  <Pressable
+    onPress={() => setModalVisible(false)}
+    style={styles.iconButton}
+    hitSlop={8}
+    accessibilityRole="button"
+    accessibilityLabel="Close appearance settings"
+  >
+    <AntDesign
+      name="close"
+      size={18 * scale}
+      color={theme.text}
+    />
+  </Pressable>
+</View>
             <Text style={styles.label}>Theme</Text>
             <ThemeToggle />
             <Text style={styles.label}>Font Size</Text>
@@ -50,52 +58,55 @@ export default function AppearanceModal({
 export const makeStyles = (theme: Theme, scale: number) =>
   StyleSheet.create({
     centeredView: {
-      justifyContent: "center",
-      alignItems: "center",
       flex: 1,
+      alignItems: "center",
+      justifyContent: "center",
+      paddingHorizontal: 16 * scale,
       backgroundColor: theme.shadow,
     },
+
     modalView: {
-      width: "89%",
-      maxHeight: "60%",
-      borderRadius: 12,
+      width: "100%",
+      maxWidth: 420,
+      padding: 16 * scale,
       backgroundColor: theme.background,
-      paddingTop: 15,
-      paddingHorizontal: 15,
-      paddingBottom: 15,
-    },
-    container: {},
-    name: {
-      position: "absolute",
-      left: 60 * scale,
-      right: 60 * scale,
-      fontSize: 22 * scale,
-      fontWeight: "700",
-      textAlign: "center",
-      color: theme.text,
+      borderWidth: 1,
+      borderColor: theme.border,
+      borderRadius: 20 * scale,
     },
 
+    container: {},
+
     header: {
-      height: 44 * scale,
-      justifyContent: "center",
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "space-between",
+      gap: 12 * scale,
       marginBottom: 20 * scale,
-      position: "relative",
     },
-    label: {
-      fontSize: 18 * scale,
-      color: theme.textSecondary,
-      marginBottom: 10 * scale,
+
+    name: {
+      flex: 1,
+      color: theme.text,
+      fontSize: 22 * scale,
+      fontWeight: "700",
     },
+
     iconButton: {
-      position: "absolute",
-      left: 0,
       width: 36 * scale,
       height: 36 * scale,
       alignItems: "center",
       justifyContent: "center",
-      borderRadius: 10 * scale,
       backgroundColor: theme.card,
       borderWidth: 1,
       borderColor: theme.border,
+      borderRadius: 10 * scale,
+    },
+
+    label: {
+      marginBottom: 10 * scale,
+      color: theme.textSecondary,
+      fontSize: 14 * scale,
+      fontWeight: "600",
     },
   });

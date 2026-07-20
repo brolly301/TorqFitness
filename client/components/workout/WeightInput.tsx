@@ -68,7 +68,7 @@ export default function WeightInput({ storedWeight, unit, onChange }: Props) {
       style={[
         styles.container,
         {
-          backgroundColor: theme.card,
+          backgroundColor: theme.buttonSecondary,
           borderRadius: 10 * scale,
           paddingVertical: 8 * scale,
           paddingHorizontal: 10 * scale,
@@ -79,6 +79,7 @@ export default function WeightInput({ storedWeight, unit, onChange }: Props) {
       <TextInput
         ref={inputRef}
         value={text}
+        
         placeholder="0"
         keyboardType="decimal-pad"
         returnKeyType="done"

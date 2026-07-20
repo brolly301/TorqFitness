@@ -19,24 +19,31 @@ export default function EditDetailsScreen() {
         showsVerticalScrollIndicator={false}
         keyboardShouldPersistTaps="handled"
       >
-        <View style={styles.header}>
-          <Pressable
-            style={styles.backButton}
-            onPress={() => router.back()}
-            hitSlop={10}
-            accessibilityRole="button"
-            accessibilityLabel="Go back"
-          >
-            <Feather name="arrow-left" size={22 * scale} color={theme.text} />
-          </Pressable>
-        </View>
+     <View style={styles.header}>
+  <Pressable
+    style={({ pressed }) => [
+      styles.backButton,
+      pressed && styles.backButtonPressed,
+    ]}
+    onPress={() => router.back()}
+    hitSlop={10}
+    accessibilityRole="button"
+    accessibilityLabel="Return to profile"
+  >
+    <Feather
+      name="arrow-left"
+      size={22 * scale}
+      color={theme.text}
+    />
+  </Pressable>
 
-        <View style={styles.titleContainer}>
-          <Text style={styles.title}>Your Details</Text>
-          <Text style={styles.description}>
-            Update your measurements and training experience
-          </Text>
-        </View>
+  <View style={styles.titleContainer}>
+    <Text style={styles.title}>Your Details</Text>
+    <Text style={styles.description}>
+      Measurements and training experience
+    </Text>
+  </View>
+</View>
 
         <ProfileDetailsForm />
       </ScrollView>
@@ -48,45 +55,52 @@ const makeStyles = (theme: Theme, scale: number) =>
   StyleSheet.create({
     container: {
       flex: 1,
-      paddingHorizontal: 16 * scale,
-      paddingTop: 12 * scale,
       backgroundColor: theme.background,
     },
 
     contentContainer: {
+      flexGrow: 1,
+      paddingTop: 12 * scale,
+      paddingHorizontal: 16 * scale,
       paddingBottom: 32 * scale,
     },
 
     header: {
       flexDirection: "row",
-      marginBottom: 12 * scale,
+      alignItems: "center",
+      marginBottom: 20 * scale,
     },
 
     backButton: {
       width: 40 * scale,
       height: 40 * scale,
-      borderRadius: 12 * scale,
+      marginRight: 12 * scale,
       alignItems: "center",
       justifyContent: "center",
       backgroundColor: theme.card,
       borderWidth: 1,
       borderColor: theme.border,
+      borderRadius: 12 * scale,
+    },
+
+    backButtonPressed: {
+      opacity: 0.7,
     },
 
     titleContainer: {
-      marginBottom: 18 * scale,
+      flex: 1,
     },
 
     title: {
-      fontSize: 32 * scale,
-      fontWeight: "700",
-      marginBottom: 4 * scale,
+      marginBottom: 2 * scale,
       color: theme.text,
+      fontSize: 25 * scale,
+      fontWeight: "700",
     },
 
     description: {
-      fontSize: 16 * scale,
       color: theme.textSecondary,
-      lineHeight: 22 * scale,
+      fontSize: 13 * scale,
+      lineHeight: 18 * scale,
     },
   });

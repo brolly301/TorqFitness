@@ -1,4 +1,13 @@
-import { Pressable, StyleSheet, Text, TextInput, View } from "react-native";
+import {
+  KeyboardAvoidingView,
+  Platform,
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TextInput,
+  View,
+} from "react-native";
 import React, { useMemo, useState } from "react";
 import { router, useLocalSearchParams } from "expo-router";
 import AppWrapper from "@/components/ui/AppWrapper";
@@ -91,7 +100,7 @@ export default function SupportScreen() {
       toggleToast({
         type: "success",
         text1: "Submitted",
-        text2: "Thanks—we’ve received your message.",
+        text2: "Thanks — we’ve received your message.",
       });
 
       router.back();
@@ -110,7 +119,7 @@ export default function SupportScreen() {
   };
 
   const renderFields = (field: SupportField) => (
-    <View key={field} style={{ marginBottom: 10 }}>
+<View key={field} style={styles.fieldContainer}>
       <Text style={styles.label}>{fieldLabels[field]}</Text>
 
       <TextInput
@@ -128,121 +137,199 @@ export default function SupportScreen() {
   );
   return (
     <AppWrapper>
-      <View style={styles.container}>
-        <View style={styles.header}>
-          <Pressable
-            style={styles.backButton}
-            onPress={() => router.back()}
-            hitSlop={10}
-          >
-            <Feather name="arrow-left" size={22 * scale} color={theme.text} />
-          </Pressable>
-        </View>
+     <KeyboardAvoidingView
+  style={styles.keyboardContainer}
+  behavior={Platform.OS === "ios" ? "padding" : undefined}
+>
+  <ScrollView
+    style={styles.container}
+    contentContainerStyle={styles.contentContainer}
+    showsVerticalScrollIndicator={false}
+    keyboardShouldPersistTaps="handled"
+  >
+    <View style={styles.header}>
+      <Pressable
+        style={({ pressed }) => [
+          styles.backButton,
+          pressed && styles.backButtonPressed,
+        ]}
+        onPress={() => router.back()}
+        hitSlop={10}
+        accessibilityRole="button"
+        accessibilityLabel="Return to settings"
+      >
+        <Feather
+          name="arrow-left"
+          size={22 * scale}
+          color={theme.text}
+        />
+      </Pressable>
 
-        <View style={styles.titleContainer}>
-          <Text style={styles.title}>{content.title}</Text>
-          <Text style={styles.description}>{content.description}</Text>
-        </View>
-        <View style={{ flex: 1 }}>
-          {content.fields.map(renderFields)}
-          <Pressable
-            style={[
-              styles.button,
-              {
-                backgroundColor: isDisabled
-                  ? theme.buttonDisabled
-                  : theme.buttonPrimary,
-              },
-            ]}
-            onPress={handleSubmit}
-            disabled={isDisabled}
-          >
-            <Text style={styles.buttonText}>
-              {isSubmitting ? "Submitting..." : "Submit"}
-            </Text>
-          </Pressable>
-        </View>
+      <View style={styles.titleContainer}>
+        <Text style={styles.title}>{content.title}</Text>
+        <Text style={styles.description}>
+          {content.description}
+        </Text>
       </View>
+    </View>
+
+    <View style={styles.formContainer}>
+      {content.fields.map(renderFields)}
+
+    <Pressable
+  onPress={handleSubmit}
+  disabled={isDisabled}
+  style={({ pressed }) => [
+    styles.button,
+    isDisabled ? styles.buttonDisabled : styles.buttonEnabled,
+    pressed && !isDisabled && styles.buttonPressed,
+  ]}
+>
+  <Text
+    style={[
+      styles.buttonText,
+      isDisabled
+        ? styles.buttonDisabledText
+        : styles.buttonEnabledText,
+    ]}
+  >
+    {isSubmitting ? "Submitting..." : "Submit"}
+  </Text>
+</Pressable>
+    </View>
+  </ScrollView>
+</KeyboardAvoidingView>
     </AppWrapper>
   );
 }
 
 const makeStyles = (theme: Theme, scale: number) =>
   StyleSheet.create({
-    container: {
+    keyboardContainer: {
       flex: 1,
-      paddingHorizontal: 16 * scale,
-      paddingTop: 12 * scale,
       backgroundColor: theme.background,
     },
+
+    container: {
+      flex: 1,
+      backgroundColor: theme.background,
+    },
+
+    contentContainer: {
+      flexGrow: 1,
+      paddingTop: 12 * scale,
+      paddingHorizontal: 16 * scale,
+      paddingBottom: 28 * scale,
+    },
+
     header: {
       flexDirection: "row",
-      justifyContent: "flex-start",
       alignItems: "center",
-      marginBottom: 12 * scale,
+      marginBottom: 20 * scale,
     },
 
     backButton: {
       width: 40 * scale,
       height: 40 * scale,
-      borderRadius: 12 * scale,
+      marginRight: 12 * scale,
       alignItems: "center",
       justifyContent: "center",
       backgroundColor: theme.card,
       borderWidth: 1,
       borderColor: theme.border,
+      borderRadius: 12 * scale,
     },
+
+    backButtonPressed: {
+      opacity: 0.7,
+    },
+
     titleContainer: {
-      marginBottom: 18 * scale,
+      flex: 1,
     },
 
     title: {
-      fontSize: 32 * scale,
-      fontWeight: "700",
-      marginBottom: 4 * scale,
+      marginBottom: 2 * scale,
       color: theme.text,
+      fontSize: 25 * scale,
+      fontWeight: "700",
     },
 
     description: {
-      fontSize: 16 * scale,
-      fontWeight: "400",
       color: theme.textSecondary,
-      lineHeight: 22 * scale,
+      fontSize: 13 * scale,
+      lineHeight: 18 * scale,
+    },
+
+    formContainer: {
+      padding: 16 * scale,
+      backgroundColor: theme.card,
+      borderWidth: 1,
+      borderColor: theme.border,
+      borderRadius: 14 * scale,
+    },
+
+    fieldContainer: {
+      marginBottom: 14 * scale,
     },
 
     label: {
-      fontSize: 13 * scale,
-      color: theme.textSecondary,
       marginBottom: 6 * scale,
+      color: theme.textSecondary,
+      fontSize: 13 * scale,
+      fontWeight: "500",
     },
 
     input: {
-      borderRadius: 12 * scale,
-      borderWidth: 1,
-      borderColor: theme.inputBorder,
+      minHeight: 46 * scale,
       paddingHorizontal: 12 * scale,
       paddingVertical: 12 * scale,
       backgroundColor: theme.buttonSecondary,
-      marginBottom: 5 * scale,
-      fontSize: 15 * scale,
-      color: theme.text,
-    },
-    button: {
-      flexDirection: "row",
-      justifyContent: "center",
-      alignItems: "center",
+      borderWidth: 1,
+      borderColor: theme.inputBorder,
       borderRadius: 12 * scale,
-      paddingVertical: 12 * scale,
-      marginTop: 10 * scale,
-      backgroundColor: theme.buttonPrimary,
+      color: theme.text,
+      fontSize: 15 * scale,
+    },
+
+    messageInput: {
+      minHeight: 120 * scale,
+    },
+
+    button: {
+      alignItems: "center",
+      justifyContent: "center",
+      minHeight: 46 * scale,
+      marginTop: 4 * scale,
+      paddingHorizontal: 16 * scale,
+      borderWidth: 1,
+      borderRadius: 12 * scale,
+    },
+
+    buttonEnabled: {
+      backgroundColor: theme.buttonPrimary + "14",
+      borderColor: theme.buttonPrimary + "40",
+    },
+
+    buttonDisabled: {
+      backgroundColor: theme.buttonDisabled,
+      borderColor: theme.border,
+    },
+
+    buttonPressed: {
+      opacity: 0.7,
     },
 
     buttonText: {
       fontSize: 15 * scale,
       fontWeight: "700",
-      color: theme.buttonPrimaryText,
     },
-    messageInput: {
-      minHeight: 120 * scale,
+
+    buttonEnabledText: {
+      color: theme.buttonPrimary,
+    },
+
+    buttonDisabledText: {
+      color: theme.buttonDisabledText,
     },
   });

@@ -9,7 +9,6 @@ const themeData = ["Light", "Dark", "Nocturne", "Dune", "Neon"];
 
 export default function ThemeToggle() {
   const { theme, scale, setTheme } = useAppTheme();
-  const styles = useMemo(() => makeStyles(theme, scale), [theme, scale]);
 
   const { settings } = useSettingsContext();
 
@@ -31,13 +30,3 @@ export default function ThemeToggle() {
     </View>
   );
 }
-
-const makeStyles = (theme: Theme, scale: number) =>
-  StyleSheet.create({
-    title: {
-      fontSize: 18 * scale,
-      fontWeight: "600",
-      color: theme.text,
-      marginBottom: 16,
-    },
-  });

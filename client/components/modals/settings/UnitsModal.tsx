@@ -28,45 +28,74 @@ export default function UnitsModal({ modalVisible, setModalVisible }: Props) {
         />
         <View style={styles.modalView}>
           <View style={styles.container}>
-            <View style={styles.header}>
-              <Pressable
-                onPress={() => setModalVisible(false)}
-                style={styles.iconButton}
-              >
-                <AntDesign name="close" size={20 * scale} color={theme.text} />
-              </Pressable>
-              <Text style={styles.name}>Units</Text>
-            </View>
-            <View style={[styles.unitContainer]}>
-              <Pressable
-                onPress={() => onChange("kg")}
-                style={[
-                  styles.unitTile,
-                  {
-                    backgroundColor:
-                      settings?.weightLabel === "kg"
-                        ? theme.buttonPrimary
-                        : theme.inputBorder,
-                  },
-                ]}
-              >
-                <Text style={styles.unitText}>KG</Text>
-              </Pressable>
-              <Pressable
-                onPress={() => onChange("lb")}
-                style={[
-                  styles.unitTile,
-                  {
-                    backgroundColor:
-                      settings?.weightLabel === "lb"
-                        ? theme.buttonPrimary
-                        : theme.inputBorder,
-                  },
-                ]}
-              >
-                <Text style={styles.unitText}>LB</Text>
-              </Pressable>
-            </View>
+          <View style={styles.header}>
+  <View style={styles.titleContainer}>
+    <Text style={styles.name}>Units</Text>
+    <Text style={styles.description}>
+      Choose how weight is displayed throughout the app
+    </Text>
+  </View>
+
+  <Pressable
+    onPress={() => setModalVisible(false)}
+    style={styles.iconButton}
+    hitSlop={8}
+    accessibilityRole="button"
+    accessibilityLabel="Close unit settings"
+  >
+    <AntDesign
+      name="close"
+      size={18 * scale}
+      color={theme.text}
+    />
+  </Pressable>
+</View>
+
+<View style={styles.unitContainer}>
+  <Pressable
+    onPress={() => onChange("kg")}
+    style={({ pressed }) => [
+      styles.unitTile,
+      settings?.weightLabel === "kg"
+        ? styles.selectedUnit
+        : styles.unselectedUnit,
+      pressed && styles.unitPressed,
+    ]}
+  >
+    <Text
+      style={[
+        styles.unitValue,
+        settings?.weightLabel === "kg" && styles.selectedUnitText,
+      ]}
+    >
+      KG
+    </Text>
+
+    <Text style={styles.unitLabel}>Kilograms</Text>
+  </Pressable>
+
+  <Pressable
+    onPress={() => onChange("lb")}
+    style={({ pressed }) => [
+      styles.unitTile,
+      settings?.weightLabel === "lb"
+        ? styles.selectedUnit
+        : styles.unselectedUnit,
+      pressed && styles.unitPressed,
+    ]}
+  >
+    <Text
+      style={[
+        styles.unitValue,
+        settings?.weightLabel === "lb" && styles.selectedUnitText,
+      ]}
+    >
+      LB
+    </Text>
+
+    <Text style={styles.unitLabel}>Pounds</Text>
+  </Pressable>
+</View>
           </View>
         </View>
       </View>
@@ -77,66 +106,101 @@ export default function UnitsModal({ modalVisible, setModalVisible }: Props) {
 export const makeStyles = (theme: Theme, scale: number) =>
   StyleSheet.create({
     centeredView: {
-      justifyContent: "center",
-      alignItems: "center",
       flex: 1,
+      alignItems: "center",
+      justifyContent: "center",
+      paddingHorizontal: 16 * scale,
       backgroundColor: theme.shadow,
     },
+
     modalView: {
-      width: "89%",
-      maxHeight: "60%",
-      borderRadius: 12,
+      width: "100%",
+      maxWidth: 420,
+      padding: 16 * scale,
       backgroundColor: theme.background,
-      paddingTop: 15,
-      paddingHorizontal: 15,
-      paddingBottom: 15,
+      borderWidth: 1,
+      borderColor: theme.border,
+      borderRadius: 20 * scale,
     },
-    container: {},
+
     header: {
-      height: 44 * scale,
-      justifyContent: "center",
+      flexDirection: "row",
+      alignItems: "flex-start",
+      justifyContent: "space-between",
+      gap: 12 * scale,
       marginBottom: 20 * scale,
-      position: "relative",
     },
+
+    titleContainer: {
+      flex: 1,
+    },
+
     name: {
-      position: "absolute",
-      left: 60 * scale,
-      right: 60 * scale,
+      marginBottom: 4 * scale,
+      color: theme.text,
       fontSize: 22 * scale,
       fontWeight: "700",
-      textAlign: "center",
-      color: theme.text,
     },
+
+    description: {
+      color: theme.textSecondary,
+      fontSize: 13 * scale,
+      lineHeight: 18 * scale,
+    },
+
     iconButton: {
-      position: "absolute",
-      left: 0,
       width: 36 * scale,
       height: 36 * scale,
       alignItems: "center",
       justifyContent: "center",
-      borderRadius: 10 * scale,
       backgroundColor: theme.card,
       borderWidth: 1,
       borderColor: theme.border,
+      borderRadius: 10 * scale,
     },
+
     unitContainer: {
       flexDirection: "row",
-      justifyContent: "space-between",
-      alignItems: "center",
-      paddingVertical: 15,
+      gap: 10 * scale,
     },
+
     unitTile: {
-      width: "48%",
-      padding: 20,
-      borderRadius: 10,
+      flex: 1,
+      minHeight: 88 * scale,
       alignItems: "center",
-      backgroundColor: theme.card,
-      textAlign: "center",
-      borderWidth: 1.2,
+      justifyContent: "center",
+      borderWidth: 1,
+      borderRadius: 13 * scale,
     },
-    unitText: {
-      fontSize: 18,
-      fontWeight: "600",
+
+    selectedUnit: {
+      backgroundColor: theme.buttonPrimary + "14",
+      borderColor: theme.buttonPrimary + "40",
+    },
+
+    unselectedUnit: {
+      backgroundColor: theme.card,
+      borderColor: theme.border,
+    },
+
+    unitPressed: {
+      opacity: 0.7,
+    },
+
+    unitValue: {
+      marginBottom: 5 * scale,
       color: theme.text,
+      fontSize: 18 * scale,
+      fontWeight: "700",
+    },
+
+    selectedUnitText: {
+      color: theme.buttonPrimary,
+    },
+
+    unitLabel: {
+      color: theme.textSecondary,
+      fontSize: 12 * scale,
+      fontWeight: "500",
     },
   });

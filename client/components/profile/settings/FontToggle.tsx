@@ -13,8 +13,7 @@ const fontOptions = [
 ];
 
 export default function FontToggle() {
-  const { theme, scale } = useAppTheme();
-  const styles = useMemo(() => makeStyles(theme, scale), [theme, scale]);
+  const { theme, scale } = useAppTheme();
   const { settings, updateSetting } = useSettingsContext();
 
   const [selectedFont, setSelectedFont] = useState<FontSizeType>(
@@ -31,18 +30,8 @@ export default function FontToggle() {
           setSelectedFont(font);
           updateSetting("fontSize", font);
         }}
-        placeholder="Theme"
+        placeholder="Font size"
       />
     </View>
   );
-}
-
-const makeStyles = (theme: Theme, scale: number) =>
-  StyleSheet.create({
-    title: {
-      fontSize: 18 * scale,
-      fontWeight: "600",
-      color: theme.text,
-      marginBottom: 16,
-    },
-  });
+}

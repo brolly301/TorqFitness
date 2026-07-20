@@ -71,47 +71,70 @@ export default function RateModal({ modalVisible, setModalVisible }: Props) {
         />
         <View style={styles.modalView}>
           <View style={styles.container}>
-            <View style={styles.header}>
-              <Pressable
-                onPress={() => handleClose()}
-                style={styles.iconButton}
-              >
-                <AntDesign name="close" size={20 * scale} color={theme.text} />
-              </Pressable>
-              <Text style={styles.name}>Rate App</Text>
-            </View>
-            <Text style={styles.subText}>How are you enjoying Torq?</Text>
-            <View style={styles.starContainer}>
-              {[1, 2, 3, 4, 5].map((stars) => {
-                return (
-                  <Pressable onPress={() => setRating(stars)} key={stars}>
-                    <FontAwesome
-                      color={theme.buttonPrimary}
-                      size={40}
-                      name={
-                        rating !== null && stars <= rating ? "star" : "star-o"
-                      }
-                    />
-                  </Pressable>
-                );
-              })}
-            </View>
-            <Pressable
-              onPress={handleSubmit}
-              disabled={isDisabled}
-              style={[
-                styles.button,
-                {
-                  backgroundColor: isDisabled
-                    ? theme.buttonDisabled
-                    : theme.buttonPrimary,
-                },
-              ]}
-            >
-              <Text style={styles.buttonText}>
-                {isSubmitting ? "Submitting..." : "Submit Rating"}
-              </Text>
-            </Pressable>
+           <View style={styles.header}>
+  <View style={styles.titleContainer}>
+    <Text style={styles.name}>Rate App</Text>
+    <Text style={styles.subText}>How are you enjoying Torq?</Text>
+  </View>
+
+  <Pressable
+    onPress={handleClose}
+    style={styles.iconButton}
+    hitSlop={8}
+    accessibilityRole="button"
+    accessibilityLabel="Close rating"
+  >
+    <AntDesign
+      name="close"
+      size={18 * scale}
+      color={theme.text}
+    />
+  </Pressable>
+</View>           <View style={styles.starContainer}>
+  {[1, 2, 3, 4, 5].map((stars) => {
+    const isSelected = rating !== null && stars <= rating;
+
+    return (
+      <Pressable
+        key={stars}
+        onPress={() => setRating(stars)}
+        hitSlop={6}
+        accessibilityRole="button"
+        accessibilityLabel={`${stars} star rating`}
+      >
+        <FontAwesome
+          color={
+            isSelected
+              ? theme.buttonPrimary
+              : theme.textSecondary
+          }
+          size={32 * scale}
+          name={isSelected ? "star" : "star-o"}
+        />
+      </Pressable>
+    );
+  })}
+</View>
+           <Pressable
+  onPress={handleSubmit}
+  disabled={isDisabled}
+  style={({ pressed }) => [
+    styles.button,
+    isDisabled ? styles.buttonDisabled : styles.buttonEnabled,
+    pressed && !isDisabled && styles.buttonPressed,
+  ]}
+>
+  <Text
+    style={[
+      styles.buttonText,
+      isDisabled
+        ? styles.buttonDisabledText
+        : styles.buttonEnabledText,
+    ]}
+  >
+    {isSubmitting ? "Submitting..." : "Submit Rating"}
+  </Text>
+</Pressable>
           </View>
         </View>
       </View>
@@ -122,78 +145,102 @@ export default function RateModal({ modalVisible, setModalVisible }: Props) {
 export const makeStyles = (theme: Theme, scale: number) =>
   StyleSheet.create({
     centeredView: {
-      justifyContent: "center",
-      alignItems: "center",
       flex: 1,
+      alignItems: "center",
+      justifyContent: "center",
+      paddingHorizontal: 16 * scale,
       backgroundColor: theme.shadow,
     },
+
     modalView: {
-      width: "89%",
-      maxHeight: "50%",
-      borderRadius: 12,
+      width: "100%",
+      maxWidth: 420,
+      padding: 16 * scale,
       backgroundColor: theme.background,
-      paddingTop: 15,
-      paddingHorizontal: 15,
-      paddingBottom: 26,
-    },
-    container: {},
-    name: {
-      position: "absolute",
-      left: 60 * scale,
-      right: 60 * scale,
-      fontSize: 22 * scale,
-      fontWeight: "700",
-      textAlign: "center",
-      color: theme.text,
+      borderWidth: 1,
+      borderColor: theme.border,
+      borderRadius: 20 * scale,
     },
 
+    container: {},
+
     header: {
-      height: 44 * scale,
-      justifyContent: "center",
-      position: "relative",
-      marginBottom: 20 * scale,
+      flexDirection: "row",
+      alignItems: "flex-start",
+      justifyContent: "space-between",
+      gap: 12 * scale,
+      marginBottom: 24 * scale,
     },
-    label: {
-      fontSize: 18 * scale,
+
+    titleContainer: {
+      flex: 1,
+    },
+
+    name: {
+      marginBottom: 4 * scale,
+      color: theme.text,
+      fontSize: 22 * scale,
+      fontWeight: "700",
+    },
+
+    subText: {
       color: theme.textSecondary,
-      marginBottom: 10 * scale,
+      fontSize: 14 * scale,
+      lineHeight: 20 * scale,
     },
+
     iconButton: {
-      position: "absolute",
-      left: 0,
       width: 36 * scale,
       height: 36 * scale,
       alignItems: "center",
       justifyContent: "center",
-      borderRadius: 10 * scale,
       backgroundColor: theme.card,
       borderWidth: 1,
       borderColor: theme.border,
+      borderRadius: 10 * scale,
     },
+
     starContainer: {
       flexDirection: "row",
-      justifyContent: "space-between",
       alignItems: "center",
-      marginVertical: 30,
+      justifyContent: "space-around",
+      marginBottom: 26 * scale,
+      paddingHorizontal: 6 * scale,
     },
+
     button: {
-      flexDirection: "row",
-      justifyContent: "center",
       alignItems: "center",
+      justifyContent: "center",
+      minHeight: 46 * scale,
+      paddingHorizontal: 16 * scale,
+      borderWidth: 1,
       borderRadius: 12 * scale,
-      paddingVertical: 12 * scale,
-      marginTop: 10 * scale,
-      backgroundColor: theme.buttonPrimary,
+    },
+
+    buttonEnabled: {
+      backgroundColor: theme.buttonPrimary + "14",
+      borderColor: theme.buttonPrimary + "40",
+    },
+
+    buttonDisabled: {
+      backgroundColor: theme.buttonDisabled,
+      borderColor: theme.border,
+    },
+
+    buttonPressed: {
+      opacity: 0.7,
     },
 
     buttonText: {
       fontSize: 15 * scale,
       fontWeight: "700",
-      color: theme.buttonPrimaryText,
     },
-    subText: {
-      fontSize: 18 * scale,
-      color: theme.textSecondary,
-      fontWeight: "500",
+
+    buttonEnabledText: {
+      color: theme.buttonPrimary,
+    },
+
+    buttonDisabledText: {
+      color: theme.buttonDisabledText,
     },
   });
