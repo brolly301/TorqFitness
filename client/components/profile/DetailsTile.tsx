@@ -49,74 +49,102 @@ export default function DetailsTile() {
   ];
   return (
     <TileWrapper title="Your Details">
-      <View style={styles.container}>
-        {details.map((item, index) => (
-          <React.Fragment key={item.label}>
-            <Pressable
-              style={styles.row}
-              onPress={() => router.push("/(tabs)/profile/editDetails")}
-              accessibilityRole="button"
-              accessibilityLabel={`Edit ${item.label}`}
-            >
-              <Text style={styles.rowLabel}>{item.label}</Text>
+     <View style={styles.container}>
+  {details.map((item, index) => (
+    <React.Fragment key={item.label}>
+      <View style={styles.row}>
+        <Text style={styles.rowLabel}>{item.label}</Text>
 
-              <View style={styles.rowRight}>
-                <Text style={styles.rowValue}>{item.value}</Text>
-                <Feather
-                  style={styles.rowArrow}
-                  name="arrow-right"
-                  size={18 * scale}
-                  color={theme.textMuted}
-                />
-              </View>
-            </Pressable>
-
-            {index !== details.length - 1 && <View style={styles.separator} />}
-          </React.Fragment>
-        ))}
+        <Text style={styles.rowValue} numberOfLines={1}>
+          {item.value}
+        </Text>
       </View>
+
+      {index !== details.length - 1 && (
+        <View style={styles.separator} />
+      )}
+    </React.Fragment>
+  ))}
+
+  <Pressable
+    style={({ pressed }) => [
+      styles.editButton,
+      pressed && styles.editButtonPressed,
+    ]}
+    onPress={() => router.push("/(tabs)/profile/editDetails")}
+    accessibilityRole="button"
+    accessibilityLabel="Edit profile details"
+  >
+    <Text style={styles.editButtonText}>Edit details</Text>
+
+    <Feather
+      name="chevron-right"
+      size={17 * scale}
+      color={theme.buttonPrimary}
+    />
+  </Pressable>
+</View>
     </TileWrapper>
   );
 }
 
 const makeStyles = (theme: Theme, scale: number) =>
   StyleSheet.create({
-    container: { paddingHorizontal: 12, paddingVertical: 6 },
+    container: {
+      paddingHorizontal: 12 * scale,
+      paddingTop: 5 * scale,
+      paddingBottom: 12 * scale,
+    },
 
     row: {
       flexDirection: "row",
+      alignItems: "center",
       justifyContent: "space-between",
-      alignItems: "center",
-      paddingVertical: 12 * scale,
-    },
-
-    rowRight: {
-      flexDirection: "row",
-      alignItems: "center",
-      marginLeft: 12 * scale,
+      minHeight: 45 * scale,
+      paddingVertical: 10 * scale,
     },
 
     rowLabel: {
       flex: 1,
-      fontSize: 15 * scale,
-      fontWeight: "500",
+      marginRight: 12 * scale,
       color: theme.text,
+      fontSize: 14 * scale,
+      fontWeight: "500",
     },
 
     rowValue: {
-      fontSize: 15 * scale,
-      fontWeight: "400",
+      flexShrink: 1,
       color: theme.textSecondary,
-    },
-
-    rowArrow: {
-      marginLeft: 8 * scale,
+      fontSize: 14 * scale,
+      textAlign: "right",
     },
 
     separator: {
       width: "100%",
       height: 1,
       backgroundColor: theme.border,
-      opacity: 0.5,
+    },
+
+    editButton: {
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "center",
+      gap: 7 * scale,
+      minHeight: 42 * scale,
+      marginTop: 12 * scale,
+      backgroundColor: theme.buttonPrimary + "12",
+      borderWidth: 1,
+      borderColor: theme.buttonPrimary + "35",
+      borderRadius: 11 * scale,
+    },
+
+    editButtonPressed: {
+      opacity: 0.7,
+    },
+
+    editButtonText: {
+      color: theme.buttonPrimary,
+      fontSize: 14 * scale,
+      fontWeight: "700",
     },
   });

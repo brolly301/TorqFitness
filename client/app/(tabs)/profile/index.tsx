@@ -1,4 +1,4 @@
-import { Pressable, StyleSheet, Text, View } from "react-native";
+import { Pressable, StyleSheet, Text, View,ScrollView } from "react-native";
 import React, { useMemo, useState } from "react";
 import { useAppTheme } from "@/hooks/useAppTheme";
 import AppWrapper from "@/components/ui/AppWrapper";
@@ -15,28 +15,35 @@ export default function ProfileScreen() {
 
   return (
     <AppWrapper>
-      <View style={styles.container}>
-        <View style={styles.header}>
-          <Pressable
-            style={styles.backButton}
-            onPress={() => router.navigate("/(tabs)/profile/settings")}
-            hitSlop={10}
-          >
-            <Feather
-              name="settings"
-              size={22 * scale}
-              color={theme.buttonPrimary}
-            />
-          </Pressable>
-        </View>
-        <View style={styles.titleContainer}>
-          <Text style={styles.title}>Profile</Text>
-          <Text style={styles.description}>Your training hub</Text>
-        </View>
+   <ScrollView
+  style={styles.container}
+  contentContainerStyle={styles.contentContainer}
+  showsVerticalScrollIndicator={false}
+>
+     <View style={styles.header}>
+  <View style={styles.titleContainer}>
+    <Text style={styles.title}>Profile</Text>
+    <Text style={styles.description}>Your training hub</Text>
+  </View>
+
+  <Pressable
+    style={styles.settingsButton}
+    onPress={() => router.navigate("/(tabs)/profile/settings")}
+    hitSlop={10}
+    accessibilityRole="button"
+    accessibilityLabel="Open settings"
+  >
+    <Feather
+      name="settings"
+      size={21 * scale}
+      color={theme.buttonPrimary}
+    />
+  </Pressable>
+</View>
         <StatsTile />
         <ProgressTile />
         <DetailsTile />
-      </View>
+    </ScrollView>
     </AppWrapper>
   );
 }
@@ -45,42 +52,50 @@ const makeStyles = (theme: Theme, scale: number) =>
   StyleSheet.create({
     container: {
       flex: 1,
-      paddingHorizontal: 16 * scale,
-      paddingTop: 12 * scale,
       backgroundColor: theme.background,
     },
-    header: {
-      flexDirection: "row",
-      justifyContent: "flex-end",
-      alignItems: "center",
-      marginBottom: 12 * scale,
+
+    contentContainer: {
+      flexGrow: 1,
+      paddingTop: 12 * scale,
+      paddingHorizontal: 16 * scale,
+      paddingBottom: 28 * scale,
     },
 
-    backButton: {
+    header: {
+      flexDirection: "row",
+      alignItems: "flex-start",
+      justifyContent: "space-between",
+      marginBottom: 18 * scale,
+    },
+
+    titleContainer: {
+      flex: 1,
+      marginRight: 16 * scale,
+    },
+
+    title: {
+      marginBottom: 4 * scale,
+      color: theme.text,
+      fontSize: 32 * scale,
+      fontWeight: "700",
+    },
+
+    description: {
+      color: theme.textSecondary,
+      fontSize: 16 * scale,
+      fontWeight: "400",
+      lineHeight: 22 * scale,
+    },
+
+    settingsButton: {
       width: 40 * scale,
       height: 40 * scale,
-      borderRadius: 12 * scale,
       alignItems: "center",
       justifyContent: "center",
       backgroundColor: theme.card,
       borderWidth: 1,
       borderColor: theme.border,
-    },
-    titleContainer: {
-      marginBottom: 18 * scale,
-    },
-
-    title: {
-      fontSize: 32 * scale,
-      fontWeight: "700",
-      marginBottom: 4 * scale,
-      color: theme.text,
-    },
-
-    description: {
-      fontSize: 16 * scale,
-      fontWeight: "400",
-      color: theme.textSecondary,
-      lineHeight: 22 * scale,
+      borderRadius: 12 * scale,
     },
   });

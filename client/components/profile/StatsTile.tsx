@@ -103,37 +103,38 @@ export const makeStyles = (theme: Theme, scale: number) =>
       flexDirection: "row",
       alignItems: "center",
       justifyContent: "space-between",
+      paddingHorizontal: 8 * scale,
       paddingVertical: 18 * scale,
     },
 
     valueContainer: {
       flex: 1,
       alignItems: "center",
+      paddingHorizontal: 4 * scale,
     },
 
     label: {
-      fontSize: 16 * scale,
-      fontWeight: "500",
-      marginBottom: 4 * scale,
+      marginBottom: 6 * scale,
       color: theme.textSecondary,
+      fontSize: 12 * scale,
+      fontWeight: "600",
     },
 
     value: {
-      fontSize: 22 * scale,
-      fontWeight: "600",
-      color: theme.buttonPrimary,
+      color: theme.text,
+      fontSize: 21 * scale,
+      fontWeight: "700",
     },
 
     subValue: {
-      fontSize: 14 * scale,
+      color: theme.textSecondary,
+      fontSize: 12 * scale,
       fontWeight: "500",
-      color: theme.text,
     },
 
     separator: {
       width: 1,
-      height: 28 * scale,
+      height: 32 * scale,
       backgroundColor: theme.border,
-      opacity: 0.6,
     },
   });

@@ -1,11 +1,11 @@
 import { StyleSheet, Text, View } from "react-native";
 import React, { useMemo } from "react";
 import TileWrapper from "./TileWrapper";
-import Feather from "@expo/vector-icons/Feather";
-import Entypo from "@expo/vector-icons/Entypo";
+import Feather from "@expo/vector-icons/Feather";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import { Theme } from "@/types/Theme";
 import { useAppTheme } from "@/hooks/useAppTheme";
+
 
 const PROGRESS_ITEMS = [
   {
@@ -33,47 +33,37 @@ export default function ProgressTile() {
     <TileWrapper title="Progress">
       <View style={styles.container}>
         {PROGRESS_ITEMS.map((item, index) => (
-          <React.Fragment key={item.label}>
-            <View style={styles.row}>
-              <View style={styles.rowLeft}>
-                <View style={styles.rowIcon}>
-                  {item.iconType === "feather" ? (
-                    <Feather
-                      name={item.icon}
-                      size={20 * scale}
-                      color={theme.buttonPrimary}
-                    />
-                  ) : (
-                    <MaterialCommunityIcons
-                      name={item.icon}
-                      size={22 * scale}
-                      color={theme.buttonPrimary}
-                    />
-                  )}
-                </View>
+        <React.Fragment key={item.label}>
+  <View style={styles.row}>
+    <View style={styles.rowLeft}>
+      <View style={styles.rowIcon}>
+        {item.iconType === "feather" ? (
+          <Feather
+            name={item.icon}
+            size={19 * scale}
+            color={theme.buttonPrimary}
+          />
+        ) : (
+          <MaterialCommunityIcons
+            name={item.icon}
+            size={21 * scale}
+            color={theme.buttonPrimary}
+          />
+        )}
+      </View>
 
-                <Text style={styles.rowLabel}>{item.label}</Text>
-              </View>
+      <Text style={styles.rowLabel}>{item.label}</Text>
+    </View>
 
-              <View style={styles.rowRight}>
-                <Entypo
-                  name="area-graph"
-                  size={20 * scale}
-                  color={theme.buttonPrimary}
-                />
-                <Feather
-                  style={styles.rowArrow}
-                  name="arrow-right"
-                  size={18 * scale}
-                  color={theme.textMuted}
-                />
-              </View>
-            </View>
+    <View style={styles.statusPill}>
+      <Text style={styles.statusText}>Coming later</Text>
+    </View>
+  </View>
 
-            {index !== PROGRESS_ITEMS.length - 1 && (
-              <View style={styles.separator} />
-            )}
-          </React.Fragment>
+  {index !== PROGRESS_ITEMS.length - 1 && (
+    <View style={styles.separator} />
+  )}
+</React.Fragment>
         ))}
       </View>
     </TileWrapper>
@@ -82,53 +72,60 @@ export default function ProgressTile() {
 
 export const makeStyles = (theme: Theme, scale: number) =>
   StyleSheet.create({
-    container: { paddingHorizontal: 12, paddingVertical: 6 },
+    container: {
+      paddingHorizontal: 12 * scale,
+      paddingVertical: 5 * scale,
+    },
 
     row: {
       flexDirection: "row",
-      justifyContent: "space-between",
       alignItems: "center",
-      paddingVertical: 12 * scale,
+      justifyContent: "space-between",
+      paddingVertical: 11 * scale,
     },
 
     rowLeft: {
-      flexDirection: "row",
-      alignItems: "center",
       flex: 1,
-      marginRight: 12 * scale,
-    },
-
-    rowRight: {
       flexDirection: "row",
       alignItems: "center",
-    },
-
-    rowIcon: {
-      width: 40 * scale,
-      height: 40 * scale,
-      borderRadius: 12 * scale,
-      alignItems: "center",
-      justifyContent: "center",
-      backgroundColor: theme.card,
-      borderWidth: 1,
-      borderColor: theme.border,
       marginRight: 10 * scale,
     },
 
-    rowLabel: {
-      fontSize: 16 * scale,
-      fontWeight: "500",
-      color: theme.text,
+    rowIcon: {
+      width: 38 * scale,
+      height: 38 * scale,
+      marginRight: 10 * scale,
+      alignItems: "center",
+      justifyContent: "center",
+      backgroundColor: theme.buttonPrimary + "12",
+      borderRadius: 11 * scale,
     },
 
-    rowArrow: {
-      marginLeft: 8 * scale,
+    rowLabel: {
+      flex: 1,
+      color: theme.text,
+      fontSize: 15 * scale,
+      fontWeight: "500",
+    },
+
+    statusPill: {
+      paddingHorizontal: 8 * scale,
+      paddingVertical: 5 * scale,
+      backgroundColor: theme.text + "08",
+      borderWidth: 1,
+      borderColor: theme.border,
+      borderRadius: 9 * scale,
+    },
+
+    statusText: {
+      color: theme.textSecondary,
+      fontSize: 11 * scale,
+      fontWeight: "600",
     },
 
     separator: {
       width: "100%",
       height: 1,
       backgroundColor: theme.border,
-      opacity: 0.5,
     },
   });

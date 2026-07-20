@@ -22,15 +22,19 @@ export default function TileWrapper({ children, title }: Props) {
 export const makeStyles = (theme: Theme, scale: number) =>
   StyleSheet.create({
     container: {
+      marginBottom: 22 * scale,
+      overflow: "hidden",
       backgroundColor: theme.card,
-      borderRadius: 10,
-      marginVertical: 5 * scale,
-      marginBottom: 25,
+      borderWidth: 1,
+      borderColor: theme.border,
+      borderRadius: 16 * scale,
     },
+
     title: {
-      fontSize: 18 * scale,
-      fontWeight: "500",
+      marginBottom: 10 * scale,
+      paddingHorizontal: 2 * scale,
       color: theme.text,
-      marginBottom: 5 * scale,
+      fontSize: 19 * scale,
+      fontWeight: "700",
     },
   });
