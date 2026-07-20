@@ -141,21 +141,37 @@ export default function ExerciseEditForm({
       <Pressable onPress={handleCloseAll} style={StyleSheet.absoluteFill} />
 
       <View style={styles.modalView}>
-        <View style={styles.header}>
-          <Pressable style={styles.iconButton} onPress={handleBack} hitSlop={8}>
-            <AntDesign name="arrow-left" size={18 * scale} color={theme.text} />
-          </Pressable>
+       <View style={styles.header}>
+  <Pressable
+    style={styles.iconButton}
+    onPress={handleBack}
+    hitSlop={8}
+    accessibilityRole="button"
+    accessibilityLabel="Return to exercise details"
+  >
+    <AntDesign
+      name="arrow-left"
+      size={18 * scale}
+      color={theme.text}
+    />
+  </Pressable>
 
-          <Pressable
-            style={styles.iconButton}
-            onPress={handleCloseAll}
-            hitSlop={8}
-          >
-            <AntDesign name="close" size={18 * scale} color={theme.text} />
-          </Pressable>
-        </View>
+  <Text style={styles.title}>Edit Exercise</Text>
 
-        <Text style={styles.title}>Edit Exercise</Text>
+  <Pressable
+    style={styles.iconButton}
+    onPress={handleCloseAll}
+    hitSlop={8}
+    accessibilityRole="button"
+    accessibilityLabel="Close exercise details"
+  >
+    <AntDesign
+      name="close"
+      size={18 * scale}
+      color={theme.text}
+    />
+  </Pressable>
+</View>
 
         <Text style={styles.label}>Name</Text>
         <TextInput
@@ -220,36 +236,40 @@ export default function ExerciseEditForm({
           }
           placeholder="Select equipment"
         />
+<Pressable
+  disabled={isDisabled || isSaving}
+  onPress={handleSave}
+  style={({ pressed }) => [
+    styles.button,
+    styles.saveButton,
+    (isDisabled || isSaving) && styles.disabledButton,
+    pressed && !isDisabled && !isSaving && styles.buttonPressed,
+  ]}
+>
+  <Text
+    style={[
+      styles.buttonText,
+      isDisabled || isSaving
+        ? styles.disabledButtonText
+        : styles.saveButtonText,
+    ]}
+  >
+    {isSaving ? "Saving..." : "Save Exercise"}
+  </Text>
+</Pressable>
 
-        <Pressable
-          disabled={isDisabled || isSaving}
-          onPress={handleSave}
-          style={[
-            styles.button,
-            styles.saveButton,
-            (isDisabled || isSaving) && styles.disabledButton,
-          ]}
-        >
-          <Text
-            style={[
-              styles.buttonText,
-              isDisabled || isSaving
-                ? styles.disabledButtonText
-                : styles.saveButtonText,
-            ]}
-          >
-            {isSaving ? "Saving..." : "Save Exercise"}
-          </Text>
-        </Pressable>
-
-        <Pressable
-          onPress={() => setDeleteModalVisible(true)}
-          style={[styles.button, styles.archiveButton]}
-        >
-          <Text style={[styles.buttonText, styles.archiveButtonText]}>
-            Archive Exercise
-          </Text>
-        </Pressable>
+<Pressable
+  onPress={() => setDeleteModalVisible(true)}
+  style={({ pressed }) => [
+    styles.button,
+    styles.archiveButton,
+    pressed && styles.buttonPressed,
+  ]}
+>
+  <Text style={[styles.buttonText, styles.archiveButtonText]}>
+    Archive Exercise
+  </Text>
+</Pressable>
       </View>
     </View>
   );
@@ -259,73 +279,79 @@ export const makeStyles = (theme: Theme, scale: number) =>
   StyleSheet.create({
     overlay: {
       flex: 1,
-      justifyContent: "center",
       alignItems: "center",
-      backgroundColor: "rgba(0,0,0,0.55)",
+      justifyContent: "center",
       paddingHorizontal: 16 * scale,
+      backgroundColor: theme.shadow,
     },
 
     modalView: {
       width: "100%",
       maxWidth: 420,
       height: "72%",
-      borderRadius: 20 * scale,
-      backgroundColor: theme.background,
       paddingTop: 16 * scale,
       paddingHorizontal: 16 * scale,
       paddingBottom: 16 * scale,
+      backgroundColor: theme.background,
       borderWidth: 1,
       borderColor: theme.border,
+      borderRadius: 20 * scale,
     },
 
     header: {
       flexDirection: "row",
-      justifyContent: "space-between",
       alignItems: "center",
-      marginBottom: 14 * scale,
+      justifyContent: "space-between",
+      marginBottom: 20 * scale,
     },
 
     iconButton: {
       width: 36 * scale,
       height: 36 * scale,
-      borderRadius: 10 * scale,
       alignItems: "center",
       justifyContent: "center",
       backgroundColor: theme.card,
       borderWidth: 1,
       borderColor: theme.border,
+      borderRadius: 10 * scale,
     },
 
     title: {
+      flex: 1,
+      marginHorizontal: 12 * scale,
+      color: theme.text,
       fontSize: 18 * scale,
       fontWeight: "700",
       textAlign: "center",
-      color: theme.text,
-      marginBottom: 20 * scale,
     },
 
     label: {
-      fontSize: 13 * scale,
+      marginBottom: 6 * scale,
       color: theme.textSecondary,
-      marginBottom: 5 * scale,
+      fontSize: 13 * scale,
+      fontWeight: "500",
     },
 
     input: {
+      minHeight: 46 * scale,
+      marginBottom: 16 * scale,
+      paddingHorizontal: 12 * scale,
+      paddingVertical: 12 * scale,
+      backgroundColor: theme.buttonSecondary,
       borderWidth: 1,
-      borderColor: theme.border,
-      backgroundColor: theme.background,
+      borderColor: theme.inputBorder,
+      borderRadius: 12 * scale,
       color: theme.text,
-      padding: 12 * scale,
-      marginBottom: 8 * scale,
-      borderRadius: 6 * scale,
+      fontSize: 15 * scale,
     },
 
     button: {
-      flexDirection: "row",
-      justifyContent: "center",
       alignItems: "center",
-      borderRadius: 10 * scale,
-      paddingVertical: 10 * scale,
+      justifyContent: "center",
+      minHeight: 44 * scale,
+      paddingHorizontal: 16 * scale,
+      borderWidth: 1,
+      borderRadius: 12 * scale,
     },
 
     buttonText: {
@@ -334,16 +360,19 @@ export const makeStyles = (theme: Theme, scale: number) =>
     },
 
     saveButton: {
-      backgroundColor: theme.buttonPrimary,
+      marginTop: 2 * scale,
       marginBottom: 10 * scale,
+      backgroundColor: theme.buttonPrimary + "14",
+      borderColor: theme.buttonPrimary + "40",
     },
 
     saveButtonText: {
-      color: theme.buttonPrimaryText,
+      color: theme.buttonPrimary,
     },
 
     disabledButton: {
       backgroundColor: theme.buttonDisabled,
+      borderColor: theme.border,
     },
 
     disabledButtonText: {
@@ -351,36 +380,41 @@ export const makeStyles = (theme: Theme, scale: number) =>
     },
 
     archiveButton: {
-      backgroundColor: theme.error,
+      backgroundColor: theme.error + "12",
+      borderColor: theme.error + "35",
     },
 
     archiveButtonText: {
-      color: theme.buttonPrimaryText,
+      color: theme.error,
+    },
+
+    buttonPressed: {
+      opacity: 0.7,
     },
 
     deleteContainer: {
       width: "100%",
       maxWidth: 420,
-      backgroundColor: theme.card,
-      borderRadius: 18 * scale,
       padding: 20 * scale,
+      backgroundColor: theme.card,
       borderWidth: 1,
       borderColor: theme.border,
+      borderRadius: 18 * scale,
     },
 
     deleteTitle: {
+      marginBottom: 8 * scale,
+      color: theme.text,
       fontSize: 20 * scale,
       fontWeight: "700",
-      color: theme.text,
-      marginBottom: 8 * scale,
       textAlign: "center",
     },
 
     description: {
+      marginBottom: 18 * scale,
+      color: theme.textSecondary,
       fontSize: 15 * scale,
       lineHeight: 21 * scale,
-      color: theme.textSecondary,
-      marginBottom: 18 * scale,
       textAlign: "center",
     },
 
@@ -389,10 +423,11 @@ export const makeStyles = (theme: Theme, scale: number) =>
     },
 
     actionButton: {
-      borderRadius: 12 * scale,
-      paddingVertical: 12 * scale,
       alignItems: "center",
       justifyContent: "center",
+      minHeight: 44 * scale,
+      paddingHorizontal: 16 * scale,
+      borderRadius: 12 * scale,
     },
 
     actionButtonText: {
@@ -401,7 +436,7 @@ export const makeStyles = (theme: Theme, scale: number) =>
     },
 
     dangerButton: {
-      backgroundColor: theme.error ?? "#DC2626",
+      backgroundColor: theme.error,
     },
 
     dangerButtonText: {
@@ -415,8 +450,8 @@ export const makeStyles = (theme: Theme, scale: number) =>
     },
 
     cancelButtonText: {
+      color: theme.buttonSecondaryText ?? theme.text,
       fontSize: 15 * scale,
       fontWeight: "600",
-      color: theme.buttonSecondaryText ?? theme.text,
     },
   });

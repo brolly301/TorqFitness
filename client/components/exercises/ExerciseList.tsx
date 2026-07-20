@@ -38,12 +38,13 @@ export default function ExerciseList({
           windowSize={5}
           keyExtractor={(item) => item.id}
           renderItem={({ item }) => (
-            <Pressable
-              onPress={() => {
-                setExercise(item);
-                setModalVisible(true);
-              }}
-            >
+           <Pressable
+  style={({ pressed }) => pressed && styles.itemPressed}
+  onPress={() => {
+    setExercise(item);
+    setModalVisible(true);
+  }}
+>
               <ExerciseItem exercise={item} />
             </Pressable>
           )}
@@ -61,11 +62,17 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
   },
+
   list: {
     flex: 1,
   },
+
   contentContainer: {
     paddingTop: 4,
     paddingBottom: 24,
+  },
+
+  itemPressed: {
+    opacity: 0.7,
   },
 });

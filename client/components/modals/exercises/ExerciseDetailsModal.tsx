@@ -88,43 +88,53 @@ export default function ExerciseDetailsModal({
           <Pressable onPress={handleClose} style={StyleSheet.absoluteFill} />
 
           <View style={styles.modalView}>
-            <View style={styles.header}>
-              <Pressable
-                style={styles.iconButton}
-                onPress={handleClose}
-                hitSlop={8}
-              >
-                <AntDesign name="close" size={18 * scale} color={theme.text} />
-              </Pressable>
+<View style={styles.header}>
+  <Text style={styles.exerciseTitle} numberOfLines={2}>
+    {exercise?.name ? capitalizeWords(exercise.name) : ""}
+  </Text>
 
-              <View style={styles.headerActions}>
-                {showAddButton && (
-                  <Pressable
-                    style={styles.primaryButton}
-                    onPress={handleSubmit}
-                  >
-                    <Text style={styles.primaryButtonText}>Add</Text>
-                  </Pressable>
-                )}
+  <Pressable
+    style={styles.iconButton}
+    onPress={handleClose}
+    hitSlop={8}
+    accessibilityRole="button"
+    accessibilityLabel="Close exercise details"
+  >
+    <AntDesign
+      name="close"
+      size={18 * scale}
+      color={theme.text}
+    />
+  </Pressable>
+</View>
 
-                {exercise?.userCreated && (
-                  <Pressable
-                    style={[
-                      styles.secondaryButton,
-                      showAddButton && styles.secondaryButtonWithGap,
-                    ]}
-                    onPress={handleEdit}
-                  >
-                    <Text style={styles.secondaryButtonText}>Edit</Text>
-                  </Pressable>
-                )}
-              </View>
-            </View>
+{(showAddButton || exercise?.userCreated) && (
+  <View style={styles.headerActions}>
+    {showAddButton && (
+      <Pressable
+        style={({ pressed }) => [
+          styles.primaryButton,
+          pressed && styles.actionPressed,
+        ]}
+        onPress={handleSubmit}
+      >
+        <Text style={styles.primaryButtonText}>Add Exercise</Text>
+      </Pressable>
+    )}
 
-            <Text style={styles.exerciseTitle} numberOfLines={2}>
-              {exercise?.name ? capitalizeWords(exercise.name) : ""}
-            </Text>
-
+    {exercise?.userCreated && (
+      <Pressable
+        style={({ pressed }) => [
+          styles.secondaryButton,
+          pressed && styles.actionPressed,
+        ]}
+        onPress={handleEdit}
+      >
+        <Text style={styles.secondaryButtonText}>Edit Exercise</Text>
+      </Pressable>
+    )}
+  </View>
+)}
             <View style={styles.tabRowContainer}>
               {TAB_NAMES.map((tabName) => {
                 const isActive = tab === tabName;
@@ -165,125 +175,138 @@ export const makeStyles = (theme: Theme, scale: number) =>
   StyleSheet.create({
     overlay: {
       flex: 1,
-      justifyContent: "center",
       alignItems: "center",
-      backgroundColor: theme.shadow,
+      justifyContent: "center",
       paddingHorizontal: 16 * scale,
+      backgroundColor: theme.shadow,
     },
 
     modalView: {
       width: "100%",
       maxWidth: 420,
       height: "72%",
-      borderRadius: 20 * scale,
-      backgroundColor: theme.background,
       paddingTop: 16 * scale,
       paddingHorizontal: 16 * scale,
       paddingBottom: 16 * scale,
+      backgroundColor: theme.background,
       borderWidth: 1,
       borderColor: theme.border,
+      borderRadius: 20 * scale,
     },
 
     header: {
       flexDirection: "row",
+      alignItems: "flex-start",
       justifyContent: "space-between",
-      alignItems: "center",
+      gap: 12 * scale,
       marginBottom: 14 * scale,
+    },
+
+    exerciseTitle: {
+      flex: 1,
+      color: theme.text,
+      fontSize: 22 * scale,
+      fontWeight: "700",
+      lineHeight: 28 * scale,
     },
 
     iconButton: {
       width: 36 * scale,
       height: 36 * scale,
-      borderRadius: 10 * scale,
       alignItems: "center",
       justifyContent: "center",
       backgroundColor: theme.card,
       borderWidth: 1,
       borderColor: theme.border,
+      borderRadius: 10 * scale,
     },
 
     headerActions: {
       flexDirection: "row",
-      alignItems: "center",
+      gap: 8 * scale,
+      marginBottom: 14 * scale,
     },
 
     primaryButton: {
-      paddingVertical: 9 * scale,
+      flex: 1,
+      alignItems: "center",
+      justifyContent: "center",
+      minHeight: 42 * scale,
       paddingHorizontal: 14 * scale,
-      borderRadius: 10 * scale,
-      backgroundColor: theme.buttonPrimary,
+      backgroundColor: theme.buttonPrimary + "14",
+      borderWidth: 1,
+      borderColor: theme.buttonPrimary + "40",
+      borderRadius: 11 * scale,
     },
 
     primaryButtonText: {
-      color: theme.buttonPrimaryText,
-      fontSize: 14 * scale,
-      fontWeight: "700",
-    },
-
-    secondaryButton: {
-      paddingVertical: 9 * scale,
-      paddingHorizontal: 14 * scale,
-      borderRadius: 10 * scale,
-      backgroundColor: `${theme.buttonPrimary}15`,
-      borderWidth: 1,
-      borderColor: `${theme.buttonPrimary}30`,
-    },
-
-    secondaryButtonWithGap: {
-      marginLeft: 8 * scale,
-    },
-
-    secondaryButtonText: {
       color: theme.buttonPrimary,
       fontSize: 14 * scale,
       fontWeight: "700",
     },
 
-    exerciseTitle: {
-      fontSize: 22 * scale,
-      fontWeight: "700",
-      textAlign: "center",
+    secondaryButton: {
+      flex: 1,
+      alignItems: "center",
+      justifyContent: "center",
+      minHeight: 42 * scale,
+      paddingHorizontal: 14 * scale,
+      backgroundColor: theme.card,
+      borderWidth: 1,
+      borderColor: theme.border,
+      borderRadius: 11 * scale,
+    },
+
+    secondaryButtonText: {
       color: theme.text,
-      marginBottom: 14 * scale,
+      fontSize: 14 * scale,
+      fontWeight: "700",
+    },
+
+    actionPressed: {
+      opacity: 0.7,
     },
 
     tabRowContainer: {
       flexDirection: "row",
       alignItems: "center",
+      gap: 3 * scale,
       marginBottom: 14 * scale,
-      gap: 8 * scale,
+      padding: 4 * scale,
+      backgroundColor: theme.card,
+      borderWidth: 1,
+      borderColor: theme.border,
+      borderRadius: 13 * scale,
     },
 
     tab: {
       flex: 1,
-      paddingVertical: 10 * scale,
-      borderRadius: 12 * scale,
       alignItems: "center",
       justifyContent: "center",
-      borderWidth: 1,
+      minHeight: 36 * scale,
+      paddingHorizontal: 4 * scale,
+      borderRadius: 9 * scale,
     },
 
     activeTab: {
-      backgroundColor: theme.buttonPrimary,
-      borderColor: theme.buttonPrimary,
+      backgroundColor: theme.buttonPrimary + "18",
     },
 
     inactiveTab: {
-      backgroundColor: theme.card,
-      borderColor: theme.border,
+      backgroundColor: "transparent",
     },
 
     tabLabel: {
-      fontSize: 14 * scale,
+      fontSize: 13 * scale,
       fontWeight: "600",
     },
 
     activeTabLabel: {
-      color: theme.buttonPrimaryText,
+      color: theme.buttonPrimary,
     },
 
     inactiveTabLabel: {
-      color: theme.text,
+      color: theme.textSecondary,
     },
 
     contentContainer: {

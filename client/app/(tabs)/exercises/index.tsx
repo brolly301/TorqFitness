@@ -40,28 +40,28 @@ export default function ExerciseScreen() {
   return (
     <AppWrapper>
       <View style={styles.container}>
-        <View style={styles.header}>
-          <Pressable
-            style={styles.addButton}
-            hitSlop={10}
-            accessibilityRole="button"
-accessibilityLabel="Create exercise"
-            onPress={() => router.push("/(tabs)/exercises/createExercise")}
-          >
-            <Feather
-              name="plus"
-              size={20 * scale}
-              color={theme.buttonPrimary}
-            />
-          </Pressable>
-        </View>
+       <View style={styles.header}>
+  <View style={styles.titleContainer}>
+    <Text style={styles.title}>Exercises</Text>
+   <Text style={styles.description}>
+  Browse and manage exercises
+</Text>
+  </View>
 
-        <View style={styles.titleContainer}>
-          <Text style={styles.title}>Exercises</Text>
-          <Text style={styles.description}>
-            Browse and manage your exercise library
-          </Text>
-        </View>
+ <Pressable
+  style={styles.addButton}
+  hitSlop={10}
+  accessibilityRole="button"
+  accessibilityLabel="Create exercise"
+  onPress={() => router.push("/(tabs)/exercises/createExercise")}
+>
+  <Feather
+    name="plus"
+    size={20 * scale}
+    color={theme.buttonPrimary}
+  />
+</Pressable>
+</View>
 
         <View style={styles.searchContainer}>
           <AppSearchBar setSearch={setSearch} />
@@ -98,44 +98,46 @@ const makeStyles = (theme: Theme, scale: number) =>
   StyleSheet.create({
     container: {
       flex: 1,
-      backgroundColor: theme.background,
       paddingHorizontal: 16 * scale,
       paddingTop: 12 * scale,
+      backgroundColor: theme.background,
     },
 
     header: {
       flexDirection: "row",
-      justifyContent: "flex-end",
-      marginBottom: 12 * scale,
+      alignItems: "flex-start",
+      justifyContent: "space-between",
+      marginBottom: 18 * scale,
+    },
+
+    titleContainer: {
+      flex: 1,
+      marginRight: 16 * scale,
+    },
+
+    title: {
+      marginBottom: 4 * scale,
+      color: theme.text,
+      fontSize: 32 * scale,
+      fontWeight: "700",
+    },
+
+    description: {
+      color: theme.textSecondary,
+      fontSize: 16 * scale,
+      fontWeight: "400",
+      lineHeight: 22 * scale,
     },
 
     addButton: {
       width: 40 * scale,
       height: 40 * scale,
-      justifyContent: "center",
       alignItems: "center",
+      justifyContent: "center",
       backgroundColor: theme.card,
-      borderRadius: 12 * scale,
       borderWidth: 1,
       borderColor: theme.border,
-    },
-
-    titleContainer: {
-      marginBottom: 18 * scale,
-    },
-
-    title: {
-      fontSize: 32 * scale,
-      fontWeight: "700",
-      marginBottom: 4 * scale,
-      color: theme.text,
-    },
-
-    description: {
-      fontSize: 16 * scale,
-      fontWeight: "400",
-      color: theme.textSecondary,
-      lineHeight: 22 * scale,
+      borderRadius: 12 * scale,
     },
 
     searchContainer: {
@@ -144,27 +146,29 @@ const makeStyles = (theme: Theme, scale: number) =>
 
     listContainer: {
       flex: 1,
-    },placeholderContainer: {
-  marginTop: 8 * scale,
-  backgroundColor: theme.card,
-  borderRadius: 16 * scale,
-  borderWidth: 1,
-  borderColor: theme.border,
-  paddingVertical: 24 * scale,
-  paddingHorizontal: 18 * scale,
-  alignItems: "center",
-},
+    },
 
-placeholderTitle: {
-  fontSize: 16 * scale,
-  fontWeight: "700",
-  color: theme.text,
-  marginBottom: 6 * scale,
-},
+    placeholderContainer: {
+      alignItems: "center",
+      marginTop: 8 * scale,
+      paddingHorizontal: 18 * scale,
+      paddingVertical: 24 * scale,
+      backgroundColor: theme.card,
+      borderWidth: 1,
+      borderColor: theme.border,
+      borderRadius: 16 * scale,
+    },
 
-placeholderText: {
-  fontSize: 14 * scale,
-  color: theme.textSecondary,
-  textAlign: "center",
-},
+    placeholderTitle: {
+      marginBottom: 6 * scale,
+      color: theme.text,
+      fontSize: 16 * scale,
+      fontWeight: "700",
+    },
+
+    placeholderText: {
+      color: theme.textSecondary,
+      fontSize: 14 * scale,
+      textAlign: "center",
+    },
   });

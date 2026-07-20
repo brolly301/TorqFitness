@@ -1,10 +1,17 @@
-import { ScrollView, StyleSheet, Text, View } from "react-native";
-import React, { useMemo } from "react";
-import { Exercise } from "@/types/Global";
+import { Exercise } from "@/types/Global";
 import { Image } from "expo-image";
 import { Theme } from "@/types/Theme";
 import { useAppTheme } from "@/hooks/useAppTheme";
 import { capitalizeWords } from "@/utils/helpers";
+import {
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  Text,
+  View,
+} from "react-native";
+import React, { useEffect, useMemo, useState } from "react";
+import Feather from "@expo/vector-icons/Feather";
 
 type Props = {
   exercise: Exercise | null;
@@ -13,6 +20,12 @@ type Props = {
 export default function DetailsTab({ exercise }: Props) {
   const { theme, scale } = useAppTheme();
   const styles = useMemo(() => makeStyles(theme, scale), [theme, scale]);
+
+const [isPlaying, setIsPlaying] = useState(false);
+
+useEffect(() => {
+  setIsPlaying(false);
+}, [exercise?.id]);
 
   const instructions = exercise?.instructions ?? [];
 
@@ -31,38 +44,69 @@ export default function DetailsTab({ exercise }: Props) {
       contentContainerStyle={styles.contentContainer}
       showsVerticalScrollIndicator={false}
     >
-      <View style={styles.topSection}>
-        {exercise?.gifUrl ? (
-          <Image
-            style={styles.gif}
-            source={exercise.gifUrl}
-            contentFit="contain"
-          />
-        ) : (
-          <View style={styles.placeholder}>
-            <Text style={styles.placeholderText}>
-              {exercise?.name?.charAt(0).toUpperCase() ?? "?"}
-            </Text>
-          </View>
-        )}
+    <View style={styles.topSection}>
+  {exercise?.gifUrl ? (
+  <Pressable
+    style={styles.mediaContainer}
+    onPress={() => setIsPlaying((current) => !current)}
+    accessibilityRole="button"
+    accessibilityLabel={isPlaying ? "Pause demonstration" : "Play demonstration"}
+  >
+    <Image
+      style={styles.gif}
+      source={exercise.gifUrl}
+      contentFit="contain"
+      autoplay={isPlaying}
+    />
 
-        <View style={styles.detailsContainer}>
-          <Text style={styles.detailLabel}>Primary Muscle</Text>
-          <Text style={styles.detailValue}>{primaryMuscle}</Text>
-
-          {!!secondaryMuscles && (
-            <>
-              <Text style={styles.detailLabel}>Secondary Muscle</Text>
-              <Text style={styles.detailValue}>{secondaryMuscles}</Text>
-            </>
-          )}
-          <Text style={styles.detailLabel}>Body Part</Text>
-          <Text style={styles.detailValue}>{bodyPart}</Text>
-
-          <Text style={styles.detailLabel}>Equipment</Text>
-          <Text style={styles.detailValue}>{equipment}</Text>
-        </View>
+    {!isPlaying && (
+      <View style={styles.playButton}>
+        <Feather
+          name="play"
+          size={20 * scale}
+          color="#FFFFFF"
+        />
       </View>
+    )}
+  </Pressable>
+) : (
+  <View style={styles.placeholder}>
+    <Text style={styles.placeholderText}>
+      {exercise?.name?.charAt(0).toUpperCase() ?? "?"}
+    </Text>
+  </View>
+)}
+
+  <View style={styles.detailsGrid}>
+    <View style={styles.detailCard}>
+      <Text style={styles.detailLabel}>Primary Muscle</Text>
+      <Text style={styles.detailValue} numberOfLines={2}>
+        {primaryMuscle || "Not specified"}
+      </Text>
+    </View>
+
+    <View style={styles.detailCard}>
+      <Text style={styles.detailLabel}>Body Part</Text>
+      <Text style={styles.detailValue} numberOfLines={2}>
+        {bodyPart || "Not specified"}
+      </Text>
+    </View>
+
+    <View style={styles.detailCard}>
+      <Text style={styles.detailLabel}>Equipment</Text>
+      <Text style={styles.detailValue} numberOfLines={2}>
+        {equipment || "Not specified"}
+      </Text>
+    </View>
+
+    <View style={styles.detailCard}>
+      <Text style={styles.detailLabel}>Secondary Muscles</Text>
+      <Text style={styles.detailValue} numberOfLines={2}>
+        {secondaryMuscles || "None"}
+      </Text>
+    </View>
+  </View>
+</View>
 
       <View style={styles.instructionContainer}>
         <Text style={styles.heading}>Instructions</Text>
@@ -93,65 +137,101 @@ export const makeStyles = (theme: Theme, scale: number) =>
     },
 
     topSection: {
-      flexDirection: "row",
-      alignItems: "stretch",
       marginBottom: 16 * scale,
     },
 
+    mediaContainer: {
+      width: "100%",
+      height: 170 * scale,
+      marginBottom: 14 * scale,
+      overflow: "hidden",
+      backgroundColor: "#FFFFFF",
+      borderRadius: 14 * scale,
+    },
+
     gif: {
-      width: 120 * scale,
-      borderRadius: 12 * scale,
-      backgroundColor: theme.card,
-      marginRight: 12 * scale,
+      width: "100%",
+      height: "100%",
+    },
+
+    playButton: {
+      position: "absolute",
+      top: "50%",
+      left: "50%",
+      width: 46 * scale,
+      height: 46 * scale,
+      marginTop: -23 * scale,
+      marginLeft: -23 * scale,
+      alignItems: "center",
+      justifyContent: "center",
+      paddingLeft: 3 * scale,
+      backgroundColor: "#00000099",
+      borderRadius: 23 * scale,
     },
 
     placeholder: {
-      width: 120 * scale,
-      borderRadius: 12 * scale,
-      backgroundColor: theme.buttonPrimary + "15",
-      justifyContent: "center",
+      width: "100%",
+      height: 170 * scale,
+      marginBottom: 14 * scale,
       alignItems: "center",
-      marginRight: 12 * scale,
+      justifyContent: "center",
+      backgroundColor: theme.buttonPrimary + "12",
+      borderWidth: 1,
+      borderColor: theme.buttonPrimary + "25",
+      borderRadius: 14 * scale,
     },
 
     placeholderText: {
+      color: theme.buttonPrimary,
       fontSize: 40 * scale,
       fontWeight: "700",
-      color: theme.buttonPrimary,
-      marginBottom: 6 * scale,
     },
 
-    detailsContainer: {
-      flex: 1,
+    detailsGrid: {
+      flexDirection: "row",
+      flexWrap: "wrap",
+      gap: 8 * scale,
+    },
+
+    detailCard: {
+      width: "48.5%",
+      minHeight: 58 * scale,
       justifyContent: "center",
+      paddingHorizontal: 10 * scale,
+      paddingVertical: 8 * scale,
+      backgroundColor: theme.card,
+      borderWidth: 1,
+      borderColor: theme.border,
+      borderRadius: 11 * scale,
     },
 
     detailLabel: {
-      fontSize: 12 * scale,
+      marginBottom: 3 * scale,
       color: theme.textSecondary,
-      marginBottom: 2 * scale,
+      fontSize: 11 * scale,
+      fontWeight: "500",
     },
 
     detailValue: {
-      fontSize: 14 * scale,
-      fontWeight: "600",
       color: theme.text,
-      marginBottom: 10 * scale,
+      fontSize: 13 * scale,
+      fontWeight: "600",
+      lineHeight: 17 * scale,
     },
 
     instructionContainer: {
+      padding: 14 * scale,
       backgroundColor: theme.card,
-      borderRadius: 14 * scale,
       borderWidth: 1,
       borderColor: theme.border,
-      padding: 14 * scale,
+      borderRadius: 14 * scale,
     },
 
     heading: {
+      marginBottom: 12 * scale,
+      color: theme.text,
       fontSize: 16 * scale,
       fontWeight: "700",
-      color: theme.text,
-      marginBottom: 12 * scale,
     },
 
     instructionRow: {
@@ -163,22 +243,22 @@ export const makeStyles = (theme: Theme, scale: number) =>
     bullet: {
       width: 6 * scale,
       height: 6 * scale,
-      borderRadius: 3 * scale,
-      backgroundColor: theme.buttonPrimary,
       marginTop: 7 * scale,
       marginRight: 10 * scale,
+      backgroundColor: theme.buttonPrimary,
+      borderRadius: 3 * scale,
     },
 
     instruction: {
       flex: 1,
+      flexShrink: 1,
+      color: theme.text,
       fontSize: 14 * scale,
       lineHeight: 21 * scale,
-      color: theme.text,
-      flexShrink: 1,
     },
 
     emptyText: {
-      fontSize: 14 * scale,
       color: theme.textSecondary,
+      fontSize: 14 * scale,
     },
   });
