@@ -88,55 +88,77 @@ export default function WorkoutDetails({
       />
 
       <View style={styles.container}>
-        <View style={styles.header}>
-          <Pressable
-            onPress={() => setModalVisible(false)}
-            style={styles.iconButton}
-          >
-            <AntDesign name="close" size={20 * scale} color={theme.text} />
-          </Pressable>
+       <View style={styles.header}>
+  <View style={styles.headerText}>
+    <Text style={styles.name} numberOfLines={2}>
+      {workout.name}
+    </Text>
 
-          <Text style={styles.name} numberOfLines={1}>
-            {workout.name}
-          </Text>
+    <Text style={styles.headerMeta}>
+      {workoutDate} • {workoutDuration} •{" "}
+      {workout.exercises.length}{" "}
+      {workout.exercises.length === 1 ? "exercise" : "exercises"} •{" "}
+      {totalSets} {totalSets === 1 ? "set" : "sets"}
+    </Text>
+  </View>
 
-          <View style={styles.headerActions}>
-            <Pressable
-              style={[styles.secondaryAction, { marginRight: 8 * scale }]}
-              onPress={() => setDeleteModalVisible(true)}
-            >
-              <MaterialIcons
-                name="delete-outline"
-                size={18 * scale}
-                color={theme.text}
-              />
-            </Pressable>
+  <Pressable
+    onPress={() => setModalVisible(false)}
+    style={styles.iconButton}
+    hitSlop={8}
+  >
+    <AntDesign name="close" size={20 * scale} color={theme.text} />
+  </Pressable>
+</View>
 
-            <Pressable style={styles.primaryAction} onPress={handleEditWorkout}>
-              <Text style={styles.editText}>Edit</Text>
-            </Pressable>
-          </View>
-        </View>
+<View style={styles.actionRow}>
+  <Pressable style={styles.editAction} onPress={handleEditWorkout}>
+    <MaterialIcons
+      name="edit"
+      size={17 * scale}
+      color={theme.buttonPrimary}
+    />
+    <Text style={styles.editText}>Edit Workout</Text>
+  </Pressable>
+
+  <Pressable
+    style={styles.deleteAction}
+    onPress={() => setDeleteModalVisible(true)}
+    accessibilityRole="button"
+    accessibilityLabel="Delete workout"
+  >
+    <MaterialIcons
+      name="delete-outline"
+      size={19 * scale}
+      color={theme.error}
+    />
+  </Pressable>
+</View>
+      
 
         <FlatList
           data={exerciseList}
           keyExtractor={(item) => item.id}
           contentContainerStyle={styles.listContent}
           showsVerticalScrollIndicator={false}
+   ListHeaderComponent={
+  workout.notes ? (
+    <View style={styles.overviewContainer}>
+      <Text style={styles.notes} numberOfLines={3}>
+        {workout.notes}
+      </Text>
+    </View>
+  ) : null
+}
           ListHeaderComponent={
-            <View style={styles.overviewContainer}>
-              {!!workout.notes && (
-                <Text style={styles.notes} numberOfLines={2}>
-                  {workout.notes}
-                </Text>
-              )}
+  workout.notes ? (
+    <View style={styles.overviewContainer}>
+      <Text style={styles.notes} numberOfLines={3}>
+        {workout.notes}
+      </Text>
+    </View>
+  ) : null
 
-              <Text style={styles.metaPrimary}>{workoutDate}</Text>
-              <Text style={styles.metaText}>
-                {workoutDuration} • {workout.exercises.length} exercises •{" "}
-                {totalSets} sets
-              </Text>
-            </View>
           }
           renderItem={({ item }) => {
             const primary = capitalizeWords(
@@ -215,50 +237,101 @@ export const makeStyles = (theme: Theme, scale: number) =>
     },
 
     header: {
-      height: 44 * scale,
+      flexDirection: "row",
+      alignItems: "flex-start",
+      justifyContent: "space-between",
+      marginBottom: 14 * scale,
+    },
+
+    headerText: {
+      flex: 1,
+      marginRight: 14 * scale,
+    },
+
+    name: {
+      fontSize: 24 * scale,
+      lineHeight: 29 * scale,
+      fontWeight: "700",
+      color: theme.text,
+      marginBottom: 5 * scale,
+    },
+
+    headerMeta: {
+      fontSize: 13 * scale,
+      lineHeight: 18 * scale,
+      color: theme.textSecondary,
+    },
+
+    iconButton: {
+      width: 36 * scale,
+      height: 36 * scale,
+      alignItems: "center",
       justifyContent: "center",
-      marginBottom: 10 * scale,
-      position: "relative",
+      borderRadius: 10 * scale,
+      backgroundColor: theme.card,
+      borderWidth: 1,
+      borderColor: theme.border,
+    },
+
+    actionRow: {
+      flexDirection: "row",
+      alignItems: "center",
+      gap: 8 * scale,
+      marginBottom: 12 * scale,
+    },
+
+    editAction: {
+      flex: 1,
+      minHeight: 40 * scale,
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "center",
+      gap: 7 * scale,
+      borderRadius: 11 * scale,
+      backgroundColor: theme.buttonPrimary + "12",
+      borderWidth: 1,
+      borderColor: theme.buttonPrimary + "35",
+    },
+
+    editText: {
+      fontSize: 14 * scale,
+      fontWeight: "600",
+      color: theme.buttonPrimary,
+    },
+
+    deleteAction: {
+      width: 42 * scale,
+      height: 40 * scale,
+      alignItems: "center",
+      justifyContent: "center",
+      borderRadius: 11 * scale,
+      backgroundColor: theme.error + "12",
+      borderWidth: 1,
+      borderColor: theme.error + "30",
     },
 
     listContent: {
-      paddingTop: 8 * scale,
+      paddingTop: 4 * scale,
       paddingBottom: 12 * scale,
     },
 
     overviewContainer: {
-      marginBottom: 6 * scale,
+      marginBottom: 8 * scale,
     },
 
     notes: {
-      fontSize: 15 * scale,
-      color: theme.textSecondary,
-      marginBottom: 6 * scale,
-    },
-
-    metaPrimary: {
-      fontSize: 16 * scale,
-      color: theme.textSecondary,
-      marginBottom: 2 * scale,
-      fontWeight: "600",
-    },
-
-    metaText: {
-      fontSize: 15 * scale,
+      fontSize: 14 * scale,
+      lineHeight: 20 * scale,
       color: theme.textSecondary,
     },
 
     workoutCard: {
       marginTop: 10 * scale,
+      overflow: "hidden",
       borderRadius: 14 * scale,
+      backgroundColor: theme.cardSurface,
       borderWidth: 1,
       borderColor: theme.border,
-      backgroundColor: theme.cardSurface,
-      overflow: "hidden",
-      shadowColor: "#000",
-      shadowOpacity: 0.03,
-      shadowRadius: 8,
-      shadowOffset: { width: 0, height: 2 },
     },
 
     workoutDetails: {
@@ -270,8 +343,8 @@ export const makeStyles = (theme: Theme, scale: number) =>
     exerciseName: {
       fontSize: 17 * scale,
       fontWeight: "700",
-      marginBottom: 2 * scale,
       color: theme.text,
+      marginBottom: 2 * scale,
     },
 
     exerciseMuscle: {
@@ -295,23 +368,25 @@ export const makeStyles = (theme: Theme, scale: number) =>
     },
 
     columnHeaderLeft: {
-      width: 46 * scale,
-      fontSize: 13 * scale,
+      width: 42 * scale,
+      fontSize: 12 * scale,
+      fontWeight: "600",
       color: theme.textSecondary,
     },
 
     columnHeaderRight: {
       flex: 1,
-      textAlign: "right",
-      fontSize: 13 * scale,
+      fontSize: 12 * scale,
+      fontWeight: "600",
       color: theme.textSecondary,
+      textAlign: "right",
     },
 
     setCard: {
       flexDirection: "row",
       alignItems: "center",
       paddingHorizontal: 14 * scale,
-      paddingVertical: 10 * scale,
+      paddingVertical: 9 * scale,
       backgroundColor: theme.rowSurface,
     },
 
@@ -321,95 +396,40 @@ export const makeStyles = (theme: Theme, scale: number) =>
     },
 
     setNumber: {
-      width: 34 * scale,
-      height: 34 * scale,
-      borderRadius: 10 * scale,
-      backgroundColor: theme.buttonPrimary,
+      width: 30 * scale,
+      height: 30 * scale,
       alignItems: "center",
       justifyContent: "center",
       marginRight: 12 * scale,
+      borderRadius: 9 * scale,
+      backgroundColor: theme.buttonPrimary + "12",
+      borderWidth: 1,
+      borderColor: theme.buttonPrimary + "30",
     },
 
     setNumberText: {
-      color: theme.buttonPrimaryText,
-      fontSize: 15 * scale,
+      fontSize: 13 * scale,
       fontWeight: "700",
+      color: theme.buttonPrimary,
     },
 
     currentSetText: {
       flex: 1,
-      fontSize: 16 * scale,
+      fontSize: 15 * scale,
       fontWeight: "600",
       color: theme.text,
-    },
-
-    previousSetText: {
-      width: 110 * scale,
       textAlign: "right",
-      fontSize: 15 * scale,
-      color: theme.textSecondary,
     },
 
-    iconButton: {
-      position: "absolute",
-      left: 0,
-      width: 36 * scale,
-      height: 36 * scale,
-      alignItems: "center",
-      justifyContent: "center",
-      borderRadius: 10 * scale,
-      backgroundColor: theme.card,
-      borderWidth: 1,
-      borderColor: theme.border,
-    },
-
-    headerActions: {
-      position: "absolute",
-      right: 0,
-      flexDirection: "row",
-      alignItems: "center",
-    },
-
-    name: {
-      position: "absolute",
-      left: 60 * scale,
-      right: 60 * scale,
-      fontSize: 22 * scale,
-      fontWeight: "700",
-      textAlign: "center",
-      color: theme.text,
-    },
-
-    secondaryAction: {
-      paddingVertical: 7.5 * scale,
-      paddingHorizontal: 10 * scale,
-      justifyContent: "center",
-      alignItems: "center",
-      backgroundColor: theme.border,
-      borderRadius: 10 * scale,
-    },
-
-    primaryAction: {
-      paddingVertical: 7.5 * scale,
-      paddingHorizontal: 12 * scale,
-      justifyContent: "center",
-      alignItems: "center",
-      backgroundColor: theme.buttonPrimary,
-      borderRadius: 10 * scale,
-    },
-
-    editText: {
-      fontSize: 15 * scale,
-      fontWeight: "600",
-      color: theme.buttonPrimaryText,
-    },
     placeholderContainer: {
       flexDirection: "row",
-      paddingVertical: 10,
+      alignItems: "center",
+      paddingVertical: 12 * scale,
     },
+
     placeholderText: {
-      color: theme.text + "CC",
       fontSize: 14 * scale,
-      marginLeft: 10,
+      color: theme.textSecondary,
+      marginLeft: 10 * scale,
     },
   });

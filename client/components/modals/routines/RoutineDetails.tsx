@@ -187,7 +187,7 @@ const [expandedExerciseId, setExpandedExerciseId] = useState<string | null>(
       <View style={styles.setPreview}>
         {visibleSets.map((set, index) => {
           const setText = set.weight
-            ? `${formatWeight(set.weight, weightUnit)} ${weightUnit} × ${set.reps}`
+            ? `${formatWeight(set.weight, weightUnit)} × ${set.reps}`
             : `${set.reps} reps`;
 
           return (

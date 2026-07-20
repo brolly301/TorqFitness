@@ -40,7 +40,8 @@ export default function HistoryScreen() {
       dates[selectedDate] = {
         ...dates[selectedDate],
         selected: true,
-        selectedColor: theme.buttonPrimary,
+        selectedColor: theme.buttonPrimary + "24",
+selectedTextColor: theme.buttonPrimary,
       };
     }
 
@@ -75,27 +76,27 @@ export default function HistoryScreen() {
       <AppWrapper>
         <View style={styles.container}>
           <View style={styles.header}>
-            <Pressable
-              style={styles.calendarButton}
-              hitSlop={10}
-              onPress={() => setCalendarVisible(true)}
-              accessibilityRole="button"
-              accessibilityLabel="Filter workouts by date"
-            >
-              <Feather
-                name="calendar"
-                size={20 * scale}
-                color={theme.buttonPrimary}
-              />
-            </Pressable>
-          </View>
+  <View style={styles.titleContainer}>
+    <Text style={styles.title}>History</Text>
+    <Text style={styles.description}>
+      Track your sessions. See your progress.
+    </Text>
+  </View>
 
-          <View style={styles.titleContainer}>
-            <Text style={styles.title}>History</Text>
-            <Text style={styles.description}>
-              Track your sessions. See your progress.
-            </Text>
-          </View>
+  <Pressable
+    style={styles.calendarButton}
+    hitSlop={10}
+    onPress={() => setCalendarVisible(true)}
+    accessibilityRole="button"
+    accessibilityLabel="Filter workouts by date"
+  >
+    <Feather
+      name="calendar"
+      size={20 * scale}
+      color={theme.buttonPrimary}
+    />
+  </Pressable>
+</View>
 
           <View style={styles.tabContainer}>
             <Pressable
@@ -140,47 +141,66 @@ export default function HistoryScreen() {
               </Text>
             </Pressable>
           </View>
-          {activeTab === "activity" && selectedDate && (
-            <View style={styles.dateFilter}>
-              <Text style={styles.dateFilterText}>
-                {new Date(`${selectedDate}T00:00:00`).toLocaleDateString(
-                  undefined,
-                  {
-                    day: "numeric",
-                    month: "long",
-                    year: "numeric",
-                  },
-                )}
-              </Text>
+         {activeTab === "activity" && selectedDate ? (
+  <View style={styles.dateFilter}>
+    <Feather
+      name="calendar"
+      size={14 * scale}
+      color={theme.buttonPrimary}
+    />
 
-              <Pressable
-                onPress={() => setSelectedDate(null)}
-                accessibilityRole="button"
-                accessibilityLabel="Clear date filter"
-                hitSlop={10}
-              >
-                <Feather name="x" size={18 * scale} color={theme.text} />
-              </Pressable>
-            </View>
-          )}
+    <Text style={styles.dateFilterText}>
+      {new Date(`${selectedDate}T00:00:00`).toLocaleDateString(
+        undefined,
+        {
+          day: "numeric",
+          month: "long",
+          year: "numeric",
+        },
+      )}
+    </Text>
+
+    <Pressable
+      style={styles.dateFilterClear}
+      onPress={() => setSelectedDate(null)}
+      accessibilityRole="button"
+      accessibilityLabel="Clear date filter"
+      hitSlop={8}
+    >
+      <Feather
+        name="x"
+        size={14 * scale}
+        color={theme.buttonPrimary}
+      />
+    </Pressable>
+  </View>
+) : null}
           <View style={styles.contentContainer}>
             {activeTab === "activity" &&
               (displayedWorkouts.length > 0 ? (
                 <ActivityList workouts={displayedWorkouts} />
               ) : (
-                <View style={styles.placeholderContainer}>
-                  <Text style={styles.placeholderTitle}>
-                    {selectedDate
-                      ? "No workouts on this date"
-                      : "No workouts yet"}
-                  </Text>
+               <View style={styles.placeholderContainer}>
+  <View style={styles.placeholderIcon}>
+    <Feather
+      name={selectedDate ? "calendar" : "activity"}
+      size={23 * scale}
+      color={theme.buttonPrimary}
+    />
+  </View>
 
-                  <Text style={styles.placeholderText}>
-                    {selectedDate
-                      ? "Choose another date or clear the date filter"
-                      : "Start your first workout to see it here"}
-                  </Text>
-                </View>
+  <Text style={styles.placeholderTitle}>
+    {selectedDate
+      ? "No workouts on this date"
+      : "No workouts yet"}
+  </Text>
+
+  <Text style={styles.placeholderText}>
+    {selectedDate
+      ? "Choose another date or clear the date filter"
+      : "Complete your first workout to see it here"}
+  </Text>
+</View>
               ))}
             {activeTab === "records" && <RecordsList workouts={workouts} />}
           </View>
@@ -194,30 +214,21 @@ const makeStyles = (theme: Theme, scale: number) =>
   StyleSheet.create({
     container: {
       flex: 1,
-      backgroundColor: theme.background,
       paddingHorizontal: 16 * scale,
       paddingTop: 12 * scale,
+      backgroundColor: theme.background,
     },
 
     header: {
       flexDirection: "row",
-      justifyContent: "flex-end",
-      marginBottom: 12 * scale,
-    },
-
-    calendarButton: {
-      width: 40 * scale,
-      height: 40 * scale,
-      justifyContent: "center",
-      alignItems: "center",
-      backgroundColor: theme.card,
-      borderRadius: 12 * scale,
-      borderWidth: 1,
-      borderColor: theme.border,
+      alignItems: "flex-start",
+      justifyContent: "space-between",
+      marginBottom: 18 * scale,
     },
 
     titleContainer: {
-      marginBottom: 18 * scale,
+      flex: 1,
+      marginRight: 16 * scale,
     },
 
     title: {
@@ -229,47 +240,93 @@ const makeStyles = (theme: Theme, scale: number) =>
 
     description: {
       fontSize: 16 * scale,
+      lineHeight: 22 * scale,
       fontWeight: "400",
       color: theme.textSecondary,
-      lineHeight: 22 * scale,
+    },
+
+    calendarButton: {
+      width: 40 * scale,
+      height: 40 * scale,
+      alignItems: "center",
+      justifyContent: "center",
+      borderRadius: 12 * scale,
+      backgroundColor: theme.card,
+      borderWidth: 1,
+      borderColor: theme.border,
     },
 
     tabContainer: {
       flexDirection: "row",
-      gap: 10 * scale,
+      gap: 4 * scale,
+      padding: 4 * scale,
       marginBottom: 16 * scale,
+      borderRadius: 14 * scale,
+      backgroundColor: theme.card,
+      borderWidth: 1,
+      borderColor: theme.border,
     },
 
     tabButton: {
       flex: 1,
-      borderRadius: 14 * scale,
-      paddingVertical: 12 * scale,
+      minHeight: 40 * scale,
       alignItems: "center",
       justifyContent: "center",
+      borderRadius: 10 * scale,
       borderWidth: 1,
     },
 
     tabButtonActive: {
-      backgroundColor: theme.buttonPrimary,
-      borderColor: theme.buttonPrimary,
+      backgroundColor: theme.buttonPrimary + "14",
+      borderColor: theme.buttonPrimary + "35",
     },
 
     tabButtonInactive: {
-      backgroundColor: theme.card,
-      borderColor: theme.border,
+      backgroundColor: "transparent",
+      borderColor: "transparent",
     },
 
     tabButtonText: {
-      fontSize: 15 * scale,
+      fontSize: 14 * scale,
       fontWeight: "600",
     },
 
     tabButtonTextActive: {
-      color: theme.buttonPrimaryText,
+      color: theme.buttonPrimary,
     },
 
     tabButtonTextInactive: {
-      color: theme.text,
+      color: theme.textSecondary,
+    },
+
+    dateFilter: {
+      alignSelf: "flex-start",
+      flexDirection: "row",
+      alignItems: "center",
+      gap: 7 * scale,
+      minHeight: 34 * scale,
+      paddingLeft: 10 * scale,
+      paddingRight: 5 * scale,
+      marginBottom: 12 * scale,
+      borderRadius: 999,
+      backgroundColor: theme.buttonPrimary + "12",
+      borderWidth: 1,
+      borderColor: theme.buttonPrimary + "30",
+    },
+
+    dateFilterText: {
+      fontSize: 13 * scale,
+      fontWeight: "600",
+      color: theme.buttonPrimary,
+    },
+
+    dateFilterClear: {
+      width: 24 * scale,
+      height: 24 * scale,
+      alignItems: "center",
+      justifyContent: "center",
+      borderRadius: 12 * scale,
+      backgroundColor: theme.buttonPrimary + "12",
     },
 
     contentContainer: {
@@ -277,45 +334,40 @@ const makeStyles = (theme: Theme, scale: number) =>
     },
 
     placeholderContainer: {
+      alignItems: "center",
       marginTop: 8 * scale,
+      paddingVertical: 30 * scale,
+      paddingHorizontal: 22 * scale,
+      borderRadius: 18 * scale,
       backgroundColor: theme.card,
-      borderRadius: 16 * scale,
       borderWidth: 1,
       borderColor: theme.border,
-      paddingVertical: 24 * scale,
-      paddingHorizontal: 18 * scale,
+    },
+
+    placeholderIcon: {
+      width: 50 * scale,
+      height: 50 * scale,
       alignItems: "center",
+      justifyContent: "center",
+      marginBottom: 15 * scale,
+      borderRadius: 15 * scale,
+      backgroundColor: theme.buttonPrimary + "14",
+      borderWidth: 1,
+      borderColor: theme.buttonPrimary + "25",
     },
 
     placeholderTitle: {
-      fontSize: 16 * scale,
+      fontSize: 18 * scale,
       fontWeight: "700",
       color: theme.text,
-      marginBottom: 6 * scale,
+      marginBottom: 7 * scale,
     },
 
     placeholderText: {
+      maxWidth: 280 * scale,
       fontSize: 14 * scale,
-      color: theme.textSecondary,
       lineHeight: 20 * scale,
+      color: theme.textSecondary,
       textAlign: "center",
-    },
-    dateFilter: {
-      flexDirection: "row",
-      alignItems: "center",
-      justifyContent: "space-between",
-      backgroundColor: theme.card,
-      borderWidth: 1,
-      borderColor: theme.border,
-      borderRadius: 12 * scale,
-      paddingHorizontal: 14 * scale,
-      paddingVertical: 10 * scale,
-      marginBottom: 12 * scale,
-    },
-
-    dateFilterText: {
-      fontSize: 14 * scale,
-      fontWeight: "600",
-      color: theme.text,
     },
   });

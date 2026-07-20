@@ -61,88 +61,99 @@ export default function ActivityTile({ workout }: Props) {
 
   const setLabel = totalSets === 1 ? "set" : "sets";
 
-  const previewExercises = exerciseList.slice(0, 3);
+  const previewExercises = exerciseList.slice(0, 2);
   const remainingExerciseCount = exerciseList.length - previewExercises.length;
 
   return (
     <>
-      <WorkoutDetailsModal
-        modalVisible={modalVisible}
-        setModalVisible={setModalVisible}
-        workout={workout}
-          returnTo="/(tabs)/history"
+     <WorkoutDetailsModal
+  modalVisible={modalVisible}
+  setModalVisible={setModalVisible}
+  workout={workout}
+  returnTo="/(tabs)/history"
+/>
 
+<Pressable
+  style={({ pressed }) => [
+    styles.container,
+    pressed && styles.containerPressed,
+  ]}
+  onPress={() => setModalVisible(true)}
+>
+  <View style={styles.header}>
+    <View style={styles.headerText}>
+      <Text style={styles.name} numberOfLines={1}>
+        {workout.name}
+      </Text>
+
+      <Text style={styles.date}>{workoutDate}</Text>
+    </View>
+
+    <View style={styles.durationPill}>
+      <Feather
+        name="clock"
+        size={13 * scale}
+        color={theme.buttonPrimary}
       />
+      <Text style={styles.duration}>{workoutDuration}</Text>
+    </View>
+  </View>
 
-      <Pressable style={styles.container} onPress={() => setModalVisible(true)}>
-        <View style={styles.titleDuration}>
-          <Text style={styles.name} numberOfLines={1}>
-            {workout.name}
-          </Text>
+  <View style={styles.statsContainer}>
+    <View style={styles.statPill}>
+      <Text style={styles.statText}>
+        {displayedTotalVolume} {weightUnit}
+      </Text>
+    </View>
 
-          <View style={styles.durationContainer}>
-            <Feather name="clock" size={14} color={theme.buttonPrimary} />
-            <Text style={styles.duration}>{formatTime(workout.duration)}</Text>
+    <View style={styles.statPill}>
+      <Text style={styles.statText}>
+        {exerciseCount} {exerciseLabel}
+      </Text>
+    </View>
+
+    <View style={styles.statPill}>
+      <Text style={styles.statText}>
+        {totalSets} {setLabel}
+      </Text>
+    </View>
+  </View>
+
+  {previewExercises.length > 0 ? (
+    <View style={styles.exercisePreview}>
+      {previewExercises.map((exercise) => {
+        const setCount = exercise.sets.length;
+
+        return (
+          <View key={exercise.id} style={styles.exerciseRow}>
+            <Text style={styles.exerciseName} numberOfLines={1}>
+              {capitalizeWords(exercise.details?.name ?? "Exercise")}
+            </Text>
+
+            <Text style={styles.exerciseSets}>
+              {setCount} {setCount === 1 ? "set" : "sets"}
+            </Text>
           </View>
-        </View>
-        <Text style={styles.dateTime}>{workoutDate}</Text>
+        );
+      })}
 
-        <View style={styles.hr} />
-
-        {exerciseList.length >= 1 ? (
-          <>
-            {previewExercises.map((exercise) => {
-              const setCount = exercise.sets.length;
-              const setLabel = setCount === 1 ? "set" : "sets";
-
-              return (
-                <View key={exercise.id} style={styles.exerciseRow}>
-                  <Text style={styles.exerciseName} numberOfLines={1}>
-                    {capitalizeWords(exercise.details?.name ?? "Exercise")}
-                  </Text>
-
-                  <Text style={styles.exerciseSets}>
-                    {setCount} {setLabel}
-                  </Text>
-                </View>
-              );
-            })}
-
-            {remainingExerciseCount > 0 && (
-              <Text style={styles.moreExercises}>
-                +{remainingExerciseCount} more
-              </Text>
-            )}
-          </>
-        ) : (
-          <View style={styles.placeholderContainer}>
-            <MaterialCommunityIcons
-              name="dumbbell"
-              color={theme.text + "CC"}
-              size={17}
-            />
-            <Text style={styles.placeholderText}>No exercises added yet</Text>
-          </View>
-        )}
-
-        <View style={styles.hr} />
-
-        <View style={styles.metaContainer}>
-          <Text style={styles.meta}>
-            {displayedTotalVolume} {weightUnit}
-          </Text>
-          <Text style={styles.meta}> • </Text>
-          <Text style={styles.meta}>
-            {exerciseCount} {exerciseLabel}
-          </Text>
-
-          <Text style={styles.meta}> • </Text>
-
-          <Text style={styles.meta}>
-            {totalSets} {setLabel}
-          </Text>
-        </View>
-      </Pressable>
+      {remainingExerciseCount > 0 ? (
+        <Text style={styles.moreExercises}>
+          +{remainingExerciseCount} more
+        </Text>
+      ) : null}
+    </View>
+  ) : (
+    <View style={styles.placeholderContainer}>
+      <MaterialCommunityIcons
+        name="dumbbell"
+        color={theme.textSecondary}
+        size={16 * scale}
+      />
+      <Text style={styles.placeholderText}>No exercises added</Text>
+    </View>
+  )}
+</Pressable>
     </>
   );
 }
@@ -150,99 +161,121 @@ export default function ActivityTile({ workout }: Props) {
 export const makeStyles = (theme: Theme, scale: number) =>
   StyleSheet.create({
     container: {
-      backgroundColor: theme.card,
-      borderRadius: 14 * scale,
       padding: 16 * scale,
       marginBottom: 12 * scale,
+      borderRadius: 16 * scale,
+      backgroundColor: theme.card,
       borderWidth: 1,
       borderColor: theme.border,
     },
 
+    containerPressed: {
+      opacity: 0.78,
+    },
+
+    header: {
+      flexDirection: "row",
+      alignItems: "flex-start",
+      justifyContent: "space-between",
+    },
+
+    headerText: {
+      flex: 1,
+      marginRight: 12 * scale,
+    },
+
     name: {
-      color: theme.text,
       fontSize: 18 * scale,
       fontWeight: "700",
-      marginBottom: 4 * scale,
+      color: theme.text,
+      marginBottom: 3 * scale,
     },
 
-    dateTimeContainer: {
-      flexDirection: "row",
-      marginBottom: 2 * scale,
-    },
-
-    dateTime: {
-      fontSize: 14 * scale,
+    date: {
+      fontSize: 13 * scale,
       color: theme.textSecondary,
     },
 
-    hr: {
-      height: 1,
-      width: "100%",
-      backgroundColor: theme.border,
-      marginVertical: 10 * scale,
+    durationPill: {
+      flexDirection: "row",
+      alignItems: "center",
+      gap: 5 * scale,
+      paddingHorizontal: 8 * scale,
+      paddingVertical: 5 * scale,
+      borderRadius: 999,
+      backgroundColor: theme.buttonPrimary + "12",
+      borderWidth: 1,
+      borderColor: theme.buttonPrimary + "25",
+    },
+
+    duration: {
+      fontSize: 12 * scale,
+      fontWeight: "600",
+      color: theme.buttonPrimary,
+    },
+
+    statsContainer: {
+      flexDirection: "row",
+      flexWrap: "wrap",
+      gap: 7 * scale,
+      marginTop: 14 * scale,
+    },
+
+    statPill: {
+      paddingHorizontal: 9 * scale,
+      paddingVertical: 5 * scale,
+      borderRadius: 999,
+      backgroundColor: theme.buttonSecondary,
+      borderWidth: 1,
+      borderColor: theme.border,
+    },
+
+    statText: {
+      fontSize: 12 * scale,
+      fontWeight: "600",
+      color: theme.textSecondary,
+    },
+
+    exercisePreview: {
+      gap: 7 * scale,
+      marginTop: 14 * scale,
     },
 
     exerciseRow: {
       flexDirection: "row",
       alignItems: "center",
       justifyContent: "space-between",
-      marginVertical: 2 * scale,
       gap: 12 * scale,
     },
 
     exerciseName: {
       flex: 1,
-      fontSize: 16 * scale,
+      fontSize: 14 * scale,
+      fontWeight: "500",
       color: theme.text,
     },
 
     exerciseSets: {
-      fontSize: 16 * scale,
-      color: theme.text,
-    },
-
-    metaContainer: {
-      flexDirection: "row",
-      alignItems: "center",
-      flexWrap: "wrap",
-    },
-
-    meta: {
-      fontSize: 16 * scale,
-      color: theme.text,
-      fontWeight: "500",
-    },
-    durationContainer: {
-      paddingHorizontal: 5,
-      paddingVertical: 3,
-      borderRadius: 10,
-      backgroundColor: theme.buttonPrimary + "15",
-
-      flexDirection: "row",
-      alignItems: "center",
-    },
-    duration: {
-      fontSize: 12,
-      fontWeight: "400",
+      fontSize: 13 * scale,
       color: theme.textSecondary,
-      marginLeft: 5,
     },
-    titleDuration: {
-      flexDirection: "row",
-      justifyContent: "space-between",
+
+    moreExercises: {
+      fontSize: 13 * scale,
+      fontWeight: "600",
+      color: theme.buttonPrimary,
+      marginTop: 1 * scale,
     },
+
     placeholderContainer: {
       flexDirection: "row",
-      marginVertical: 5 * scale,
+      alignItems: "center",
+      marginTop: 14 * scale,
     },
+
     placeholderText: {
-      color: theme.text + "CC",
-      fontSize: 14 * scale,
-      marginLeft: 10,
-    },
-    moreExercises: {
-      fontSize: 14 * scale,
+      fontSize: 13 * scale,
       color: theme.textSecondary,
-      marginTop: 6 * scale,
+      marginLeft: 8 * scale,
     },
   });

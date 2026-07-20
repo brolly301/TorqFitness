@@ -3,6 +3,9 @@ import { FlatList, StyleSheet, Text, View } from "react-native";
 import { Workout } from "@/types/Global";
 import { useExerciseContext } from "@/context/ExerciseContext";
 import RecordsTile, { ExerciseRecord } from "./RecordsTile";
+import Feather from "@expo/vector-icons/Feather";
+import { useAppTheme } from "@/hooks/useAppTheme";
+import { Theme } from "@/types/Theme";
 
 type Props = {
   workouts: Workout[];
@@ -10,6 +13,9 @@ type Props = {
 
 export default function RecordsList({ workouts }: Props) {
   const { exercises } = useExerciseContext();
+  
+  const { theme, scale } = useAppTheme();
+const styles = useMemo(() => makeStyles(theme, scale), [theme, scale]);
 
   const records = useMemo(() => {
     const recordsByExercise = new Map<string, ExerciseRecord>();
@@ -83,12 +89,21 @@ export default function RecordsList({ workouts }: Props) {
 
   if (records.length === 0) {
     return (
-      <View style={styles.placeholder}>
-        <Text style={styles.placeholderTitle}>No records yet</Text>
-        <Text style={styles.placeholderText}>
-          Complete a workout to start tracking records
-        </Text>
-      </View>
+     <View style={styles.placeholder}>
+  <View style={styles.placeholderIcon}>
+    <Feather
+      name="award"
+      size={23 * scale}
+      color={theme.buttonPrimary}
+    />
+  </View>
+
+  <Text style={styles.placeholderTitle}>No records yet</Text>
+
+  <Text style={styles.placeholderText}>
+    Complete a workout to start building your exercise records.
+  </Text>
+</View>
     );
   }
 
@@ -103,23 +118,47 @@ export default function RecordsList({ workouts }: Props) {
   );
 }
 
-const styles = StyleSheet.create({
-  listContent: {
-    paddingBottom: 32,
-  },
+const makeStyles = (theme: Theme, scale: number) =>
+  StyleSheet.create({
+    listContent: {
+      paddingBottom: 32 * scale,
+    },
 
-  placeholder: {
-    alignItems: "center",
-    padding: 24,
-  },
+    placeholder: {
+      alignItems: "center",
+      marginTop: 8 * scale,
+      paddingVertical: 30 * scale,
+      paddingHorizontal: 22 * scale,
+      borderRadius: 18 * scale,
+      backgroundColor: theme.card,
+      borderWidth: 1,
+      borderColor: theme.border,
+    },
 
-  placeholderTitle: {
-    fontSize: 16,
-    fontWeight: "700",
-  },
+    placeholderIcon: {
+      width: 50 * scale,
+      height: 50 * scale,
+      alignItems: "center",
+      justifyContent: "center",
+      marginBottom: 15 * scale,
+      borderRadius: 15 * scale,
+      backgroundColor: theme.buttonPrimary + "14",
+      borderWidth: 1,
+      borderColor: theme.buttonPrimary + "25",
+    },
 
-  placeholderText: {
-    fontSize: 14,
-    marginTop: 6,
-  },
-});
+    placeholderTitle: {
+      fontSize: 18 * scale,
+      fontWeight: "700",
+      color: theme.text,
+      marginBottom: 7 * scale,
+    },
+
+    placeholderText: {
+      maxWidth: 280 * scale,
+      fontSize: 14 * scale,
+      lineHeight: 20 * scale,
+      color: theme.textSecondary,
+      textAlign: "center",
+    },
+  });
