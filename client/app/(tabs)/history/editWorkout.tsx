@@ -171,44 +171,46 @@ export default function EditWorkoutScreen() {
           behavior={Platform.OS === "ios" ? "padding" : undefined}
           keyboardVerticalOffset={0}
         >
-          <View style={styles.header}>
-            <Pressable
-              onPress={() => setDiscardModalVisible(true)}
-              hitSlop={10}
-              style={styles.headerIconButton}
-            >
-              <Feather name="arrow-left" color={theme.text} size={22 * scale} />
-            </Pressable>
+        <View style={styles.header}>
+  <Pressable
+    onPress={() => setDiscardModalVisible(true)}
+    hitSlop={10}
+    style={({ pressed }) => [
+      styles.headerIconButton,
+      pressed && styles.headerButtonPressed,
+    ]}
+    accessibilityRole="button"
+    accessibilityLabel="Discard changes and go back"
+  >
+    <Feather
+      name="arrow-left"
+      color={theme.text}
+      size={22 * scale}
+    />
+  </Pressable>
 
-            <Pressable
-              style={[
-                styles.saveButton,
-                !canSave && {
-                  backgroundColor: theme.buttonDisabled,
-                  borderColor: theme.buttonDisabled,
-                },
-              ]}
-              onPress={() => setFinishModalVisible(true)}
-              disabled={!canSave}
-              hitSlop={10}
-            >
-              <Text
-                style={[
-                  styles.saveText,
-                  {
-                    color: canSave ? theme.buttonPrimary : theme.textSecondary,
-                  },
-                ]}
-              >
-                Save
-              </Text>
-              <Feather
-                name="check"
-                color={canSave ? theme.buttonPrimary : theme.textSecondary}
-                size={20 * scale}
-              />
-            </Pressable>
-          </View>
+  <Pressable
+    style={({ pressed }) => [
+      styles.saveButton,
+      !canSave && styles.saveButtonDisabled,
+      pressed && canSave && styles.headerButtonPressed,
+    ]}
+    onPress={() => setFinishModalVisible(true)}
+    disabled={!canSave}
+    hitSlop={10}
+    accessibilityRole="button"
+    accessibilityLabel="Save workout changes"
+  >
+    <Text
+      style={[
+        styles.saveText,
+        !canSave && styles.saveTextDisabled,
+      ]}
+    >
+      Save
+    </Text>
+  </Pressable>
+</View>
 
           <View style={styles.formContainer}>
             <WorkoutForm
@@ -229,46 +231,58 @@ const makeStyles = (theme: Theme, scale: number) =>
   StyleSheet.create({
     container: {
       flex: 1,
-      paddingHorizontal: 16 * scale,
       paddingTop: 12 * scale,
+      paddingHorizontal: 16 * scale,
       backgroundColor: theme.background,
     },
 
     header: {
+      minHeight: 40 * scale,
       flexDirection: "row",
-      justifyContent: "space-between",
       alignItems: "center",
+      justifyContent: "space-between",
       marginBottom: 16 * scale,
     },
 
     headerIconButton: {
       width: 40 * scale,
       height: 40 * scale,
-      borderRadius: 12 * scale,
       alignItems: "center",
       justifyContent: "center",
       backgroundColor: theme.card,
       borderWidth: 1,
       borderColor: theme.border,
+      borderRadius: 12 * scale,
     },
 
     saveButton: {
-      flexDirection: "row",
+      minHeight: 40 * scale,
       alignItems: "center",
       justifyContent: "center",
-      paddingVertical: 10 * scale,
       paddingHorizontal: 14 * scale,
-      borderRadius: 12 * scale,
-      backgroundColor: theme.buttonPrimary + "15",
+      backgroundColor: theme.buttonPrimary + "14",
       borderWidth: 1,
-      borderColor: theme.buttonPrimary + "30",
+      borderColor: theme.buttonPrimary + "40",
+      borderRadius: 12 * scale,
+    },
+
+    saveButtonDisabled: {
+      backgroundColor: theme.buttonDisabled,
+      borderColor: theme.border,
     },
 
     saveText: {
-      fontSize: 16 * scale,
-      fontWeight: "600",
-      marginRight: 6 * scale,
       color: theme.buttonPrimary,
+      fontSize: 14 * scale,
+      fontWeight: "700",
+    },
+
+    saveTextDisabled: {
+      color: theme.buttonDisabledText,
+    },
+
+    headerButtonPressed: {
+      opacity: 0.7,
     },
 
     formContainer: {
@@ -276,7 +290,7 @@ const makeStyles = (theme: Theme, scale: number) =>
     },
 
     loadingText: {
-      fontSize: 16 * scale,
       color: theme.textSecondary,
+      fontSize: 16 * scale,
     },
   });

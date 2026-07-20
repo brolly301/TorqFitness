@@ -1,42 +1,30 @@
-import {
-  Pressable,
-  StyleSheet,
-  TextInput,
-  View,
-} from "react-native";
+import { Pressable, StyleSheet, TextInput, View } from "react-native";
 import React, { useMemo, useState } from "react";
 import Feather from "@expo/vector-icons/Feather";
 import { useAppTheme } from "@/hooks/useAppTheme";
 import { Theme } from "@/types/Theme";
 
 type Props = {
+  search: string;
   setSearch: React.Dispatch<React.SetStateAction<string>>;
 };
 
-export default function AppSearchBar({ setSearch }: Props) {
+export default function AppSearchBar({ search, setSearch }: Props) {
   const { theme, scale } = useAppTheme();
   const styles = useMemo(() => makeStyles(theme, scale), [theme, scale]);
 
   const [active, setActive] = useState(false);
-  const [value, setValue] = useState("");
 
   const handleChange = (text: string) => {
-    setValue(text);
     setSearch(text);
   };
 
   const handleClear = () => {
-    setValue("");
     setSearch("");
   };
 
   return (
-    <View
-      style={[
-        styles.container,
-        active && styles.containerActive,
-      ]}
-    >
+    <View style={[styles.container, active && styles.containerActive]}>
       <Feather
         name="search"
         size={18 * scale}
@@ -45,7 +33,7 @@ export default function AppSearchBar({ setSearch }: Props) {
 
       <TextInput
         style={styles.input}
-        value={value}
+        value={search}
         onChangeText={handleChange}
         onFocus={() => setActive(true)}
         onBlur={() => setActive(false)}
@@ -55,7 +43,7 @@ export default function AppSearchBar({ setSearch }: Props) {
         accessibilityLabel="Search exercises"
       />
 
-      {value.length > 0 && (
+      {search.length > 0 && (
         <Pressable
           style={({ pressed }) => [
             styles.clearButton,
@@ -66,11 +54,7 @@ export default function AppSearchBar({ setSearch }: Props) {
           accessibilityRole="button"
           accessibilityLabel="Clear search"
         >
-          <Feather
-            name="x"
-            size={16 * scale}
-            color={theme.textSecondary}
-          />
+          <Feather name="x" size={16 * scale} color={theme.textSecondary} />
         </Pressable>
       )}
     </View>

@@ -79,7 +79,7 @@ export default function ExerciseModal({
           </Text>
 
           <View style={styles.searchContainer}>
-            <AppSearchBar setSearch={setSearch} />
+            <AppSearchBar setSearch={setSearch} search={search} />
           </View>
 
           <View style={styles.listContainer}>

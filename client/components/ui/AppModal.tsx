@@ -42,15 +42,14 @@ export const makeStyles = (theme: Theme, scale: number) =>
   StyleSheet.create({
     centeredView: {
       flex: 1,
-      justifyContent: "center",
       alignItems: "center",
+      justifyContent: "center",
+      paddingHorizontal: 16 * scale,
       backgroundColor: theme.shadow,
     },
+
     modalView: {
-      width: "89%",
-      borderRadius: 12 * scale,
-      paddingTop: 15 * scale,
-      paddingHorizontal: 15 * scale,
-      paddingBottom: 26 * scale,
+      width: "100%",
+      maxWidth: 420,
     },
   });

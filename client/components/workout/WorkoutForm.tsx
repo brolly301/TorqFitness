@@ -162,6 +162,23 @@ export default function WorkoutForm<T extends WorkoutDraft>({
             textAlignVertical="top"
           />
         </View>
+        {exerciseList.length === 0 && (
+          <View style={styles.emptyState}>
+            <View style={styles.emptyIcon}>
+              <Feather
+                name="activity"
+                size={23 * scale}
+                color={theme.buttonPrimary}
+              />
+            </View>
+
+            <Text style={styles.emptyTitle}>No exercises yet</Text>
+
+            <Text style={styles.emptyText}>
+              Add an exercise to begin logging your workout.
+            </Text>
+          </View>
+        )}
         {exerciseList.map((exercise) => {
           const primaryMuscle = capitalizeWords(
             exercise.details?.primaryMuscles?.[0] ?? "",
@@ -229,132 +246,128 @@ export default function WorkoutForm<T extends WorkoutDraft>({
                 return (
                   <View key={set.id} style={styles.exerciseContainer}>
                     <View style={styles.setTopRow}>
-  <View style={styles.setHeader}>
-    <View style={styles.setNumberBadge}>
-      <Text style={styles.setNumber}>{index + 1}</Text>
-    </View>
+                      <View style={styles.setHeader}>
+                        <View style={styles.setNumberBadge}>
+                          <Text style={styles.setNumber}>{index + 1}</Text>
+                        </View>
 
-    <View style={styles.previousContainer}>
-      <Text style={styles.previousLabel}>Previous</Text>
-      <Text style={styles.previousText} numberOfLines={1}>
-        {previousText}
-      </Text>
-    </View>
-  </View>
+                        <View style={styles.previousContainer}>
+                          <Text style={styles.previousLabel}>Previous</Text>
+                          <Text style={styles.previousText} numberOfLines={1}>
+                            {previousText}
+                          </Text>
+                        </View>
+                      </View>
 
-  <View style={styles.setActions}>
-    <View style={styles.volumePill}>
-      <Text style={styles.volumeText}>
-        {displayedSetVolume} {weightUnit}
-      </Text>
-    </View>
+                      <View style={styles.setActions}>
+                        <View style={styles.volumePill}>
+                          <Text style={styles.volumeText}>
+                            {displayedSetVolume} {weightUnit}
+                          </Text>
+                        </View>
 
-    {exercise.sets.length > 1 ? (
-      <Pressable
-        style={({ pressed }) => [
-          styles.removeSetButton,
-          pressed && styles.removeButtonPressed,
-        ]}
-        onPress={() =>
-          removeSet(setDraft, exercise.id, set.id)
-        }
-        hitSlop={8}
-        accessibilityRole="button"
-        accessibilityLabel={`Remove set ${index + 1}`}
-      >
-        <Feather
-          name="x"
-          size={15 * scale}
-          color={theme.error}
-        />
-      </Pressable>
-    ) : null}
-  </View>
-</View>
+                        {exercise.sets.length > 1 ? (
+                          <Pressable
+                            style={({ pressed }) => [
+                              styles.removeSetButton,
+                              pressed && styles.removeButtonPressed,
+                            ]}
+                            onPress={() =>
+                              removeSet(setDraft, exercise.id, set.id)
+                            }
+                            hitSlop={8}
+                            accessibilityRole="button"
+                            accessibilityLabel={`Remove set ${index + 1}`}
+                          >
+                            <Feather
+                              name="x"
+                              size={15 * scale}
+                              color={theme.error}
+                            />
+                          </Pressable>
+                        ) : null}
+                      </View>
+                    </View>
 
-<View style={styles.inputsRow}>
-  <WeightInput
-    storedWeight={set.weight}
-    unit={weightUnit}
-    onChange={(storedWeight) =>
-      updateSet(
-        setDraft,
-        exercise.id,
-        set.id,
-        "weight",
-        storedWeight,
-      )
-    }
-  />
+                    <View style={styles.inputsRow}>
+                      <WeightInput
+                        storedWeight={set.weight}
+                        unit={weightUnit}
+                        onChange={(storedWeight) =>
+                          updateSet(
+                            setDraft,
+                            exercise.id,
+                            set.id,
+                            "weight",
+                            storedWeight,
+                          )
+                        }
+                      />
 
-  <Text style={styles.x}>×</Text>
+                      <Text style={styles.x}>×</Text>
 
-  <Pressable
-    style={styles.valueLabelContainer}
-    onPress={() => repRefs.current[set.id]?.focus()}
-  >
-    <TextInput
-      ref={(ref) => {
-        repRefs.current[set.id] = ref;
-      }}
-      value={set.reps ? String(set.reps) : ""}
-      returnKeyType="done"
-      placeholder="0"
-      placeholderTextColor={theme.textSecondary}
-      keyboardType="numeric"
-      onChangeText={(text) =>
-        updateSet(
-          setDraft,
-          exercise.id,
-          set.id,
-          "reps",
-          text === "" ? 0 : parseInt(text, 10) || 0,
-        )
-      }
-      style={styles.valueInput}
-    />
+                      <Pressable
+                        style={styles.valueLabelContainer}
+                        onPress={() => repRefs.current[set.id]?.focus()}
+                      >
+                        <TextInput
+                          ref={(ref) => {
+                            repRefs.current[set.id] = ref;
+                          }}
+                          value={set.reps ? String(set.reps) : ""}
+                          returnKeyType="done"
+                          placeholder="0"
+                          placeholderTextColor={theme.textSecondary}
+                          keyboardType="numeric"
+                          onChangeText={(text) =>
+                            updateSet(
+                              setDraft,
+                              exercise.id,
+                              set.id,
+                              "reps",
+                              text === "" ? 0 : parseInt(text, 10) || 0,
+                            )
+                          }
+                          style={styles.valueInput}
+                        />
 
-    <Text style={styles.labelText}>reps</Text>
-  </Pressable>
-</View>
+                        <Text style={styles.labelText}>reps</Text>
+                      </Pressable>
+                    </View>
                   </View>
                 );
               })}
 
-            <Pressable
-  style={({ pressed }) => [
-    styles.secondaryButton,
-    pressed && styles.actionButtonPressed,
-  ]}
-  onPress={() => addSet(setDraft, exercise.id)}
->
-  <Feather
-    name="plus"
-    size={15 * scale}
-    color={theme.buttonPrimary}
-  />
+              <Pressable
+                style={({ pressed }) => [
+                  styles.secondaryButton,
+                  pressed && styles.actionButtonPressed,
+                ]}
+                onPress={() => addSet(setDraft, exercise.id)}
+              >
+                <Feather
+                  name="plus"
+                  size={15 * scale}
+                  color={theme.buttonPrimary}
+                />
 
-  <Text style={styles.secondaryButtonText}>Add set</Text>
-</Pressable>
+                <Text style={styles.secondaryButtonText}>Add set</Text>
+              </Pressable>
             </View>
           );
         })}
 
         <Pressable
-  style={({ pressed }) => [
-    styles.button,
-    pressed && styles.actionButtonPressed,
-  ]}
-  onPress={() => setModalVisible(true)}
->
-  <Feather
-    name="plus"
-    size={17 * scale}
-    color={theme.buttonPrimary}
-  />
+          style={({ pressed }) => [
+            styles.button,
+            pressed && styles.actionButtonPressed,
+          ]}
+          onPress={() => setModalVisible(true)}
+        >
+          <Feather name="plus" size={17 * scale} color={theme.buttonPrimary} />
 
-  <Text style={styles.buttonText}>Add exercise</Text>
-</Pressable>
+          <Text style={styles.buttonText}>Add exercise</Text>
+        </Pressable>
       </ScrollView>
     </>
   );
@@ -439,6 +452,44 @@ export const makeStyles = (theme: Theme, scale: number) =>
       color: theme.text,
       fontSize: 13 * scale,
       lineHeight: 18 * scale,
+    },
+
+    emptyState: {
+      alignItems: "center",
+      marginBottom: 12 * scale,
+      paddingHorizontal: 22 * scale,
+      paddingVertical: 26 * scale,
+      backgroundColor: theme.card,
+      borderWidth: 1,
+      borderColor: theme.border,
+      borderRadius: 16 * scale,
+    },
+
+    emptyIcon: {
+      width: 48 * scale,
+      height: 48 * scale,
+      marginBottom: 14 * scale,
+      alignItems: "center",
+      justifyContent: "center",
+      backgroundColor: theme.buttonPrimary + "14",
+      borderWidth: 1,
+      borderColor: theme.buttonPrimary + "25",
+      borderRadius: 15 * scale,
+    },
+
+    emptyTitle: {
+      marginBottom: 6 * scale,
+      color: theme.text,
+      fontSize: 17 * scale,
+      fontWeight: "700",
+    },
+
+    emptyText: {
+      maxWidth: 270 * scale,
+      color: theme.textSecondary,
+      fontSize: 14 * scale,
+      lineHeight: 20 * scale,
+      textAlign: "center",
     },
 
     workoutContainer: {
