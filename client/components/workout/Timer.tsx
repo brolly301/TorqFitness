@@ -2,6 +2,7 @@ import { StyleSheet, Text, View } from "react-native";
 import React, { useEffect, useMemo, useState } from "react";
 import { useAppTheme } from "@/hooks/useAppTheme";
 import { Theme } from "@/types/Theme";
+import Feather from "@expo/vector-icons/Feather";
 
 export default function Timer() {
   const { theme, scale } = useAppTheme();
@@ -21,9 +22,12 @@ export default function Timer() {
 
   return (
     <View style={styles.timeContainer}>
-      <Text style={styles.time}>{hour.toString().padStart(2, "0")}:</Text>
-      <Text style={styles.time}>{minute.toString().padStart(2, "0")}:</Text>
-      <Text style={styles.time}>{second.toString().padStart(2, "0")}</Text>
+      <Feather name="clock" size={13 * scale} color={theme.buttonPrimary} />
+
+      <Text style={styles.time}>
+        {hour.toString().padStart(2, "0")}:{minute.toString().padStart(2, "0")}:
+        {second.toString().padStart(2, "0")}
+      </Text>
     </View>
   );
 }
@@ -32,11 +36,20 @@ export const makeStyles = (theme: Theme, scale: number) =>
   StyleSheet.create({
     timeContainer: {
       flexDirection: "row",
-      marginTop: 5,
+      alignItems: "center",
+      gap: 6 * scale,
+      paddingHorizontal: 9 * scale,
+      paddingVertical: 6 * scale,
+      backgroundColor: theme.buttonPrimary + "12",
+      borderWidth: 1,
+      borderColor: theme.buttonPrimary + "30",
+      borderRadius: 10 * scale,
     },
+
     time: {
-      fontSize: 20 * scale,
-      fontWeight: "600",
-      color: theme.text,
+      color: theme.buttonPrimary,
+      fontSize: 13 * scale,
+      fontWeight: "700",
+      fontVariant: ["tabular-nums"],
     },
   });

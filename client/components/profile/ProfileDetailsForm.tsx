@@ -167,6 +167,7 @@ export default function ProfileDetailsForm() {
         <WeightInput
           storedWeight={currentWeightKg}
           unit={weightUnit}
+           surface="secondary"
           onChange={setCurrentWeightKg}
         />
       </View>
@@ -176,6 +177,7 @@ export default function ProfileDetailsForm() {
         <WeightInput
           storedWeight={goalWeightKg}
           unit={weightUnit}
+           surface="secondary"
           onChange={setGoalWeightKg}
         />
       </View>

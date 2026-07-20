@@ -7,9 +7,10 @@ type Props = {
   storedWeight: number | null;
   unit: WeightUnit;
   onChange: (storedWeight: number | null) => void;
+   surface?: "card" | "secondary";
 };
 
-export default function WeightInput({ storedWeight, unit, onChange }: Props) {
+export default function WeightInput({ storedWeight,surface, unit, onChange }: Props) {
   const { theme, scale } = useAppTheme();
   const inputRef = useRef<TextInput | null>(null);
 
@@ -68,7 +69,10 @@ export default function WeightInput({ storedWeight, unit, onChange }: Props) {
       style={[
         styles.container,
         {
-          backgroundColor: theme.buttonSecondary,
+          backgroundColor:
+  surface === "secondary"
+    ? theme.buttonSecondary
+    : theme.card,
           borderRadius: 10 * scale,
           paddingVertical: 8 * scale,
           paddingHorizontal: 10 * scale,

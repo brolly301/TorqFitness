@@ -180,40 +180,36 @@ export default function StartWorkoutScreen() {
             <Pressable
               onPress={() => setDiscardModalVisible(true)}
               hitSlop={10}
-              style={styles.headerIconButton}
+              style={({ pressed }) => [
+                styles.headerIconButton,
+                pressed && styles.headerButtonPressed,
+              ]}
+              accessibilityRole="button"
+              accessibilityLabel="Discard workout and go back"
             >
               <Feather name="arrow-left" color={theme.text} size={22 * scale} />
             </Pressable>
 
             <Pressable
-              style={[
+              style={({ pressed }) => [
                 styles.finishButton,
-                !canFinish && {
-                  backgroundColor: theme.buttonDisabled,
-                  borderColor: theme.buttonDisabled,
-                },
+                !canFinish && styles.finishButtonDisabled,
+                pressed && canFinish && styles.headerButtonPressed,
               ]}
               onPress={() => setFinishModalVisible(true)}
               disabled={!canFinish}
               hitSlop={10}
+              accessibilityRole="button"
+              accessibilityLabel="Finish workout"
             >
               <Text
                 style={[
                   styles.finishText,
-                  {
-                    color: canFinish
-                      ? theme.buttonPrimary
-                      : theme.textSecondary,
-                  },
+                  !canFinish && styles.finishTextDisabled,
                 ]}
               >
                 Finish
               </Text>
-              <Feather
-                name="check"
-                color={canFinish ? theme.buttonPrimary : theme.textSecondary}
-                size={20 * scale}
-              />
             </Pressable>
           </View>
 
@@ -236,46 +232,71 @@ const makeStyles = (theme: Theme, scale: number) =>
   StyleSheet.create({
     container: {
       flex: 1,
-      paddingHorizontal: 16 * scale,
       paddingTop: 12 * scale,
+      paddingHorizontal: 16 * scale,
       backgroundColor: theme.background,
     },
 
     header: {
+      minHeight: 40 * scale,
       flexDirection: "row",
-      justifyContent: "space-between",
       alignItems: "center",
+      justifyContent: "space-between",
+
       marginBottom: 16 * scale,
     },
 
     headerIconButton: {
       width: 40 * scale,
       height: 40 * scale,
-      borderRadius: 12 * scale,
       alignItems: "center",
       justifyContent: "center",
       backgroundColor: theme.card,
       borderWidth: 1,
       borderColor: theme.border,
+      borderRadius: 12 * scale,
+      zIndex: 1,
+    },
+
+    headerTitle: {
+      position: "absolute",
+      left: 80 * scale,
+      right: 80 * scale,
+      color: theme.text,
+      fontSize: 17 * scale,
+      fontWeight: "700",
+      textAlign: "center",
     },
 
     finishButton: {
-      flexDirection: "row",
+      minHeight: 40 * scale,
       alignItems: "center",
       justifyContent: "center",
-      paddingVertical: 10 * scale,
       paddingHorizontal: 14 * scale,
-      borderRadius: 12 * scale,
-      backgroundColor: theme.buttonPrimary + "15",
+      backgroundColor: theme.buttonPrimary + "14",
       borderWidth: 1,
-      borderColor: theme.buttonPrimary + "30",
+      borderColor: theme.buttonPrimary + "40",
+      borderRadius: 12 * scale,
+      zIndex: 1,
+    },
+
+    finishButtonDisabled: {
+      backgroundColor: theme.buttonDisabled,
+      borderColor: theme.border,
     },
 
     finishText: {
-      fontSize: 16 * scale,
-      fontWeight: "600",
-      marginRight: 6 * scale,
       color: theme.buttonPrimary,
+      fontSize: 14 * scale,
+      fontWeight: "700",
+    },
+
+    finishTextDisabled: {
+      color: theme.buttonDisabledText,
+    },
+
+    headerButtonPressed: {
+      opacity: 0.7,
     },
 
     formContainer: {
