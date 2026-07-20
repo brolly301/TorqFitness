@@ -1,11 +1,21 @@
-import { StyleSheet, Text, View } from "react-native";
-import React from "react";
+import {
+  KeyboardAvoidingView,
+  Platform,
+  ScrollView,
+  StyleSheet,
+} from "react-native";
+import React, { useMemo } from "react";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
+import Animated, {
+  FadeInRight,
+  FadeOutLeft,
+} from "react-native-reanimated";
 import Header from "./Header";
-import { AuthSectionType, SectionType } from "@/app/(auth)";
-import Animated, { FadeInRight, FadeOutLeft } from "react-native-reanimated";
+import { SectionType } from "@/app/(auth)";
 import LoginSection from "./LoginSection";
 import ResetSection from "./ResetSection";
 import SignUpSection from "./SignUpSection";
+import { useAppTheme } from "@/hooks/useAppTheme";
 
 type Props = {
   setSection: (section: SectionType) => void;
@@ -13,25 +23,71 @@ type Props = {
   screen: SectionType;
 };
 
-export default function AuthSection({ setSection, onBack, screen }: Props) {
+export default function AuthSection({
+  setSection,
+  onBack,
+  screen,
+}: Props) {
+  const { scale } = useAppTheme();
+  const insets = useSafeAreaInsets();
+  const styles = useMemo(() => makeStyles(scale), [scale]);
+
   return (
-    <View style={styles.container}>
-      <Header onBack={onBack} />
-      <Animated.View
-        key={screen}
-        entering={FadeInRight.duration(250)}
-        exiting={FadeOutLeft.duration(200)}
-        style={styles.sectionContainer}
+    <KeyboardAvoidingView
+      style={styles.container}
+      behavior={Platform.OS === "ios" ? "padding" : undefined}
+    >
+      <ScrollView
+        contentContainerStyle={[
+          styles.contentContainer,
+          {
+            paddingTop: Math.max(insets.top, 16),
+            paddingBottom: Math.max(insets.bottom, 28),
+          },
+        ]}
+        showsVerticalScrollIndicator={false}
+        keyboardShouldPersistTaps="handled"
       >
-        {screen === "login" && <LoginSection setSection={setSection} />}
-        {screen === "signUp" && <SignUpSection setSection={setSection} />}
-        {screen === "resetPassword" && <ResetSection setSection={setSection} />}
-      </Animated.View>
-    </View>
+        <Header onBack={onBack} />
+
+        <Animated.View
+          key={screen}
+          entering={FadeInRight.duration(250)}
+          exiting={FadeOutLeft.duration(200)}
+          style={styles.sectionContainer}
+        >
+          {screen === "login" && (
+            <LoginSection setSection={setSection} />
+          )}
+
+          {screen === "signUp" && (
+            <SignUpSection setSection={setSection} />
+          )}
+
+          {screen === "resetPassword" && (
+            <ResetSection setSection={setSection} />
+          )}
+        </Animated.View>
+      </ScrollView>
+    </KeyboardAvoidingView>
   );
 }
 
-const styles = StyleSheet.create({
-  container: { flex: 1, marginTop: 40, paddingHorizontal: 30 },
-  sectionContainer: { flex: 1 },
-});
+const makeStyles = (scale: number) =>
+  StyleSheet.create({
+    container: {
+      flex: 1,
+    },
+
+    contentContainer: {
+      flexGrow: 1,
+      paddingHorizontal: 24 * scale,
+    },
+
+    sectionContainer: {
+      flexGrow: 1,
+      width: "100%",
+      maxWidth: 420,
+      alignSelf: "center",
+    },
+  });

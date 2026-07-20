@@ -13,11 +13,8 @@ import {
   ResetEmailFormValues,
   resetEmailSchema,
 } from "@/utils/validation/authSchema";
-import AppError from "@/components/ui/AppError";
 import { useUserContext } from "@/context/UserContext";
-import { useNavigation } from "expo-router";
 
-import { Theme } from "@/types/Theme";
 import { useAppTheme } from "@/hooks/useAppTheme";
 import { ResetStep } from "../welcome/ResetSection";
 import { toggleToast } from "@/utils/toggleToast";
@@ -28,9 +25,8 @@ type Props = {
 };
 
 export default function EmailForm({ setStep, setEmail }: Props) {
-  const { theme, scale, themeType } = useAppTheme();
-  const styles = useMemo(() => makeStyles(theme, scale), [theme, scale]);
-
+  const { scale } = useAppTheme();
+  const styles = useMemo(() => makeStyles(scale), [scale]);
   const [loading, setLoading] = useState<boolean>(false);
 
   const { error, setError, requestResetCode } = useUserContext();
@@ -76,88 +72,117 @@ export default function EmailForm({ setStep, setEmail }: Props) {
   };
 
   return (
-    <View>
-      <Text style={styles.subtitle}>Please enter your email below.</Text>
+    <View style={styles.form}>
+      <Text style={styles.subtitle}>
+        Enter the email associated with your account and we’ll send you a
+        verification code.
+      </Text>
+
       <Controller
         name="email"
-        key="email"
         control={control}
         render={({ field: { onChange, value } }) => (
           <View style={styles.inputContainer}>
+            <Text style={styles.label}>Email</Text>
+
             <TextInput
               placeholder="Email"
-              placeholderTextColor={"black"}
+              placeholderTextColor="rgba(255,255,255,0.38)"
               onChangeText={onChange}
-              textAlignVertical="center"
               value={value}
-              autoComplete="off"
-              textContentType="oneTimeCode"
-              importantForAutofill="no"
-              style={[styles.input]}
+              keyboardType="email-address"
+              autoCapitalize="none"
+              autoCorrect={false}
+              style={styles.input}
             />
           </View>
         )}
       />
+
       <Pressable
         disabled={loading || !isValid}
-        style={[
+        style={({ pressed }) => [
           styles.buttonContainer,
-          {
-            backgroundColor:
-              loading || !isValid
-                ? "rgba(53, 44, 66, 0.8)"
-                : "rgba(40, 25, 60, 0.8)",
-          },
+          (loading || !isValid) && styles.buttonDisabled,
+          pressed && !loading && isValid && styles.buttonPressed,
         ]}
         onPress={handleSubmit(onSubmit)}
       >
         {loading ? (
-          <ActivityIndicator
-            color={"rgba(255,255,255,0.78)"}
-            style={{ zIndex: 1 }}
-          />
+          <ActivityIndicator color="#FFFFFF" />
         ) : (
-          <Text style={styles.buttonText}>Send Reset Link</Text>
+          <Text style={styles.buttonText}>Send Verification Code</Text>
         )}
       </Pressable>
     </View>
   );
 }
 
-const makeStyles = (theme: Theme, scale: number) =>
+const makeStyles = (scale: number) =>
   StyleSheet.create({
-    subtitle: {
-      color: "rgba(255,255,255,0.78)",
-      fontSize: 15,
-      marginBottom: 40,
-      alignSelf: "flex-start",
-    },
-    input: {
-      borderRadius: 12 * scale,
-      borderWidth: 1,
-      borderColor: theme.inputBorder,
-      paddingHorizontal: 12 * scale,
-      paddingVertical: 12 * scale,
-      backgroundColor: "rgba(255,255,255,0.92)",
-      fontSize: 15 * scale,
-      color: theme.text,
-    },
-    inputContainer: { marginBottom: 10 },
-    buttonContainer: {
-      backgroundColor: "rgba(40, 25, 60, 0.8)",
-      borderColor: "rgba(180, 140, 255, 0.25)",
-      borderWidth: 2,
-      borderRadius: 12,
-      paddingVertical: 12,
-
+    form: {
       width: "100%",
-      marginVertical: 8,
-      alignItems: "center",
+      padding: 18 * scale,
+      backgroundColor: "rgba(10,8,14,0.82)",
+      borderWidth: 1,
+      borderColor: "rgba(255,255,255,0.14)",
+      borderRadius: 18 * scale,
     },
-    buttonText: {
-      color: "#F4EEFF",
+
+    subtitle: {
+      marginBottom: 20 * scale,
+      color: "rgba(255,255,255,0.68)",
+      fontSize: 14 * scale,
+      lineHeight: 20 * scale,
+    },
+
+    inputContainer: {
+      marginBottom: 18 * scale,
+    },
+
+    label: {
+      marginBottom: 6 * scale,
+      color: "rgba(255,255,255,0.68)",
+      fontSize: 12 * scale,
       fontWeight: "600",
-      letterSpacing: 1.6,
-      fontSize: 14,
+    },
+
+    input: {
+      minHeight: 47 * scale,
+      paddingHorizontal: 13 * scale,
+      paddingVertical: 11 * scale,
+      backgroundColor: "rgba(255,255,255,0.08)",
+      borderWidth: 1,
+      borderColor: "rgba(255,255,255,0.16)",
+      borderRadius: 12 * scale,
+      color: "#FFFFFF",
+      fontSize: 15 * scale,
+    },
+
+    buttonContainer: {
+      minHeight: 48 * scale,
+      alignItems: "center",
+      justifyContent: "center",
+    backgroundColor: "rgba(40,25,60,0.88)",
+borderColor: "rgba(180,140,255,0.3)",
+      borderWidth: 1,
+     
+      borderRadius: 12 * scale,
+    },
+
+    buttonDisabled: {
+      backgroundColor: "rgba(74,65,87,0.72)",
+      borderColor: "rgba(255,255,255,0.1)",
+    },
+
+    buttonPressed: {
+      opacity: 0.75,
+    },
+
+    buttonText: {
+      color: "#FFFFFF",
+      fontSize: 14 * scale,
+      fontWeight: "700",
+      letterSpacing: 0.4,
     },
   });

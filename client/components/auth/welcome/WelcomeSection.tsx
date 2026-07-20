@@ -17,25 +17,27 @@ export default function WelcomeSection({ setSection }: Props) {
       />
 
       <Text style={[styles.tagline]}>Train with intent.</Text>
-      <View
-        style={{
-          width: "100%",
-          paddingHorizontal: 30,
-          paddingBottom: 50,
-          marginTop: "auto",
-        }}
-      >
+      <View style={styles.actions}>
         <Pressable
           onPress={() => setSection("login")}
-          style={styles.buttonContainer}
+          style={({ pressed }) => [
+            styles.button,
+            styles.primaryButton,
+            pressed && styles.buttonPressed,
+          ]}
         >
-          <Text style={styles.buttonText}>Login</Text>
+          <Text style={styles.primaryButtonText}>Log In</Text>
         </Pressable>
+
         <Pressable
           onPress={() => setSection("signUp")}
-          style={styles.buttonContainer}
+          style={({ pressed }) => [
+            styles.button,
+            styles.secondaryButton,
+            pressed && styles.buttonPressed,
+          ]}
         >
-          <Text style={styles.buttonText}>Sign Up</Text>
+          <Text style={styles.secondaryButtonText}>Sign Up</Text>
         </Pressable>
       </View>
     </View>
@@ -44,37 +46,66 @@ export default function WelcomeSection({ setSection }: Props) {
 
 const styles = StyleSheet.create({
   container: {
-    paddingTop: 40,
-    alignItems: "center",
     flex: 1,
-  },
-  buttonContainer: {
-    backgroundColor: "rgba(40, 25, 60, 0.8)",
-    borderColor: "rgba(180, 140, 255, 0.25)",
-    borderWidth: 2,
-    borderRadius: 16,
-    paddingVertical: 12,
-
-    width: "100%",
-    marginVertical: 8,
     alignItems: "center",
-  },
-  buttonText: {
-    color: "#F4EEFF",
-    fontWeight: "600",
-    letterSpacing: 1.6,
-    fontSize: 14,
+    paddingTop: 40,
   },
 
-  tagline: {
-    fontSize: 18,
-    color: "rgba(255,255,255,0.75)",
-    marginTop: -110,
-    letterSpacing: 1,
-    fontStyle: "italic",
-  },
   image: {
     width: 450,
     height: 450,
+  },
+
+  tagline: {
+    marginTop: -110,
+    color: "rgba(255,255,255,0.75)",
+    fontSize: 18,
+    fontStyle: "italic",
+    letterSpacing: 1,
+  },
+
+  actions: {
+    width: "100%",
+    marginTop: "auto",
+    paddingHorizontal: 30,
+    paddingBottom: 50,
+    gap: 12,
+  },
+
+  button: {
+    width: "100%",
+    minHeight: 48,
+    alignItems: "center",
+    justifyContent: "center",
+    borderWidth: 1,
+    borderRadius: 12,
+  },
+
+  primaryButton: {
+    backgroundColor: "rgba(40,25,60,0.88)",
+    borderColor: "rgba(180,140,255,0.3)",
+  },
+
+  secondaryButton: {
+    backgroundColor: "rgba(10,8,14,0.76)",
+    borderColor: "rgba(255,255,255,0.16)",
+  },
+
+  buttonPressed: {
+    opacity: 0.75,
+  },
+
+  primaryButtonText: {
+    color: "#FFFFFF",
+    fontSize: 14,
+    fontWeight: "700",
+    letterSpacing: 0.4,
+  },
+
+  secondaryButtonText: {
+    color: "rgba(255,255,255,0.82)",
+    fontSize: 14,
+    fontWeight: "700",
+    letterSpacing: 0.4,
   },
 });

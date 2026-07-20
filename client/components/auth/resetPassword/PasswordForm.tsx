@@ -14,7 +14,7 @@ import {
   resetPasswordSchema,
 } from "@/utils/validation/authSchema";
 import { useUserContext } from "@/context/UserContext";
-import { Theme } from "@/types/Theme";
+
 import { useAppTheme } from "@/hooks/useAppTheme";
 import { ResetStep } from "../welcome/ResetSection";
 import { toggleToast } from "@/utils/toggleToast";
@@ -25,8 +25,8 @@ type Props = {
 };
 
 export default function PasswordForm({ setStep, email }: Props) {
-  const { theme, scale, themeType } = useAppTheme();
-  const styles = useMemo(() => makeStyles(theme, scale), [theme, scale]);
+  const { scale } = useAppTheme();
+  const styles = useMemo(() => makeStyles(scale), [scale]);
 
   const { error, setError, resetPassword } = useUserContext();
   const [loading, setLoading] = useState<boolean>(false);
@@ -73,46 +73,54 @@ export default function PasswordForm({ setStep, email }: Props) {
   };
 
   return (
-    <View>
-      <Text style={styles.subtitle}>Please enter your new password below.</Text>
+    <View style={styles.form}>
+      <Text style={styles.subtitle}>
+        Choose a new password for your account.
+      </Text>
+
       <Controller
         name="password"
-        key="password"
         control={control}
         render={({ field: { onChange, value } }) => (
           <View style={styles.inputContainer}>
+            <Text style={styles.label}>New Password</Text>
+
             <TextInput
-              placeholder="Password"
-              placeholderTextColor={"black"}
+              placeholder="New password"
+              placeholderTextColor="rgba(255,255,255,0.38)"
               onChangeText={onChange}
-              textAlignVertical="center"
               value={value}
               secureTextEntry
+              autoCapitalize="none"
+              autoCorrect={false}
               autoComplete="off"
               textContentType="oneTimeCode"
               importantForAutofill="no"
-              style={[styles.input]}
+              style={styles.input}
             />
           </View>
         )}
       />
+
       <Controller
         name="confirmPassword"
-        key="confirmPassword"
         control={control}
         render={({ field: { onChange, value } }) => (
           <View style={styles.inputContainer}>
+            <Text style={styles.label}>Confirm Password</Text>
+
             <TextInput
-              placeholder="Confirm Password"
-              placeholderTextColor={"black"}
+              placeholder="Confirm new password"
+              placeholderTextColor="rgba(255,255,255,0.38)"
               onChangeText={onChange}
-              textAlignVertical="center"
               value={value}
               secureTextEntry
+              autoCapitalize="none"
+              autoCorrect={false}
               autoComplete="off"
               textContentType="oneTimeCode"
               importantForAutofill="no"
-              style={[styles.input]}
+              style={styles.input}
             />
           </View>
         )}
@@ -120,64 +128,88 @@ export default function PasswordForm({ setStep, email }: Props) {
 
       <Pressable
         disabled={loading || !isValid}
-        style={[
+        style={({ pressed }) => [
           styles.buttonContainer,
-          {
-            backgroundColor:
-              loading || !isValid
-                ? "rgba(53, 44, 66, 0.8)"
-                : "rgba(40, 25, 60, 0.8)",
-          },
+          (loading || !isValid) && styles.buttonDisabled,
+          pressed && !loading && isValid && styles.buttonPressed,
         ]}
         onPress={handleSubmit(onSubmit)}
       >
         {loading ? (
-          <ActivityIndicator
-            color={"rgba(255,255,255,0.78)"}
-            style={{ zIndex: 1 }}
-          />
+          <ActivityIndicator color="#FFFFFF" />
         ) : (
-          <Text style={styles.buttonText}>Submit</Text>
+          <Text style={styles.buttonText}>Update Password</Text>
         )}
       </Pressable>
     </View>
   );
 }
 
-const makeStyles = (theme: Theme, scale: number) =>
+const makeStyles = (scale: number) =>
   StyleSheet.create({
-    subtitle: {
-      color: "rgba(255,255,255,0.78)",
-      fontSize: 15,
-      marginBottom: 40,
-      alignSelf: "flex-start",
-    },
-    input: {
-      borderRadius: 12 * scale,
-      borderWidth: 1,
-      borderColor: theme.inputBorder,
-      paddingHorizontal: 12 * scale,
-      paddingVertical: 12 * scale,
-      backgroundColor: "rgba(255,255,255,0.92)",
-      fontSize: 15 * scale,
-      color: theme.text,
-    },
-    inputContainer: { marginBottom: 10 },
-    buttonContainer: {
-      backgroundColor: "rgba(40, 25, 60, 0.8)",
-      borderColor: "rgba(180, 140, 255, 0.25)",
-      borderWidth: 2,
-      borderRadius: 12,
-      paddingVertical: 12,
-
+    form: {
       width: "100%",
-      marginVertical: 8,
-      alignItems: "center",
+      padding: 18 * scale,
+      backgroundColor: "rgba(10,8,14,0.82)",
+      borderWidth: 1,
+      borderColor: "rgba(255,255,255,0.14)",
+      borderRadius: 18 * scale,
     },
-    buttonText: {
-      color: "#F4EEFF",
+
+    subtitle: {
+      marginBottom: 20 * scale,
+      color: "rgba(255,255,255,0.68)",
+      fontSize: 14 * scale,
+      lineHeight: 20 * scale,
+    },
+
+    inputContainer: {
+      marginBottom: 14 * scale,
+    },
+
+    label: {
+      marginBottom: 6 * scale,
+      color: "rgba(255,255,255,0.68)",
+      fontSize: 12 * scale,
       fontWeight: "600",
-      letterSpacing: 1.6,
-      fontSize: 14,
+    },
+
+    input: {
+      minHeight: 47 * scale,
+      paddingHorizontal: 13 * scale,
+      paddingVertical: 11 * scale,
+      backgroundColor: "rgba(255,255,255,0.08)",
+      borderWidth: 1,
+      borderColor: "rgba(255,255,255,0.16)",
+      borderRadius: 12 * scale,
+      color: "#FFFFFF",
+      fontSize: 15 * scale,
+    },
+
+    buttonContainer: {
+      minHeight: 48 * scale,
+      alignItems: "center",
+      justifyContent: "center",
+      marginTop: 4 * scale,
+      backgroundColor: "rgba(40,25,60,0.88)",
+borderColor: "rgba(180,140,255,0.3)",
+      borderWidth: 1,
+      borderRadius: 12 * scale,
+    },
+
+    buttonDisabled: {
+      backgroundColor: "rgba(74,65,87,0.72)",
+      borderColor: "rgba(255,255,255,0.1)",
+    },
+
+    buttonPressed: {
+      opacity: 0.75,
+    },
+
+    buttonText: {
+      color: "#FFFFFF",
+      fontSize: 14 * scale,
+      fontWeight: "700",
+      letterSpacing: 0.4,
     },
   });
